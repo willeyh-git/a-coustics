@@ -18,6 +18,8 @@
  */
 import { isPrime } from '#shared/utils/math-helpers';
 
+const SPEED_OF_SOUND = 343; // m/s
+
 /**
  * Calculates well depths for a given panel order, ensuring the order is prime.
  * If n is not prime, it finds the next prime number.
@@ -53,4 +55,89 @@ export function calculateSkylineDepths(p: number): number[] {
     depths.push((i * i) % p);
   }
   return depths;
+}
+
+/**
+ * Calculates acoustic properties for a Skyline Diffuser.
+ * 
+ * @param width - Total width of the panel.
+ * @param height - Total height of the panel.
+ * @param depth - Maximum depth of the cells.
+ * @param rows - Number of rows.
+ * @param cols - Number of columns.
+ * @returns An object containing acoustic calculations.
+ */
+export function calculateSkylineAcoustics(
+	width: number,
+	height: number,
+	depth: number,
+	rows: number,
+	cols: number
+): {
+	designFrequency: number;
+	minFrequency: number;
+	maxFrequency: number;
+	effectiveBandwidth: number;
+} {
+	const cellWidth = width / cols;
+	const cellHeight = height / rows;
+
+	// For Skyline, the depth is often distributed across rows.
+	// We use the average cell dimension to estimate the design frequency.
+	const avgCellDim = (cellWidth + cellHeight) / 2;
+	
+	// Design wavelength λd = avgCellDim * (1 + depth / avgCellDim)
+	const wavelengthD = avgCellDim * (1 + depth / avgCellDim);
+	const designFrequency = SPEED_OF_SOUND / wavelengthD;
+
+	// Min/Max frequencies
+	const minWavelength = avgCellDim * (1 + 0 / avgCellDim);
+	const maxWavelength = avgCellDim * (1 + depth / avgCellDim);
+	
+	const minFrequency = SPEED_OF_SOUND / maxWavelength;
+	const maxFrequency = SPEED_OF_SOUND / minWavelength;
+
+	// Effective bandwidth
+	const effectiveBandwidth = designFrequency * 0.2;
+
+	return {
+		designFrequency,
+		minFrequency,
+		maxFrequency,
+		effectiveBandwidth,
+	};
+}
+
+/**
+ * Calculates both geometry and acoustics for a Skyline Diffuser.
+ *
+ * @param width - Total width of the panel.
+ * @param height - Total height of the panel.
+ * @param depth - Maximum depth of the cells.
+ * @param rows - Number of rows.
+ * @param cols - Number of columns.
+ * @returns An object containing all calculations.
+ */
+export function getSkylineCalculations(
+	width: number,
+	height: number,
+	depth: number,
+	rows: number,
+	cols: number
+) {
+	const order = rows * cols;
+	const depths = calculateSkylineDepths(order);
+	
+	const acoustics = calculateSkylineAcoustics(width, height, depth, rows, cols);
+
+	return {
+		...acoustics,
+		depths,
+		order,
+		width,
+		height,
+		depth,
+		rows,
+		cols,
+	};
 }
