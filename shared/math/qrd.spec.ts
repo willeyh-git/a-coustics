@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isPrime } from "#shared/utils/math-helpers";
-import { calculateQRDDepths, getQRDDepths } from "./qrd";
+import { calculateQRDDepths, getQRDDepths, getQRDCalculations } from "./qrd";
 
 describe("qrd math", () => {
 	it("should return true for prime numbers", () => {
@@ -55,6 +55,17 @@ describe("qrd math", () => {
 			const result6 = getQRDDepths(6);
 			expect(result6.order).toBe(7);
 			expect(result6.depths).toEqual([0, 1, 4, 2, 2, 4, 1]);
+		});
+	});
+
+	describe("getQRDCalculations", () => {
+		it("should return correct geometry and acoustics", () => {
+			const result = getQRDCalculations(1000, 1000, 200, 5);
+			expect(result.order).toBe(5);
+			expect(result.depths).toEqual([0, 1, 4, 4, 1]);
+			expect(result.designFrequency).toBeCloseTo(343 / 300);
+			expect(result.minFrequency).toBeLessThan(result.designFrequency);
+			expect(result.maxFrequency).toBeGreaterThan(result.designFrequency);
 		});
 	});
 });

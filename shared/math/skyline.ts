@@ -126,7 +126,7 @@ export function getSkylineCalculations(
 	cols: number
 ) {
 	const order = rows * cols;
-	const depths = calculateSkylineDepths(order);
+	const depths = getSkylineDepths(order).depths;
 	
 	const acoustics = calculateSkylineAcoustics(width, height, depth, rows, cols);
 

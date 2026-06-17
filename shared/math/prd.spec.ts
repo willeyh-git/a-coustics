@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculatePRDDepths, getPRDDepths } from "./prd";
+import { calculatePRDDepths, getPRDDepths, getPRDCalculations } from "./prd";
 
 describe("prd math", () => {
 	describe("calculatePRDDepths", () => {
@@ -42,6 +42,17 @@ describe("prd math", () => {
 			const result6 = getPRDDepths(6);
 			expect(result6.order).toBe(7);
 			expect(result6.depths).toEqual([1, 3, 2, 6, 4, 5]);
+		});
+	});
+
+	describe("getPRDCalculations", () => {
+		it("should return correct geometry and acoustics", () => {
+			const result = getPRDCalculations(1000, 1000, 200, 5);
+			expect(result.order).toBe(5);
+			expect(result.depths).toEqual([1, 2, 4, 3]);
+			expect(result.designFrequency).toBeCloseTo(343 / 300);
+			expect(result.minFrequency).toBeLessThan(result.designFrequency);
+			expect(result.maxFrequency).toBeGreaterThan(result.designFrequency);
 		});
 	});
 });
