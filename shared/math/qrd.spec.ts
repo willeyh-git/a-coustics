@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { calculateQRDDepths, isPrime, getQRDDepths } from "./qrd";
+import { describe, expect, it } from "vitest";
+import { isPrime } from "#shared/utils/math-helpers";
+import { calculateQRDDepths, getQRDDepths } from "./qrd";
 
 describe("qrd math", () => {
 	describe("isPrime", () => {

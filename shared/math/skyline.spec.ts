@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@nuxt/test-utils";
+import { describe, expect, it } from "vitest";
 import { calculateSkylineDepths, getSkylineDepths } from "./skyline";
 
 describe("skyline math", () => {
