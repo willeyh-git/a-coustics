@@ -35,6 +35,7 @@ Rules:
 - Use branded primitive types for physical quantities
 - Use discriminated unions instead of boolean flags
 - Separate units at the type level whenever practical
+- All unit conversion goes through geometry/scaling.ts
 
 Example:
 
