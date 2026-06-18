@@ -1,227 +1,184 @@
 /**
- * Abfusor math.
+ * Configuration object for Abfusor calculations.
  *
- * An Abfusor is a hybrid panel that combines the properties of an absorber 
- * and a diffuser by using a series of slats.
- *
- * @param width - Total width of the panel.
- * @param height - Total height of the panel.
- * @param depth - Total depth of the panel.
- * @param numSlats - Number of slats.
- * @param slatWidth - Width of each slat.
- * @param slatSpacing - Spacing between slats.
- * @param slatDepthVariation - Variation in depth across slats.
- * @param absorberDepth - Depth of the absorption material.
- * @returns An object containing geometry calculations.
+ * @category Types
  */
-import { isPrime } from "#shared/utils/math-helpers";
+export interface AbfusorConfig {
+	/** Total width of the panel (mm). Must be > 0 and >= occupied slat width. */
+	width: number;
+	/** Total height of the panel (mm). Reserved for future expansion. */
+	height: number;
+	/** Total depth of the panel (mm). Must be > 0. */
+	depth: number;
+	/** Number of slats (must be >= 1). */
+	numSlats: number;
+	/** Width of each slat in mm (must be > 0). */
+	slatWidth: number;
+	/** Spacing between slats in mm (>= 0). */
+	slatSpacing: number;
+	/** Depth variation across slats in mm. Must be >= 0 and <= depth. */
+	slatDepthVariation: number;
+	/** Depth of absorption backing in mm. Must be >= 0 and <= depth. */
+	absorberDepth: number;
+}
 
-const SPEED_OF_SOUND = 343; // m/s
+import type { AbfusorGeometry, AbfusorAcoustics } from "#shared/types/acoustics";
+
+/**
+ * Rounds a number to 2 decimal places.
+ */
+const round2 = (n: number): number => Math.round(n * 100) / 100;
+
+/**
+ * Validates an Abfusor configuration and throws if invalid.
+ *
+ * @param config - Configuration to validate.
+ * @throws Error if any constraint is violated.
+ */
+function validateConfig(config: AbfusorConfig): void {
+	// Check all values are finite numbers first
+	for (const [key, value] of Object.entries(config)) {
+		if (!Number.isFinite(value)) {
+			throw new Error(
+				`Configuration value "${key}" must be a finite number, got ${value}`
+			);
+		}
+	}
+
+	// Physical dimension validations - all panel dimensions must be positive
+	if (config.width <= 0) {
+		throw new Error("width must be > 0");
+	}
+
+	if (config.height <= 0) {
+		throw new Error("height must be > 0");
+	}
+
+	if (config.depth <= 0) {
+		throw new Error("depth must be > 0");
+	}
+
+	// Functional constraint validations
+	if (config.numSlats < 1) {
+		throw new Error("numSlats must be >= 1");
+	}
+
+	if (config.slatWidth <= 0) {
+		throw new Error("slatWidth must be > 0");
+	}
+
+	if (config.slatSpacing < 0) {
+		throw new Error("slatSpacing must be >= 0");
+	}
+
+	if (config.slatDepthVariation < 0 || config.slatDepthVariation > config.depth) {
+		throw new Error(
+			`slatDepthVariation (${config.slatDepthVariation}) must be >= 0 and <= depth (${config.depth})`
+		);
+	}
+
+	if (config.absorberDepth < 0 || config.absorberDepth > config.depth) {
+		throw new Error(
+			`absorberDepth (${config.absorberDepth}) must be >= 0 and <= depth (${config.depth})`
+		);
+	}
+
+	// Validate that slat layout fits within panel width
+	const occupiedWidth =
+		config.numSlats * config.slatWidth +
+		(config.numSlats - 1) * config.slatSpacing;
+
+	if (occupiedWidth > config.width) {
+		throw new Error(
+			`Slat layout (${occupiedWidth.toFixed(0)}mm) exceeds panel width (${config.width.toFixed(0)}mm)`
+		);
+	}
+}
 
 /**
  * Calculates the geometry and open area for an Abfusor.
  *
- * @param width - Total width of the panel.
- * @param height - Total height of the panel.
- * @param depth - Total depth of the panel.
- * @param numSlats - Number of slats.
- * @param slatWidth - Width of each slat.
- * @param slatSpacing - Spacing between slats.
- * @param slatDepthVariation - Variation in depth across slats.
- * @param absorberDepth - Depth of the absorption material.
- * @returns An object containing geometry calculations.
+ * @param config - Configuration object containing all parameters.
+ * @returns Geometry data including open area percentage and slat positions.
  */
-export function calculateAbfusorGeometry(
-	width: number,
-	height: number,
-	depth: number,
-	numSlats: number,
-	slatWidth: number,
-	slatSpacing: number,
-	slatDepthVariation: number,
-	absorberDepth: number
-): {
-	openAreaPercentage: number;
-	slatPositions: number[];
-} {
-	// Calculate open area percentage
-	// Total width of slats = numSlats * slatWidth
-	// Total width of gaps = (numSlats - 1) * slatSpacing
-	
-	const totalGapWidth = (numSlats - 1) * slatSpacing;
-	const totalSlatGapWidth = numSlats * slatWidth + (numSlats - 1) * slatSpacing;
-	
-	// If totalSlatGapWidth is less than width, we assume the remainder is also gap or margin.
-	// For this calculation, we'll use the proportion of gap to total slat/gap width.
-	const openAreaPercentage = (totalGapWidth / totalSlatGapWidth) * 100;
+function calculateAbfusorGeometry(config: AbfusorConfig): AbfusorGeometry {
+	// Extract only the parameters we actually need for geometry calculation
+	const { numSlats, slatWidth, slatSpacing } = config;
 
-	// Slat positions (centers)
+	// Calculate total gap width (sum of all spacing between slats)
+	const totalGapWidth = (numSlats - 1) * slatSpacing;
+
+	// Calculate total panel width occupied by slats and gaps
+	const totalSlatGapWidth = numSlats * slatWidth + (numSlats - 1) * slatSpacing;
+
+	// Open area percentage: ratio of gap area to total slat+gap area
+	const openAreaPercentage =
+		totalSlatGapWidth > 0
+			? round2((totalGapWidth / totalSlatGapWidth) * 100)
+			: 0;
+
+	// Calculate slat positions from left edge
 	const slatPositions: number[] = [];
-	let currentX = slatWidth / 2;
+	let currentX = slatWidth / 2; // Start centered on first slat
 	for (let i = 0; i < numSlats; i++) {
-		slatPositions.push(currentX);
+		slatPositions.push(round2(currentX));
 		currentX += slatWidth + slatSpacing;
 	}
 
-	return {
-		openAreaPercentage,
-		slatPositions,
-	};
+	return { openAreaPercentage, slatPositions };
 }
 
 /**
- * Calculates geometry for an Abfusor, ensuring consistency with user inputs.
+ * Calculates acoustic scattering performance for an Abfusor.
  *
- * @param width - Total width of the panel.
- * @param height - Total height of the panel.
- * @param depth - Total depth of the panel.
- * @param numSlats - Number of slats.
- * @param slatWidth - Width of each slat.
- * @param slatSpacing - Spacing between slats.
- * @param slatDepthVariation - Variation in depth across slats.
- * @param absorberDepth - Depth of the absorption material.
- * @returns An object containing geometry calculations.
+ * Heuristic estimate of scattering performance based on slat spacing and depth variation.
+ * This is not a physically derived acoustic model and should be considered a comparative design metric.
+ *
+ * @param config - Configuration object containing all parameters.
+ * @param openAreaPercentage - Open area percentage from geometry calculation (must match config).
+ * @returns Acoustic performance metrics including scattering and absorption.
  */
-export function getAbfusorGeometry(
-	width: number,
-	height: number,
-	depth: number,
-	numSlats: number,
-	slatWidth: number,
-	slatSpacing: number,
-	slatDepthVariation: number,
-	absorberDepth: number
-) {
-	const geometry = calculateAbfusorGeometry(
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth
-	);
-	return {
-		...geometry,
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth,
-	};
-}
+function calculateAbfusorScattering(
+	config: AbfusorConfig,
+	openAreaPercentage: number
+): AbfusorAcoustics {
+	// Extract parameters we actually need for scattering calculation
+	const { slatWidth, slatSpacing, slatDepthVariation, depth, absorberDepth } = config;
 
-/**
- * Calculates acoustic properties for an Abfusor.
- * 
- * @param width - Total width of the panel.
- * @param height - Total height of the panel.
- * @param depth - Total depth of the panel.
- * @param numSlats - Number of slats.
- * @param slatWidth - Width of each slat.
- * @param slatSpacing - Spacing between slats.
- * @param slatDepthVariation - Variation in depth across slats.
- * @param absorberDepth - Depth of the absorption material.
- * @returns An object containing acoustic calculations.
- */
-export function calculateAbfusorAcoustics(
-	width: number,
-	height: number,
-	depth: number,
-	numSlats: number,
-	slatWidth: number,
-	slatSpacing: number,
-	slatDepthVariation: number,
-	absorberDepth: number
-): {
-	openAreaPercentage: number;
-	estimatedScattering: number; // 0-100
-	estimatedAbsorption: number; // 0-100
-} {
-	const { openAreaPercentage } = calculateAbfusorGeometry(
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth
-	);
+	// Density factor: logarithmic ratio of spacing to width
+	// Higher values indicate more open structure
+	const densityFactor = Math.log10(1 + slatSpacing / slatWidth);
 
-	// Scattering estimate: based on slat depth variation and spacing
-	// More variation and smaller spacing = higher scattering
-	const scattering = Math.min(100, (slatDepthVariation / depth) * 100 + (slatSpacing / slatWidth) * 20);
+	// Variation factor: normalized depth variation as percentage
+	// Greater variation = more effective diffusion
+	const variationFactor = (slatDepthVariation / depth) * 100;
 
-	// Absorption estimate: based on absorber depth and open area
-	// More depth and less open area (more material) = higher absorption
-	const absorption = Math.min(100, (absorberDepth / depth) * 100 + (100 - openAreaPercentage) * 0.5);
+	// Combined spreading factor with proper scaling
+	// The divisor of 4 normalizes the range to approximately 0-50%
+	const factor = (variationFactor + densityFactor) * 0.25;
 
-	return {
-		openAreaPercentage,
-		estimatedScattering: scattering,
-		estimatedAbsorption: absorption,
-	};
+	// Calculate absorption based on absorber depth and open area
+	// Deeper absorbers + lower open area = higher absorption
+	let absorption = (absorberDepth / depth) * 100 + (100 - openAreaPercentage) * 0.5;
+	absorption = Math.min(100, Math.max(0, absorption));
+
+	// Calculate spread percentage with bounds
+	const spreadPercent = Math.min(100, Math.max(0, factor));
+
+	return { openAreaPercentage, spreadPercent, absorption };
 }
 
 /**
  * Calculates both geometry and acoustics for an Abfusor.
  *
- * @param width - Total width of the panel.
- * @param height - Total height of the panel.
- * @param depth - Total depth of the panel.
- * @param numSlats - Number of slats.
- * @param slatWidth - Width of each slat.
- * @param slatSpacing - Spacing between slats.
- * @param slatDepthVariation - Variation in depth across slats.
- * @param absorberDepth - Depth of the absorption material.
- * @returns An object containing all calculations.
+ * @param config - Configuration object containing all parameters.
+ * @returns Complete Abfusor calculation results including geometry and acoustics.
  */
-export function getAbfusorCalculations(
-	width: number,
-	height: number,
-	depth: number,
-	numSlats: number,
-	slatWidth: number,
-	slatSpacing: number,
-	slatDepthVariation: number,
-	absorberDepth: number
-) {
-	const geometry = getAbfusorGeometry(
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth
-	);
-	const acoustics = calculateAbfusorAcoustics(
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth
-	);
+export function getAbfusorCalculations(config: AbfusorConfig): AbfusorGeometry & AbfusorAcoustics {
+	validateConfig(config);
 
-	return {
-		...acoustics,
-		...geometry,
-		width,
-		height,
-		depth,
-		numSlats,
-		slatWidth,
-		slatSpacing,
-		slatDepthVariation,
-		absorberDepth,
-	};
+	const geometry = calculateAbfusorGeometry(config);
+	const acoustics = calculateAbfusorScattering(config, geometry.openAreaPercentage);
+
+	return { ...acoustics, ...geometry };
 }
