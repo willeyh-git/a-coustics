@@ -1,4 +1,4 @@
-# Acoustic Panel Calculator — Pre-Plan v2
+# Acoustic Panel Calculator — Pre-Plan v3
 
 ## Overview
 
@@ -9,9 +9,18 @@ Supported panel types:
 1. QRD (Quadratic Residue Diffuser)
 2. PRD (Primitive Root Diffuser)
 3. Skyline Diffuser
-4. Poly Diffuser (2D QRD / Polynomial Diffuser)
+4. Poly Diffuser (2D Quadratic Residue Diffuser)
 5. Helmholtz Resonator
 6. ABFUSOR (Absorbing Binary Diffuser)
+
+The application must provide:
+
+- Accurate physical calculations
+- Strong compile-time type safety
+- Reusable mathematical infrastructure
+- Comprehensive test coverage
+- Separation of number theory, geometry, and acoustics
+- Shared calculation modules that can be reused across panel types
 
 ---
 
@@ -19,74 +28,109 @@ Supported panel types:
 
 ## Strong Typing
 
-* No `any`
-* No `unknown` unless explicitly justified
-* Use branded units for physical quantities
-* Prefer discriminated unions over boolean flags
+Rules:
 
-## Test Driven Development
+- No `any`
+- No `unknown` unless explicitly justified
+- Use branded primitive types for physical quantities
+- Use discriminated unions instead of boolean flags
+- Separate units at the type level whenever practical
 
-Tests define behavior before implementation.
+Example:
 
-Development cycle:
-
-1. Write failing test
-2. Implement minimum code
-3. Refactor
-4. Add property/invariant tests
-
-## Separation of Concerns
-
-The system is divided into three layers:
-
-### Layer 1 — Number Theory
-
-Pure mathematical sequence generation.
-
-Examples:
-
-* Prime validation
-* Quadratic residues
-* Primitive roots
-* Sequence generation
-
-### Layer 2 — Geometry
-
-Convert mathematical sequences into physical dimensions.
-
-Examples:
-
-* Well depths
-* Cell heights
-* Panel dimensions
-
-### Layer 3 — Acoustics
-
-Convert geometry into acoustic performance.
-
-Examples:
-
-* Design frequency
-* Diffusion bandwidth
-* Resonant frequency
-* Absorption curves
-
-No module should mix responsibilities across layers.
-
----
-
-# Units & Physical Types
-
-## Base Units
 ```ts
 type Length = Brand<number, 'm'>;
 type Area = Brand<number, 'm²'>;
 type Volume = Brand<number, 'm³'>;
 
 type Frequency = Brand<number, 'Hz'>;
+
 type Density = Brand<number, 'kg/m³'>;
 type FlowResistivity = Brand<number, 'rayls'>;
 ```
+
+---
+
+## Test Driven Development
+
+Development cycle:
+
+1. Write failing test
+2. Implement minimum code
+3. Refactor
+4. Add edge-case tests
+5. Add invariant/property tests
+
+No production code should be written without a corresponding test.
+
+---
+
+## Separation of Concerns
+
+The system is divided into three primary layers.
+
+### Layer 1 — Number Theory
+
+Pure mathematics.
+
+Examples:
+
+- Prime validation
+- Modular arithmetic
+- Primitive roots
+- Residue generation
+
+No physical units.
+
+No acoustics.
+
+---
+
+### Layer 2 — Geometry
+
+Converts mathematical sequences into physical dimensions.
+
+Examples:
+
+- Well depths
+- Cell heights
+- Panel dimensions
+- Panel area
+
+No acoustic performance calculations.
+
+---
+
+### Layer 3 — Acoustics
+
+Converts geometry into acoustic behavior.
+
+Examples:
+
+- Wavelength calculations
+- Design frequency calculations
+- Diffusion bandwidth
+- Resonant frequency
+- Absorption curves
+
+---
+
+# Units & Physical Types
+
+## Base Units
+
+```ts
+type Length = Brand<number, 'm'>;
+type Area = Brand<number, 'm²'>;
+type Volume = Brand<number, 'm³'>;
+
+type Frequency = Brand<number, 'Hz'>;
+
+type Density = Brand<number, 'kg/m³'>;
+type FlowResistivity = Brand<number, 'rayls'>;
+```
+
+Constants:
 
 ```ts
 export const m = 1 as Length;
@@ -95,7 +139,7 @@ export const Hz = 1 as Frequency;
 
 All internal calculations use SI units.
 
-UI conversions occur only at display boundaries.
+UI conversion occurs only at presentation boundaries.
 
 ---
 
@@ -110,6 +154,8 @@ interface FrequencyRange {
 }
 ```
 
+---
+
 ## Material Properties
 
 ```ts
@@ -121,6 +167,8 @@ interface MaterialProperties {
 }
 ```
 
+---
+
 ## Panel Type
 
 ```ts
@@ -131,6 +179,227 @@ type PanelType =
   | 'POLY'
   | 'HELMHOLTZ'
   | 'ABFUSOR';
+```
+
+---
+
+## Common Frequency Response
+
+```ts
+interface FrequencyResponse {
+  frequencies: Frequency[];
+  values: number[];
+}
+```
+
+---
+
+# Shared Mathematical Infrastructure
+
+Several panel types share mathematical foundations.
+
+These should be implemented once and reused.
+
+---
+
+## Number Theory Module
+
+Used by:
+
+- QRD
+- PRD
+- Skyline
+- Poly
+- ABFUSOR
+
+Responsibilities:
+
+```ts
+isPrime()
+
+gcd()
+
+isCoprime()
+
+modPow()
+
+getQuadraticResidues()
+
+getPrimitiveRoots()
+```
+
+Sequence generation:
+
+```ts
+generateQRDSequence()
+
+generatePRDSequence()
+```
+
+Example:
+
+```ts
+generateQRDSequence(7);
+
+// [0,1,4,2,2,4,1]
+```
+
+This module contains no geometry or acoustics.
+
+---
+
+## Shared Acoustic Math
+
+Used by:
+
+- QRD
+- PRD
+- Skyline
+- Poly
+- Helmholtz
+- ABFUSOR
+
+Responsibilities:
+
+```ts
+speedOfSound()
+
+wavelength()
+
+frequencyFromWavelength()
+
+quarterWavelength()
+
+halfWavelength()
+```
+
+Example:
+
+```ts
+wavelength(1000 * Hz);
+```
+
+---
+
+## Shared Diffuser Design Math
+
+Used by:
+
+- QRD
+- PRD
+- Skyline
+- Poly
+
+Responsibilities:
+
+```ts
+calculateUnitDepth()
+
+calculateMaxDepth()
+
+calculateDiffusionBandwidth()
+```
+
+Example:
+
+```ts
+calculateUnitDepth(
+  700 * Hz,
+  7
+);
+```
+
+---
+
+## Sequence-to-Geometry Conversion
+
+Used by:
+
+- QRD
+- PRD
+- Skyline
+- Poly
+
+Responsibilities:
+
+```ts
+sequenceToDepths()
+
+matrixToDepths()
+```
+
+Example:
+
+```ts
+sequenceToDepths(
+  [0,1,4,2,2,4,1],
+  unitDepth
+);
+```
+
+---
+
+## Shared Geometry
+
+Used by:
+
+- QRD
+- PRD
+- Skyline
+- Poly
+- ABFUSOR
+- Helmholtz
+
+Responsibilities:
+
+```ts
+calculatePanelWidth()
+
+calculatePanelHeight()
+
+calculatePanelArea()
+
+calculatePanelVolume()
+```
+
+---
+
+## Shared Frequency Analysis
+
+Used by:
+
+- Diffusers
+- Resonators
+- Absorbers
+
+Responsibilities:
+
+```ts
+generateFrequencyAxis()
+
+generateOctaveBands()
+
+generateThirdOctaveBands()
+```
+
+---
+
+## Shared Material Models
+
+Used by:
+
+- Helmholtz
+- ABFUSOR
+- Future porous absorbers
+
+Responsibilities:
+
+```ts
+calculateFlowResistance()
+
+calculatePorousAbsorption()
+
+lookupMaterial()
 ```
 
 ---
@@ -152,53 +421,54 @@ Example:
 ```text
 p = 7
 
-Sequence:
 0, 1, 4, 2, 2, 4, 1
 ```
 
-### Well Depth
+---
 
-Standard QRD depth:
+### Unit Depth
 
 ```text
-d(i) = S(i) × d_unit
+d_unit = λ₀ / (2p)
 ```
 
 Where:
 
 ```text
-d_unit = λ₀ / (2p)
-
 λ₀ = c / f_design
 ```
 
-Definitions:
+---
 
-* c = speed of sound
-* f_design = design frequency
-* p = prime number
+### Well Depth
 
-Maximum depth:
+```text
+d(i) = S(i) × d_unit
+```
+
+---
+
+### Maximum Depth
 
 ```text
 d_max = ((p - 1) × λ₀) / (2p)
 ```
 
+---
+
 ### Constraints
 
-* p must be prime
-* Well widths chosen from highest design frequency
-* Depths derived from residue sequence
+- Prime number required
+- Well width derived from highest operating frequency
+- Depths derived from residue sequence
 
 ---
 
 ## PRD (Primitive Root Diffuser)
 
-### Primitive Root Sequence
+### Sequence
 
-Choose primitive root g of prime p.
-
-Sequence:
+For primitive root g:
 
 ```text
 S(i) = g^i mod p
@@ -213,28 +483,26 @@ g = 3
 1, 3, 2, 6, 4, 5
 ```
 
-### Well Depth
+---
+
+### Depth
 
 ```text
 d(i) = S(i) × d_unit
 ```
 
-Where:
-
-```text
-d_unit = λ₀ / (2p)
-```
+---
 
 ### Constraints
 
-* p must be prime
-* g must be a primitive root modulo p
+- p must be prime
+- g must be a primitive root modulo p
 
 ---
 
 ## Skyline Diffuser
 
-Skyline diffusers are derived from QRD or PRD sequences.
+Derived from QRD or PRD sequences.
 
 Example:
 
@@ -247,19 +515,21 @@ Height(i,j)
 Depth:
 
 ```text
-d(i,j) = Height(i,j) × d_unit
+d(i,j)
+=
+Height(i,j) × d_unit
 ```
 
 Constraints:
 
-* Square grid preferred
-* Equal cell spacing in X and Y
+- Equal X/Y spacing
+- Square grids preferred
 
 ---
 
 ## Poly Diffuser
 
-Two-dimensional quadratic residue diffuser:
+Two-dimensional residue diffuser.
 
 ```text
 S(i,j)
@@ -277,8 +547,8 @@ S(i,j) × d_unit
 
 Constraints:
 
-* p prime
-* q₁ and q₂ valid residues
+- Prime p
+- Valid quadratic residues q₁ and q₂
 
 ---
 
@@ -287,7 +557,8 @@ Constraints:
 Resonant frequency:
 
 ```text
-f =
+f
+=
 (c / 2π)
 ×
 √(A / (V × L_eff))
@@ -301,50 +572,49 @@ L_eff = L + 1.7r
 
 Definitions:
 
-* A = neck area
-* V = cavity volume
-* L = neck length
-* r = neck radius
+- A = neck area
+- V = cavity volume
+- L = neck length
+- r = neck radius
 
 Outputs:
 
-* Resonant frequency
-* Bandwidth estimate
-* Absorption curve
+- Resonant frequency
+- Bandwidth estimate
+- Absorption curve
 
 ---
 
 ## ABFUSOR
 
-Hybrid absorber/diffuser.
+Hybrid absorber and diffuser.
 
-Each well is classified as:
+Well states:
 
 ```text
 DIFFUSIVE
-or
 ABSORPTIVE
 ```
 
 Diffusive wells:
 
 ```text
-depth = QRD depth
+QRD depth
 ```
 
 Absorptive wells:
 
 ```text
-depth = shallow cavity
+shallow cavity
 +
 absorptive material
 ```
 
 Outputs:
 
-* Diffusion profile
-* Absorption profile
-* Combined performance metrics
+- Diffusion profile
+- Absorption profile
+- Combined metrics
 
 ---
 
@@ -360,8 +630,9 @@ shared/
 │
 ├── math/
 │   ├── constants.ts
-│   ├── primes.ts
-│   ├── residues.ts
+│   ├── number-theory.ts
+│   ├── sequences.ts
+│   ├── grids.ts
 │   ├── qrd.ts
 │   ├── prd.ts
 │   ├── skyline.ts
@@ -369,17 +640,22 @@ shared/
 │   ├── helmholtz.ts
 │   └── abfusor.ts
 │
+├── acoustics/
+│   ├── wavelength.ts
+│   ├── diffuser.ts
+│   ├── response.ts
+│   ├── materials.ts
+│   ├── diffusion.ts
+│   └── absorption.ts
+│
 ├── geometry/
 │   ├── depths.ts
+│   ├── panel.ts
 │   ├── dimensions.ts
 │   └── spacing.ts
 │
-├── acoustics/
-│   ├── diffusion.ts
-│   ├── absorption.ts
-│   └── frequency.ts
-│
 └── validators/
+    ├── common.ts
     ├── qrd.ts
     ├── prd.ts
     ├── skyline.ts
@@ -390,140 +666,13 @@ shared/
 
 ---
 
-# TDD Roadmap
-
-## Phase 1 — Number Theory
-
-Write tests first.
-
-### Primes
-
-```ts
-isPrime()
-```
-
-### Coprime
-
-```ts
-isCoprime()
-```
-
-### Quadratic Residues
-
-```ts
-getQuadraticResidues()
-```
-
-### Primitive Roots
-
-```ts
-getPrimitiveRoots()
-```
-
-Example:
-
-```ts
-expect(generateQRDSequence(7))
-  .toEqual([0,1,4,2,2,4,1]);
-```
-
-No acoustic calculations yet.
-
----
-
-## Phase 2 — Geometry
-
-Convert sequences into dimensions.
-
-Functions:
-
-```ts
-sequenceToDepths()
-calculatePanelWidth()
-calculatePanelHeight()
-```
-
-Example:
-
-```ts
-expect(
-  sequenceToDepths(
-    [0,1,4,2,2,4,1],
-    10 * m
-  )
-);
-```
-
----
-
-## Phase 3 — QRD / PRD Design
-
-Introduce design frequency.
-
-Functions:
-
-```ts
-designQRD()
-designPRD()
-```
-
-Outputs:
-
-```ts
-{
-  depths,
-  unitDepth,
-  maxDepth,
-  bandwidth
-}
-```
-
----
-
-## Phase 4 — Skyline & Poly
-
-Implement 2D diffusion.
-
-Tests:
-
-* symmetry
-* valid residue generation
-* dimension calculations
-
----
-
-## Phase 5 — Helmholtz
-
-Implement:
-
-```ts
-calculateResonantFrequency()
-calculateBandwidth()
-calculateAbsorptionCurve()
-```
-
-Tests verified against published reference calculations.
-
----
-
-## Phase 6 — ABFUSOR
-
-Combine:
-
-* QRD geometry
-* porous absorption
-* cavity tuning
-
-Outputs:
-
-* diffusion metrics
-* absorption metrics
-
----
-
 # Validation Philosophy
 
-Validation returns structured errors.
+Validation returns structured results.
+
+User errors are never thrown.
+
+Example:
 
 ```ts
 type ValidationResult =
@@ -534,7 +683,7 @@ type ValidationResult =
     };
 ```
 
-Example:
+Validation error:
 
 ```ts
 type ValidationError =
@@ -548,22 +697,193 @@ type ValidationError =
     };
 ```
 
-Never throw for user input validation.
+Exceptions are reserved for programmer errors and impossible states.
 
-Reserve exceptions for programmer errors.
+---
+
+# TDD Roadmap
+
+## Phase 1 — Shared Math Foundations
+
+Write tests before implementation.
+
+Implement:
+
+```ts
+isPrime()
+
+gcd()
+
+isCoprime()
+
+modPow()
+
+getQuadraticResidues()
+
+getPrimitiveRoots()
+```
+
+Then:
+
+```ts
+generateQRDSequence()
+
+generatePRDSequence()
+```
+
+Example:
+
+```ts
+expect(
+  generateQRDSequence(7)
+).toEqual([
+  0,1,4,2,2,4,1
+]);
+```
+
+No geometry.
+
+No acoustics.
+
+---
+
+## Phase 2 — Shared Geometry
+
+Implement:
+
+```ts
+sequenceToDepths()
+
+matrixToDepths()
+
+calculatePanelWidth()
+
+calculatePanelHeight()
+
+calculatePanelArea()
+```
+
+Tests verify dimensional correctness.
+
+---
+
+## Phase 3 — Shared Acoustic Utilities
+
+Implement:
+
+```ts
+speedOfSound()
+
+wavelength()
+
+frequencyFromWavelength()
+
+calculateUnitDepth()
+
+calculateMaxDepth()
+```
+
+Tests verified against published acoustic references.
+
+---
+
+## Phase 4 — QRD
+
+Build first complete diffuser.
+
+QRD becomes the reference implementation.
+
+Validate:
+
+- Number theory
+- Geometry
+- Acoustics
+- Validation
+- Results
+
+---
+
+## Phase 5 — PRD
+
+Reuse:
+
+- Number theory
+- Geometry
+- Diffuser acoustics
+
+Implement only primitive-root-specific behavior.
+
+---
+
+## Phase 6 — Skyline
+
+Reuse:
+
+- QRD/PRD sequences
+- Shared geometry
+- Shared acoustics
+
+Implement 2D skyline generation.
+
+---
+
+## Phase 7 — Poly
+
+Reuse:
+
+- Residue infrastructure
+- Shared geometry
+- Shared acoustics
+
+Implement 2D residue grids.
+
+---
+
+## Phase 8 — Helmholtz
+
+Implement:
+
+```ts
+calculateResonantFrequency()
+
+calculateBandwidth()
+
+calculateAbsorptionCurve()
+```
+
+Reuse:
+
+- Wavelength calculations
+- Geometry
+- Frequency response infrastructure
+
+---
+
+## Phase 9 — ABFUSOR
+
+Reuse:
+
+- QRD infrastructure
+- Shared geometry
+- Shared materials
+- Frequency response infrastructure
+
+Implement hybrid absorber/diffuser behavior.
 
 ---
 
 # Success Criteria
 
-A panel design is considered valid when:
+A panel design is considered complete when:
 
-* Mathematical constraints pass
-* Geometric constraints pass
-* Acoustic constraints pass
-* All calculations are reproducible through tests
-* No UI code contains calculation logic
-* All acoustic formulas live under `shared/`
+- Mathematical constraints pass
+- Geometric constraints pass
+- Acoustic constraints pass
+- All calculations are covered by tests
+- Shared infrastructure is reused instead of duplicated
+- No UI code contains calculation logic
+- All physical formulas live under `shared/`
+- QRD, PRD, Skyline, and Poly share common diffuser infrastructure
+- Helmholtz and ABFUSOR reuse common acoustic infrastructure
 
-The application should be able to generate diffuser and absorber designs from a small set of physical inputs while maintaining full type safety and test coverage.
-
+The application should generate physically meaningful diffuser and absorber designs from a small set of user inputs while maintaining strong type safety, high test coverage, and clear architectural boundaries.
