@@ -1,20 +1,44 @@
-export type Brand<T, K extends string> = T & { __brand: K };
+/**
+ * Brand types for physical quantities.
+ * @template T - The underlying primitive type.
+ * @template Name - The unit name.
+ */
+export type Brand<T, Name> = {
+	__brand: Name;
+} & T;
 
-// This is a helper to cast a value to a branded type
-export const asLength = (value: number) => ({ __brand: 'm', value });
-export const asArea = (value: number) => ({ __brand: 'm²', value });
-export const asVolume = (value: number) => ({ __brand: 'm³', value });
-export const asFrequency = (value: number) => ({ __brand: 'Hz', value });
-export const asDensity = (value: number) => ({ __brand: 'kg/m³', value });
-export const asFlowResistivity = (value: number) => ({ __brand: 'rayls', value });
-
-// Alternatively, using type aliases as suggested in pre-plan
+/**
+ * Length in meters.
+ */
 export type Length = Brand<number, 'm'>;
+
+/**
+ * Area in square meters.
+ */
 export type Area = Brand<number, 'm²'>;
+
+/**
+ * Volume in cubic meters.
+ */
 export type Volume = Brand<number, 'm³'>;
+
+/**
+ * Frequency in Hertz.
+ */
 export type Frequency = Brand<number, 'Hz'>;
+
+/**
+ * Density in kg/m³.
+ */
 export type Density = Brand<number, 'kg/m³'>;
+
+/**
+ * Flow Resistivity in rayls.
+ */
 export type FlowResistivity = Brand<number, 'rayls'>;
 
+/**
+ * Base units constants.
+ */
 export const m = 1 as Length;
 export const Hz = 1 as Frequency;
