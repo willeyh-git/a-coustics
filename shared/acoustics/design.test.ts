@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { SPEED_OF_SOUND } from "./constants";
 import { designUnitDepth } from "./design";
-import { calculateWavelength } from "./frequency";
+import {
+	calculateWavelength,
+	frequencyFromWavelength,
+	halfWavelength,
+	quarterWavelength,
+} from "./frequency";
 import { calculateUnitDepth } from "./qrd-physics";
 
 describe("acoustics constants", () => {
