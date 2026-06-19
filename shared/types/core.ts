@@ -1,4 +1,4 @@
-import { Length, Frequency, Density, FlowResistivity } from './units';
+import type { Density, FlowResistivity, Frequency, Length } from "./units";
 
 /**
  * Frequency Range.

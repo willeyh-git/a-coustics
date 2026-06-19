@@ -1,6 +1,7 @@
-import type { Length, Frequency } from "../types/units";
+import { toFrequency, toLength } from "../geometry/scaling";
+import type { Frequency, Length } from "../types/units";
+import { Hz, m } from "../types/units";
 import { SPEED_OF_SOUND } from "./constants";
-import { toLength, toFrequency } from "../geometry/scaling";
 
 /**
  * Calculates the wavelength for a given frequency.
