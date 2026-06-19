@@ -1,5 +1,6 @@
-import type { Length } from "../types/units";
+import type { Length, Frequency } from "../types/units";
 import { SPEED_OF_SOUND } from "./constants";
+import { toLength, toFrequency } from "../geometry/scaling";
 
 /**
  * Calculates the wavelength for a given frequency.
@@ -7,7 +8,7 @@ import { SPEED_OF_SOUND } from "./constants";
  * @returns Wavelength in meters.
  */
 export function calculateWavelength(frequency: number): Length {
-	return SPEED_OF_SOUND / frequency;
+	return toLength(SPEED_OF_SOUND / frequency, m);
 }
 
 /**
@@ -16,7 +17,7 @@ export function calculateWavelength(frequency: number): Length {
  * @returns Frequency in Hz.
  */
 export function frequencyFromWavelength(wavelength: number): Frequency {
-	return SPEED_OF_SOUND / wavelength;
+	return toFrequency(SPEED_OF_SOUND / wavelength, Hz);
 }
 
 /**
@@ -25,7 +26,7 @@ export function frequencyFromWavelength(wavelength: number): Frequency {
  * @returns Quarter wavelength in meters.
  */
 export function quarterWavelength(frequency: number): Length {
-	return SPEED_OF_SOUND / frequency / 4;
+	return toLength(SPEED_OF_SOUND / frequency / 4, m);
 }
 
 /**
@@ -34,5 +35,5 @@ export function quarterWavelength(frequency: number): Length {
  * @returns Half wavelength in meters.
  */
 export function halfWavelength(frequency: number): Length {
-	return SPEED_OF_SOUND / frequency / 2;
+	return toLength(SPEED_OF_SOUND / frequency / 2, m);
 }
