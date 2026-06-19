@@ -85,3 +85,19 @@ describe("determinism", () => {
 		expect(a).toBeCloseTo(b, 10);
 	});
 });
+
+describe("frequencyFromWavelength", () => {
+	it("should be the inverse of calculateWavelength", () => {
+		const frequency = 343;
+
+		const wavelength = calculateWavelength(frequency);
+
+		expect(frequencyFromWavelength(wavelength)).toBeCloseTo(frequency, 10);
+	});
+	it("should calculate quarter wavelength", () => {
+		expect(quarterWavelength(343)).toBeCloseTo(0.25, 3);
+	});
+	it("should calculate half wavelength", () => {
+		expect(halfWavelength(343)).toBeCloseTo(0.5, 3);
+	});
+});
