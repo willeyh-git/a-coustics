@@ -1,4 +1,6 @@
+import { toLength } from "../geometry/scaling";
 import type { Length } from "../types/units";
+import { m } from "../types/units";
 
 /**
  * Calculates the unit depth for a QRD (Quadratic Residue Diffuser).
@@ -7,5 +9,5 @@ import type { Length } from "../types/units";
  * @returns The unit depth in meters.
  */
 export function calculateUnitDepth(lambda: number, p: number): Length {
-	return lambda / (2 * p);
+	return toLength(lambda / (2 * p), m);
 }
