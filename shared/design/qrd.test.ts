@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { designQRD } from "./qrd";
+import { toFrequency } from "../geometry/scaling";
+import { Hz } from "../types/units";
 
 describe("designQRD", () => {
 	it("should generate a complete QRD design", () => {
 		const result = designQRD({
 			prime: 7,
-			designFrequency: 343,
+			designFrequency: toFrequency(343, Hz),
 		});
 
 		expect(result.sequence).toEqual([0, 1, 4, 2, 2, 4, 1]);
@@ -18,7 +20,7 @@ describe("designQRD", () => {
 	it("should have depths derived from sequence × unitDepth", () => {
 		const result = designQRD({
 			prime: 7,
-			designFrequency: 343,
+			designFrequency: toFrequency(343, Hz),
 		});
 
 		expect(result.depths[0]).toBeCloseTo(0, 3);
@@ -30,7 +32,7 @@ describe("designQRD", () => {
 		expect(() =>
 			designQRD({
 				prime: 8,
-				designFrequency: 343,
+				designFrequency: toFrequency(343, Hz),
 			}),
 		).toThrow();
 	});
