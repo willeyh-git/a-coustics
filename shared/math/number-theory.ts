@@ -2,16 +2,14 @@
  * Checks if a number is prime.
  * @param n The number to check.
  * @returns True if prime, false otherwise.
- * @throws Error if n is less than 2.
  */
 export function isPrime(n: number): boolean {
-	if (n < 2) {
-		throw new Error("Number must be at least 2");
-	}
-	for (let i = 2; i <= Math.sqrt(n); i++) {
-		if (n % i === 0) {
-			return false;
-		}
+	if (n <= 1) return false;
+	if (n <= 3) return true;
+	if (n % 2 === 0 || n % 3 === 0) return false;
+
+	for (let i = 5; i * i <= n; i += 6) {
+		if (n % i === 0 || n % (i + 2) === 0) return false;
 	}
 	return true;
 }
@@ -52,4 +50,21 @@ export function modPow(base: number, exp: number, mod: number): number {
 		exp = Math.floor(exp / 2);
 	}
 	return res;
+}
+
+/**
+ * Returns the set of quadratic residues modulo p.
+ * Quadratic residues are numbers y such that there exists some x where x^2 ≡ y (mod p).
+ *
+ * @param p A prime number.
+ * @returns An array of unique quadratic residues modulo p.
+ * @throws Error if p is not prime.
+ */
+export function getQuadraticResidues(p: number): number[] {
+	const residues = new Set<number>();
+	for (let i = 0; i < p; i++) {
+		residues.add((i * i) % p);
+	}
+
+	return Array.from(residues).sort((a, b) => a - b);
 }
