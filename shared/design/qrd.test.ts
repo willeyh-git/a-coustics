@@ -1,0 +1,37 @@
+import { describe, expect, it } from "vitest";
+import { designQRD } from "./qrd";
+
+describe("designQRD", () => {
+	it("should generate a complete QRD design", () => {
+		const result = designQRD({
+			prime: 7,
+			designFrequency: 343,
+		});
+
+		expect(result.sequence).toEqual([0, 1, 4, 2, 2, 4, 1]);
+
+		expect(result.unitDepth).toBeCloseTo(1 / 14, 3);
+
+		expect(result.depths).toHaveLength(7);
+	});
+
+	it("should have depths derived from sequence × unitDepth", () => {
+		const result = designQRD({
+			prime: 7,
+			designFrequency: 343,
+		});
+
+		expect(result.depths[0]).toBeCloseTo(0, 3);
+		expect(result.depths[1]).toBeCloseTo(1 / 14, 3);
+		expect(result.depths[2]).toBeCloseTo(4 / 14, 3);
+	});
+
+	it("should reject non-prime values", () => {
+		expect(() =>
+			designQRD({
+				prime: 8,
+				designFrequency: 343,
+			}),
+		).toThrow();
+	});
+});
