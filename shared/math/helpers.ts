@@ -44,3 +44,47 @@ export function assertPrime(n: number): asserts n is Prime {
 		throw new RangeError(`Value ${n} must be a prime number.`);
 	}
 }
+
+/**
+ * Constructs a PositiveInteger from a number.
+ * @param n The number to convert.
+ * @returns The branded PositiveInteger.
+ * @throws RangeError if n is not a positive integer.
+ */
+export function asPositiveInteger(n: number): PositiveInteger {
+	assertPositiveInteger(n);
+	return n;
+}
+
+/**
+ * Constructs a Prime from a number.
+ * @param n The number to convert.
+ * @returns The branded Prime.
+ * @throws RangeError if n is not a prime number.
+ */
+export function asPrime(n: number): Prime {
+	assertPrime(n);
+	return n;
+}
+
+/**
+ * Constructs an Integer from a number.
+ * @param n The number to convert.
+ * @returns The branded Integer.
+ * @throws RangeError if n is not an integer.
+ */
+export function asInteger(n: number): Integer {
+	assertInteger(n);
+	return n;
+}
+
+/**
+ * Constructs a NonNegativeInteger from a number.
+ * @param n The number to convert.
+ * @returns The branded NonNegativeInteger.
+ * @throws RangeError if n is not a non-negative integer.
+ */
+export function asNonNegativeInteger(n: number): NonNegativeInteger {
+	assertNonNegativeInteger(n);
+	return n;
+}
