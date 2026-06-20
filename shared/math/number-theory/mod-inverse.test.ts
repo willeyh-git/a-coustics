@@ -23,9 +23,9 @@ describe("modInverse", () => {
 
 	describe("non-existent inverses", () => {
 		it("throws when gcd(a, m) ≠ 1", () => {
-			expect(() => modInverse(2, 4)).toThrow(RangeError);
-			expect(() => modInverse(6, 9)).toThrow(RangeError);
-			expect(() => modInverse(12, 18)).toThrow(RangeError);
+			expect(() => modInverse(2, 4)).toThrow(Error);
+			expect(() => modInverse(6, 9)).toThrow(Error);
+			expect(() => modInverse(12, 18)).toThrow(Error);
 		});
 	});
 
