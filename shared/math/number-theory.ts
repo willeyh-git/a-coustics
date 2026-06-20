@@ -35,20 +35,33 @@ export function isCoprime(a: number, b: number): boolean {
 }
 
 /**
+ * Returns the mathematical modulo of n by m.
+ * Unlike the JavaScript % operator, which is a remainder operator,
+ * this function returns a non-negative result.
+ *
+ * @param n The number to be modulated.
+ * @param m The modulus.
+ * @returns The non-negative remainder of n / m.
+ */
+export function mod(n: number, m: number): number {
+	return ((n % m) + m) % m;
+}
+
+/**
  * Modular exponentiation.
  * @param base The base.
  * @param exp The exponent.
- * @param mod The modulus.
- * @returns (base^exp) % mod.
+ * @param modulus The modulus.
+ * @returns (base^exp) % modulus.
  */
-export function modPow(base: number, exp: number, mod: number): number {
+export function modPow(base: number, exp: number, modulus: number): number {
 	let res = 1;
-	base = base % mod;
+	base = mod(base, modulus);
 	while (exp > 0) {
 		if (exp % 2 === 1) {
-			res = (res * base) % mod;
+			res = mod(res * base, modulus);
 		}
-		base = (base * base) % mod;
+		base = mod(base * base, modulus);
 		exp = Math.floor(exp / 2);
 	}
 	return res;
@@ -63,9 +76,12 @@ export function modPow(base: number, exp: number, mod: number): number {
  * @throws Error if p is not prime.
  */
 export function getQuadraticResidues(p: number): number[] {
+	if (!isPrime(p)) {
+		throw new RangeError("p must be prime");
+	}
 	const residues = new Set<number>();
 	for (let i = 0; i < p; i++) {
-		residues.add((i * i) % p);
+		residues.add(mod(i * i, p));
 	}
 
 	return Array.from(residues).sort((a, b) => a - b);

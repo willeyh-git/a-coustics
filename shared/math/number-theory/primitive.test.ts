@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findPrimitiveRoot } from "../number-theory";
+import { findPrimitiveRoot, mod } from "../number-theory";
 
 describe("findPrimitiveRoot", () => {
 	it("finds primitive root of 3", () => {
