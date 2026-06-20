@@ -1,3 +1,5 @@
+import { getPrimeFactors } from "./factors";
+
 /**
  * Checks if a number is prime.
  * @param n The number to check.
@@ -67,4 +69,43 @@ export function getQuadraticResidues(p: number): number[] {
 	}
 
 	return Array.from(residues).sort((a, b) => a - b);
+}
+
+/**
+ * Finds the smallest primitive root modulo p.
+ * A primitive root modulo p is a number g such that every number coprime to p
+ * is congruent to a power of g modulo p.
+ *
+ * @param p A prime number.
+ * @returns The smallest primitive root modulo p.
+ * @throws Error if p is not a prime number.
+ */
+export function findPrimitiveRoot(p: number): number {
+	if (!isPrime(p)) {
+		throw new RangeError("p must be prime");
+	}
+
+	if (p === 2) {
+		return 1;
+	}
+
+	const phi = p - 1;
+	const factors = getPrimeFactors(phi);
+	const uniqueFactors = Array.from(new Set(factors));
+
+	for (let g = 2; g < p; g++) {
+		let isPrimitive = true;
+		for (const q of uniqueFactors) {
+			if (modPow(g, phi / q, p) === 1) {
+				isPrimitive = false;
+				break;
+			}
+		}
+		if (isPrimitive) {
+			return g;
+		}
+	}
+	throw new Error(
+		`Invariant violation: primitive root not found for prime ${p}`,
+	);
 }
