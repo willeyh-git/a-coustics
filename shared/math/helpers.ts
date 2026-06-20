@@ -88,3 +88,16 @@ export function asNonNegativeInteger(n: number): NonNegativeInteger {
 	assertNonNegativeInteger(n);
 	return n;
 }
+
+/**
+ * Constructs a Frequency from a number.
+ * @param n The number to convert.
+ * @returns The branded Frequency.
+ * @throws RangeError if n is not a positive number.
+ */
+export function asFrequency(n: number): Frequency {
+	if (n <= 0) {
+		throw new RangeError(`Value ${n} must be a positive number.`);
+	}
+	return n as Frequency;
+}

@@ -1,23 +1,24 @@
 import { describe, expect, it } from "vitest";
+import { asPrime } from "./helpers";
 import { generateQRDSequence } from "./sequences";
 
 describe("generateQRDSequence", () => {
 	describe("Core correctness", () => {
 		it("should generate the correct QRD sequence for p=7", () => {
-			expect(generateQRDSequence(7)).toEqual([0, 1, 4, 2, 2, 4, 1]);
+			expect(generateQRDSequence(asPrime(7))).toEqual([0, 1, 4, 2, 2, 4, 1]);
 		});
 
 		it("should generate correct sequences for other small primes", () => {
-			expect(generateQRDSequence(3)).toEqual([0, 1, 1]);
-			expect(generateQRDSequence(5)).toEqual([0, 1, 4, 4, 1]);
-			expect(generateQRDSequence(11)).toEqual([
+			expect(generateQRDSequence(asPrime(3))).toEqual([0, 1, 1]);
+			expect(generateQRDSequence(asPrime(5))).toEqual([0, 1, 4, 4, 1]);
+			expect(generateQRDSequence(asPrime(11))).toEqual([
 				0, 1, 4, 9, 5, 3, 3, 5, 9, 4, 1,
 			]);
 		});
 
 		it("should work for larger primes", () => {
 			const p = 13;
-			const sequence = generateQRDSequence(p);
+			const sequence = generateQRDSequence(asPrime(p));
 			expect(sequence.length).toBe(13);
 			expect(sequence[1]).toBe(1);
 			expect(sequence[2]).toBe(4);
@@ -28,13 +29,13 @@ describe("generateQRDSequence", () => {
 	describe("Invariants", () => {
 		it("should have a length equal to p", () => {
 			const p = 13;
-			const sequence = generateQRDSequence(p);
+			const sequence = generateQRDSequence(asPrime(p));
 			expect(sequence.length).toBe(p);
 		});
 
 		it("should have all elements within the modular bounds [0, p-1]", () => {
 			const p = 17;
-			const sequence = generateQRDSequence(p);
+			const sequence = generateQRDSequence(asPrime(p));
 			sequence.forEach((val) => {
 				expect(val).toBeGreaterThanOrEqual(0);
 				expect(val).toBeLessThan(p);
@@ -43,14 +44,14 @@ describe("generateQRDSequence", () => {
 
 		it("should be idempotent (deterministic)", () => {
 			const p = 7;
-			const first = generateQRDSequence(p);
-			const second = generateQRDSequence(p);
+			const first = generateQRDSequence(asPrime(p));
+			const second = generateQRDSequence(asPrime(p));
 			expect(first).toEqual(second);
 		});
 
 		it("should satisfy i^2 mod p definition", () => {
 			const p = 11;
-			const sequence = generateQRDSequence(p);
+			const sequence = generateQRDSequence(asPrime(p));
 
 			const expected = Array.from({ length: p }, (_, i) => (i * i) % p);
 
@@ -74,13 +75,13 @@ describe("generateQRDSequence", () => {
 		it("should succeed for prime numbers", () => {
 			const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
 			primes.forEach((p) => {
-				expect(() => generateQRDSequence(p)).not.toThrow();
+				expect(() => generateQRDSequence(asPrime(p))).not.toThrow();
 			});
 		});
 
 		it("should always satisfy sequence[i] === i^2 mod p", () => {
 			for (const p of [3, 5, 7, 11, 13]) {
-				const seq = generateQRDSequence(p);
+				const seq = generateQRDSequence(asPrime(p));
 
 				seq.forEach((val, i) => {
 					expect(val).toBe((i * i) % p);

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { asFrequency, asPositiveInteger, asPrime } from "../math/helpers";
 import { SPEED_OF_SOUND } from "./constants";
 import { designUnitDepth } from "./design";
 import {
@@ -18,14 +19,14 @@ describe("acoustics constants", () => {
 
 describe("wavelength", () => {
 	it("should compute correct wavelength at 343 Hz", () => {
-		const result = calculateWavelength(343 as Frequency);
+		const result = calculateWavelength(asFrequency(343));
 
 		expect(result).toBeCloseTo(1, 3);
 	});
 
 	it("should decrease with increasing frequency", () => {
-		const low = calculateWavelength(200 as Frequency);
-		const high = calculateWavelength(800 as Frequency);
+		const low = calculateWavelength(asFrequency(200));
+		const high = calculateWavelength(asFrequency(800));
 
 		expect(low).toBeGreaterThan(high);
 	});
@@ -34,7 +35,7 @@ describe("wavelength", () => {
 describe("QRD unit depth", () => {
 	it("should compute unit depth from wavelength and prime", () => {
 		const lambda = 1 as Length; // normalized wavelength
-		const p = 7;
+		const p = asPrime(7);
 
 		const result = calculateUnitDepth(lambda, p);
 
@@ -42,10 +43,10 @@ describe("QRD unit depth", () => {
 	});
 
 	it("should scale inversely with prime number", () => {
-		const lambda = 1;
+		const lambda = 1 as Length;
 
-		const smallP = calculateUnitDepth(lambda, 5);
-		const largeP = calculateUnitDepth(lambda, 11);
+		const smallP = calculateUnitDepth(lambda, asPrime(5));
+		const largeP = calculateUnitDepth(lambda, asPrime(11));
 
 		expect(smallP).toBeGreaterThan(largeP);
 	});
@@ -53,8 +54,8 @@ describe("QRD unit depth", () => {
 
 describe("design unit depth", () => {
 	it("should derive unit depth from frequency and prime", () => {
-		const p = 7;
-		const f = 343 as Frequency; // Hz
+		const p = asPrime(7);
+		const f = asFrequency(343); // Hz
 
 		const result = designUnitDepth(f, p);
 
@@ -62,10 +63,10 @@ describe("design unit depth", () => {
 	});
 
 	it("should produce smaller depths at higher frequency", () => {
-		const p = 7;
+		const p = asPrime(7);
 
-		const low = designUnitDepth(200, p);
-		const high = designUnitDepth(800, p);
+		const low = designUnitDepth(asFrequency(200), p);
+		const high = designUnitDepth(asFrequency(800), p);
 
 		expect(low).toBeGreaterThan(high);
 	});
@@ -73,19 +74,20 @@ describe("design unit depth", () => {
 
 describe("acoustic sanity constraints", () => {
 	it("should reject zero or negative frequency", () => {
-		expect(() => designUnitDepth(0, 7)).toThrow();
-		expect(() => designUnitDepth(-100, 7)).toThrow();
+		expect(() => designUnitDepth(asFrequency(0), asPrime(7))).toThrow();
+		expect(() => designUnitDepth(asFrequency(-100), asPrime(7))).toThrow();
 	});
 
 	it("should reject non-prime p", () => {
-		expect(() => designUnitDepth(343, 8)).toThrow();
+		expect(() => designUnitDepth(asFrequency(343), asPrime(8))).toThrow();
 	});
 });
 
 describe("determinism", () => {
 	it("should always return same unit depth for same inputs", () => {
-		const a = designUnitDepth(343, 7);
-		const b = designUnitDepth(343, 7);
+		const frequency = asFrequency(343);
+		const a = designUnitDepth(frequency, asPositiveInteger(7));
+		const b = designUnitDepth(frequency, asPositiveInteger(7));
 
 		expect(a).toBeCloseTo(b, 10);
 	});
@@ -93,16 +95,16 @@ describe("determinism", () => {
 
 describe("frequencyFromWavelength", () => {
 	it("should be the inverse of calculateWavelength", () => {
-		const frequency = 343;
+		const frequency = asFrequency(343);
 
 		const wavelength = calculateWavelength(frequency);
 
 		expect(frequencyFromWavelength(wavelength)).toBeCloseTo(frequency, 10);
 	});
 	it("should calculate quarter wavelength", () => {
-		expect(quarterWavelength(343 as Frequency)).toBeCloseTo(0.25, 3);
+		expect(quarterWavelength(asFrequency(343))).toBeCloseTo(0.25, 3);
 	});
 	it("should calculate half wavelength", () => {
-		expect(halfWavelength(343 as Frequency)).toBeCloseTo(0.5, 3);
+		expect(halfWavelength(asFrequency(343))).toBeCloseTo(0.5, 3);
 	});
 });
