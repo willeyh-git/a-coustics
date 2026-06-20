@@ -26,7 +26,7 @@ The project aims to build a strongly-typed, test-driven Nuxt application for des
 
 ### `shared/math/`
 - `number-theory.ts`:
-    - **Methods**: `isPrime`, `gcd`, `isCoprime`, `modPow`, `getQuadraticResidues`.
+    - **Methods**: `isPrime`, `gcd`, `isCoprime`, `mod`, `modPow`, `getQuadraticResidues`, `findPrimitiveRoot`.
 - `extended-gcd.ts`:
     - **Methods**: `extendedGcd`.
 - `factors.ts`:
@@ -41,6 +41,7 @@ The project aims to build a strongly-typed, test-driven Nuxt application for des
     - `number-theory/isPrime.test.ts`
     - `number-theory/residues.test.ts`
     - `number-theory/extended-gcd.test.ts`
+    - `number-theory/mod-inverse.test.ts`
     - `number-theory/primitive.test.ts`
     - `factors.test.ts`
     - `helpers.test.ts`
