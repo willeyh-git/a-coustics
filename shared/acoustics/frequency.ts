@@ -8,7 +8,7 @@ import { SPEED_OF_SOUND } from "./constants";
  * @param frequency Frequency in Hz.
  * @returns Wavelength in meters.
  */
-export function calculateWavelength(frequency: number): Length {
+export function calculateWavelength(frequency: Frequency): Length {
 	return toLength(SPEED_OF_SOUND / frequency, m);
 }
 
@@ -17,7 +17,7 @@ export function calculateWavelength(frequency: number): Length {
  * @param wavelength Wavelength in meters.
  * @returns Frequency in Hz.
  */
-export function frequencyFromWavelength(wavelength: number): Frequency {
+export function frequencyFromWavelength(wavelength: Length): Frequency {
 	return toFrequency(SPEED_OF_SOUND / wavelength, Hz);
 }
 
@@ -26,7 +26,7 @@ export function frequencyFromWavelength(wavelength: number): Frequency {
  * @param frequency Frequency in Hz.
  * @returns Quarter wavelength in meters.
  */
-export function quarterWavelength(frequency: number): Length {
+export function quarterWavelength(frequency: Frequency): Length {
 	return toLength(SPEED_OF_SOUND / frequency / 4, m);
 }
 
@@ -35,6 +35,6 @@ export function quarterWavelength(frequency: number): Length {
  * @param frequency Frequency in Hz.
  * @returns Half wavelength in meters.
  */
-export function halfWavelength(frequency: number): Length {
+export function halfWavelength(frequency: Frequency): Length {
 	return toLength(SPEED_OF_SOUND / frequency / 2, m);
 }

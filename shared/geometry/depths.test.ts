@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { m } from "../types/units";
-import { toLength } from "./scaling";
 import { sequenceToDepths } from "./depths";
+import { toLength } from "./scaling";
 
 describe("sequenceToDepths", () => {
 	it("should map sequence values linearly to depths", () => {

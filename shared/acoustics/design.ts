@@ -9,7 +9,7 @@ import { isPrime } from "../math/number-theory";
  * @returns The unit depth in meters.
  * @throws Error if frequency is non-positive or p is not prime.
  */
-export function designUnitDepth(frequency: number, p: number): number {
+export function designUnitDepth(frequency: Frequency, p: number): number {
 	if (frequency <= 0) {
 		throw new Error("Frequency must be greater than zero");
 	}

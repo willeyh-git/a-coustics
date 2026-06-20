@@ -18,14 +18,14 @@ describe("acoustics constants", () => {
 
 describe("wavelength", () => {
 	it("should compute correct wavelength at 343 Hz", () => {
-		const result = calculateWavelength(343);
+		const result = calculateWavelength(343 as Frequency);
 
 		expect(result).toBeCloseTo(1, 3);
 	});
 
 	it("should decrease with increasing frequency", () => {
-		const low = calculateWavelength(200);
-		const high = calculateWavelength(800);
+		const low = calculateWavelength(200 as Frequency);
+		const high = calculateWavelength(800 as Frequency);
 
 		expect(low).toBeGreaterThan(high);
 	});
@@ -33,7 +33,7 @@ describe("wavelength", () => {
 
 describe("QRD unit depth", () => {
 	it("should compute unit depth from wavelength and prime", () => {
-		const lambda = 1; // normalized wavelength
+		const lambda = 1 as Length; // normalized wavelength
 		const p = 7;
 
 		const result = calculateUnitDepth(lambda, p);
@@ -54,7 +54,7 @@ describe("QRD unit depth", () => {
 describe("design unit depth", () => {
 	it("should derive unit depth from frequency and prime", () => {
 		const p = 7;
-		const f = 343; // Hz
+		const f = 343 as Frequency; // Hz
 
 		const result = designUnitDepth(f, p);
 
@@ -100,9 +100,9 @@ describe("frequencyFromWavelength", () => {
 		expect(frequencyFromWavelength(wavelength)).toBeCloseTo(frequency, 10);
 	});
 	it("should calculate quarter wavelength", () => {
-		expect(quarterWavelength(343)).toBeCloseTo(0.25, 3);
+		expect(quarterWavelength(343 as Frequency)).toBeCloseTo(0.25, 3);
 	});
 	it("should calculate half wavelength", () => {
-		expect(halfWavelength(343)).toBeCloseTo(0.5, 3);
+		expect(halfWavelength(343 as Frequency)).toBeCloseTo(0.5, 3);
 	});
 });

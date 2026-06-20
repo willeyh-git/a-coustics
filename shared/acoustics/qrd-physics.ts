@@ -8,6 +8,6 @@ import { m } from "../types/units";
  * @param p The prime number used for the QRD sequence.
  * @returns The unit depth in meters.
  */
-export function calculateUnitDepth(lambda: number, p: number): Length {
+export function calculateUnitDepth(lambda: Length, p: number): Length {
 	return toLength(lambda / (2 * p), m);
 }
