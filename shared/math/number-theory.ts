@@ -18,8 +18,16 @@ export function isPrime(n: number): boolean {
 
 /**
  * Greatest Common Divisor of two numbers.
+ * 
+ * @param a A non-negative integer.
+ * @param b A non-negative integer.
+ * @returns The greatest common divisor of a and b.
+ * @throws RangeError if a or b is negative.
  */
 export function gcd(a: number, b: number): number {
+	if (a < 0 || b < 0) {
+		throw new RangeError("Arguments must be non-negative");
+	}
 	while (b !== 0) {
 		a %= b;
 		[a, b] = [b, a];
@@ -69,7 +77,7 @@ export function modPow(base: number, exp: number, modulus: number): number {
 
 /**
  * Returns the set of quadratic residues modulo p.
- * Quadratic residues are numbers y such that there exists some x where x^2 ≡ y (mod p).
+ * Quadratic residues are numbers y such such as there exists some x where x^2 ≡ y (mod p).
  *
  * @param p A prime number.
  * @returns An array of unique quadratic residues modulo p.

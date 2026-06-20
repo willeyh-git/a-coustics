@@ -27,4 +27,15 @@ describe("extendedGcd", () => {
 		expect(result.x).toBe(1);
 		expect(result.y).toBe(0);
 	});
+	it("throws when a is negative", () => {
+		expect(() => extendedGcd(-1, 5)).toThrow(RangeError);
+	});
+
+	it("throws when b is negative", () => {
+		expect(() => extendedGcd(5, -1)).toThrow(RangeError);
+	});
+
+	it("throws when both inputs are negative", () => {
+		expect(() => extendedGcd(-5, -1)).toThrow(RangeError);
+	});
 });
