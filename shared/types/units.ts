@@ -38,6 +38,13 @@ export type Density = Brand<number, 'kg/m³'>;
 export type FlowResistivity = Brand<number, 'rayls'>;
 
 /**
+ * Mathematical branded types.
+ */
+export type Prime = Brand<number, 'prime'>;
+export type Modulus = Brand<number, 'modulus'>;
+export type PositiveInteger = Brand<number, 'positive'>;
+
+/**
  * Base units constants.
  */
 export const m = 1 as Length;
