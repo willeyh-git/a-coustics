@@ -19,7 +19,7 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
 - **Strongly Typed**: Every function, variable, and object must have explicit types.
 - **No `any`**: The use of `any` is strictly prohibited. Use `unknown` if the type cannot be determined, and perform type narrowing.
 - **Shared Types**: Use the types defined in `shared/types/` where applicable.
-- **Branded Types**: Use the types defined in `shared/types/` where applicable.
+- **Branded Types**: Use the types defined in `shared/types/` where applicable. All entry into the math system must be via assertion → branding. Use construction functions (e.g., `asPrime(n: number): Prime`) instead of just assertions to ensure runtime validation and type-safe arithmetic.
 - **Converting Scalar values**: Convert scalar values to branded types by scaling in `shared/geometry/scaling` where applicable.
 
 ### Development Workflow
