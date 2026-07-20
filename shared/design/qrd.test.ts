@@ -32,7 +32,7 @@ describe("designQRD", () => {
 	it("should reject non-prime values", () => {
 		expect(() =>
 			designQRD({
-				prime: 8,
+				prime: asPrime(8),
 				designFrequency: toFrequency(343, Hz),
 			}),
 		).toThrow();
