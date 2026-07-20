@@ -1,4 +1,5 @@
 import { isPrime } from './number-theory';
+import type { Prime } from "../types/units";
 
 /**
  * Generates a Quadratic Residue Diffuser (QRD) sequence for a given prime p.
@@ -8,7 +9,7 @@ import { isPrime } from './number-theory';
  * @returns An array of integers representing the QRD sequence.
  * @throws Error if p is not prime.
  */
-export function generateQRDSequence(p: number): number[] {
+export function generateQRDSequence(p: Prime): number[] {
   if (!isPrime(p)) {
     throw new Error('p must be a prime number');
   }

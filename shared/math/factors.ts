@@ -1,14 +1,16 @@
+import type { Prime, PositiveInteger } from "../types/units";
+
 /**
  * Returns the prime factorization of a given integer.
  * @param n The number to factorize.
  * @returns An array of prime factors in ascending order.
  */
-export function getPrimeFactors(n: number): number[] {
+export function getPrimeFactors(n: PositiveInteger): Prime[] {
 	if (n < 1) {
 		throw new RangeError("n must be a positive integer");
 	}
 
-	const factors: number[] = [];
+	const factors: Prime[] = [];
 	let d = 2;
 	let temp = n;
 

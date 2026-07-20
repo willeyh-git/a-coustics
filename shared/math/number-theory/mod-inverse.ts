@@ -1,3 +1,4 @@
+import type { Modulus, PositiveInteger } from "../../types/units";
 import { extendedGcd } from "../extended-gcd";
 
 /**
@@ -10,7 +11,7 @@ import { extendedGcd } from "../extended-gcd";
  * @returns The modular inverse of a modulo m.
  * @throws RangeError if a or m is not a positive integer, if a is 0, or if gcd(a, m) ≠ 1.
  */
-export function modInverse(a: number, m: number): number {
+export function modInverse(a: PositiveInteger, m: Modulus): number {
 	// Domain validation
 	if (!Number.isFinite(a) || !Number.isFinite(m)) {
 		throw new RangeError("Arguments must be finite numbers");

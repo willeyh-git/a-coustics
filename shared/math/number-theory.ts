@@ -1,4 +1,5 @@
 import { getPrimeFactors } from "./factors";
+import type { Prime, Modulus, PositiveInteger } from "../types/units";
 
 /**
  * Checks if a number is prime.
@@ -24,7 +25,7 @@ export function isPrime(n: number): boolean {
  * @returns The greatest common divisor of a and b.
  * @throws RangeError if a or b is negative.
  */
-export function gcd(a: number, b: number): number {
+export function gcd(a: PositiveInteger, b: PositiveInteger): number {
 	if (a < 0 || b < 0) {
 		throw new RangeError("Arguments must be non-negative");
 	}
@@ -38,7 +39,7 @@ export function gcd(a: number, b: number): number {
 /**
  * Checks if two numbers are coprime.
  */
-export function isCoprime(a: number, b: number): boolean {
+export function isCoprime(a: PositiveInteger, b: PositiveInteger): boolean {
 	return gcd(a, b) === 1;
 }
 
@@ -51,7 +52,7 @@ export function isCoprime(a: number, b: number): boolean {
  * @param m The modulus.
  * @returns The non-negative remainder of n / m.
  */
-export function mod(n: number, m: number): number {
+export function mod(n: number, m: Modulus): number {
 	return ((n % m) + m) % m;
 }
 
@@ -62,7 +63,7 @@ export function mod(n: number, m: number): number {
  * @param modulus The modulus.
  * @returns (base^exp) % modulus.
  */
-export function modPow(base: number, exp: number, modulus: number): number {
+export function modPow(base: number, exp: number, modulus: Modulus): number {
 	let res = 1;
 	base = mod(base, modulus);
 	while (exp > 0) {
@@ -83,7 +84,7 @@ export function modPow(base: number, exp: number, modulus: number): number {
  * @returns An array of unique quadratic residues modulo p.
  * @throws Error if p is not prime.
  */
-export function getQuadraticResidues(p: number): number[] {
+export function getQuadraticResidues(p: Prime): number[] {
 	if (!isPrime(p)) {
 		throw new RangeError("p must be prime");
 	}
@@ -104,7 +105,7 @@ export function getQuadraticResidues(p: number): number[] {
  * @returns The smallest primitive root modulo p.
  * @throws Error if p is not a prime number.
  */
-export function findPrimitiveRoot(p: number): number {
+export function findPrimitiveRoot(p: Prime): number {
 	if (!isPrime(p)) {
 		throw new RangeError("p must be prime");
 	}

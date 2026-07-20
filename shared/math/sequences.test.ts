@@ -66,7 +66,10 @@ describe("generateQRDSequence", () => {
 				-1, -2, -3, -5, -7, -11,
 			];
 			nonPrimes.forEach((n) => {
-				expect(() => generateQRDSequence(n)).toThrow(
+				// Since we now expect a Prime brand, we need to pass the number directly 
+				// for the failure case because asPrime() would throw before it reaches 
+				// generateQRDSequence().
+				expect(() => generateQRDSequence(n as any)).toThrow(
 					"p must be a prime number",
 				);
 			});

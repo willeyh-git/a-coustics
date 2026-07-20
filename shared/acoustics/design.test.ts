@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { asFrequency, asPositiveInteger, asPrime } from "../math/helpers";
+import { asFrequency, asLength, asPositiveInteger, asPrime } from "../math/helpers";
 import { SPEED_OF_SOUND } from "./constants";
 import { designUnitDepth } from "./design";
 import {
@@ -79,15 +79,18 @@ describe("acoustic sanity constraints", () => {
 	});
 
 	it("should reject non-prime p", () => {
-		expect(() => designUnitDepth(asFrequency(343), asPrime(8))).toThrow();
+		// Using as any to bypass asPrime's internal validation to test designUnitDepth's validation
+		expect(() => designUnitDepth(asFrequency(343), 8 as any)).toThrow(
+			"p must be a prime number",
+		);
 	});
 });
 
 describe("determinism", () => {
 	it("should always return same unit depth for same inputs", () => {
 		const frequency = asFrequency(343);
-		const a = designUnitDepth(frequency, asPositiveInteger(7));
-		const b = designUnitDepth(frequency, asPositiveInteger(7));
+		const a = designUnitDepth(frequency, asPrime(7));
+		const b = designUnitDepth(frequency, asPrime(7));
 
 		expect(a).toBeCloseTo(b, 10);
 	});
