@@ -20,3 +20,23 @@ export function generateQRDSequence(p: Prime): number[] {
   }
   return sequence;
 }
+
+/**
+ * Generates a Primitive Root Diffuser (PRD) sequence for a given prime p and primitive root g.
+ * The sequence is defined as S(i) = g^i mod p for i from 0 to p-1.
+ * 
+ * @param p - A prime number.
+ * @param g - A primitive root modulo p.
+ * @returns An array of integers representing the PRD sequence.
+ */
+export function generatePRDSequence(p: Prime, g: number): number[] {
+  // Generate sequence S(i) = g^i mod p for i from 0 to p-1
+  const sequence: number[] = [];
+  
+  for (let i = 0; i < p; i++) {
+    const value = Math.pow(g, i) % p;
+    sequence.push(value);
+  }
+  
+  return sequence;
+}

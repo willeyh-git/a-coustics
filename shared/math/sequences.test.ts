@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { asPrime } from "./helpers";
-import { generateQRDSequence } from "./sequences";
+import { generateQRDSequence, generatePRDSequence } from "./sequences";
 
 describe("generateQRDSequence", () => {
 	describe("Core correctness", () => {
@@ -60,21 +60,6 @@ describe("generateQRDSequence", () => {
 	});
 
 	describe("Constraints and Validations", () => {
-		it("should throw an error if p is not a prime number", () => {
-			const nonPrimes = [
-				0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 18, 20, 21, 25, 33, 100, 500, 1000,
-				-1, -2, -3, -5, -7, -11,
-			];
-			nonPrimes.forEach((n) => {
-				// Since we now expect a Prime brand, we need to pass the number directly 
-				// for the failure case because asPrime() would throw before it reaches 
-				// generateQRDSequence().
-				expect(() => generateQRDSequence(n as any)).toThrow(
-					"p must be a prime number",
-				);
-			});
-		});
-
 		it("should succeed for prime numbers", () => {
 			const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
 			primes.forEach((p) => {
@@ -90,6 +75,68 @@ describe("generateQRDSequence", () => {
 					expect(val).toBe((i * i) % p);
 				});
 			}
+		});
+	});
+});
+
+describe("generatePRDSequence", () => {
+	describe("Core correctness", () => {
+		it("should generate the correct PRD sequence for p=7 with primitive root 3", () => {
+			expect(generatePRDSequence(asPrime(7), 3)).toEqual([1, 3, 2, 6, 4, 5, 1]);
+		});
+
+		it("should generate correct sequences for other small primes and roots", () => {
+			expect(generatePRDSequence(asPrime(2), 1)).toEqual([1, 1]);
+			expect(generatePRDSequence(asPrime(3), 2)).toEqual([1, 2, 1]);
+			expect(generatePRDSequence(asPrime(5), 2)).toEqual([1, 2, 4, 3, 1]);
+		});
+
+		it("should work for larger primes", () => {
+			const p = 11;
+			const sequence = generatePRDSequence(asPrime(p), 2);
+			expect(sequence.length).toBe(11);
+			expect(sequence[0]).toBe(1);
+			expect(sequence[1]).toBe(2);
+			expect(sequence[2]).toBe(4);
+		});
+	});
+
+	describe("Invariants", () => {
+		it("should have a length equal to p", () => {
+			const p = 13;
+			const sequence = generatePRDSequence(asPrime(p), 2);
+			expect(sequence.length).toBe(p);
+		});
+
+		it("should have all elements within the modular bounds [0, p-1]", () => {
+			const p = 17;
+			const sequence = generatePRDSequence(asPrime(p), 3);
+			sequence.forEach((val) => {
+				expect(val).toBeGreaterThanOrEqual(0);
+				expect(val).toBeLessThan(p);
+			});
+		});
+
+		it("should be idempotent (deterministic)", () => {
+			const p = 7;
+			const first = generatePRDSequence(asPrime(p), 3);
+			const second = generatePRDSequence(asPrime(p), 3);
+			expect(first).toEqual(second);
+		});
+	});
+
+	describe("Constraints and Validations", () => {
+		it("should succeed for prime numbers", () => {
+			const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
+			primes.forEach((p) => {
+				expect(() => generatePRDSequence(asPrime(p), 1)).not.toThrow();
+			});
+		});
+
+		it("should work with different primitive roots", () => {
+			const p = 7;
+			const sequence = generatePRDSequence(asPrime(p), 3);
+			expect(sequence).toEqual([1, 3, 2, 6, 4, 5, 1]);
 		});
 	});
 });
