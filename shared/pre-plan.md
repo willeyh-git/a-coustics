@@ -824,7 +824,7 @@ Reuse:
 
 Implement only primitive-root-specific behavior.
 
-**Status: 🟡 Partial** — `generatePRDSequence()` exists (Phase 1). Pending: `shared/design/prd.ts`, `shared/validators/prd.ts`.
+**Status: ✅ Complete** — `designPRD()` in `shared/design/prd.ts` with auto-select of primitive root. Full test coverage.
 
 ---
 

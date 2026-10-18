@@ -1,5 +1,10 @@
 import { isPrime } from "./number-theory";
-import type { Prime, PositiveInteger, Integer, NonNegativeInteger } from "../types/units";
+import type {
+	Prime,
+	PositiveInteger,
+	Integer,
+	NonNegativeInteger,
+} from "../types/units";
 
 /**
  * Asserts that the given value is an integer.
@@ -17,7 +22,9 @@ export function assertInteger(n: number): asserts n is Integer {
  * @param n The value to check.
  * @throws RangeError if n is not a non-negative integer.
  */
-export function assertNonNegativeInteger(n: number): asserts n is NonNegativeInteger {
+export function assertNonNegativeInteger(
+	n: number,
+): asserts n is NonNegativeInteger {
 	if (!Number.isInteger(n) || n < 0) {
 		throw new RangeError(`Value ${n} must be a non-negative integer.`);
 	}

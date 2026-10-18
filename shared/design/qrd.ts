@@ -17,7 +17,7 @@ export interface DesignQRDResult {
 export function designQRD(input: DesignQRDInput): DesignQRDResult {
 	const { prime, designFrequency } = input;
 
-	const unitDepth = designUnitDepth(designFrequency, prime) as Length;
+	const unitDepth = designUnitDepth(designFrequency, prime);
 
 	const sequence = generateQRDSequence(prime);
 	const depths = sequenceToDepths(sequence, unitDepth);

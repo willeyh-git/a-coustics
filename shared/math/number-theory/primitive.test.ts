@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { asInteger, asPositiveInteger, asPrime } from "../helpers";
-import { findPrimitiveRoot, mod } from "../number-theory";
+import { findPrimitiveRoot, isPrimitiveRoot, mod } from "../number-theory";
 
 describe("findPrimitiveRoot", () => {
 	it("finds primitive root of 3", () => {
@@ -28,6 +28,28 @@ describe("findPrimitiveRoot", () => {
 	});
 	it("throws primitive root of 15", () => {
 		expect(() => findPrimitiveRoot(15)).toThrow();
+	});
+});
+
+describe("isPrimitiveRoot", () => {
+	it("should accept primitive roots", () => {
+		expect(isPrimitiveRoot(asPrime(7), 3)).toBe(true);
+		expect(isPrimitiveRoot(asPrime(7), 5)).toBe(true);
+		expect(isPrimitiveRoot(asPrime(11), 2)).toBe(true);
+		expect(isPrimitiveRoot(asPrime(2), 1)).toBe(true);
+	});
+
+	it("should reject non-primitive roots", () => {
+		expect(isPrimitiveRoot(asPrime(7), 2)).toBe(false);
+		expect(isPrimitiveRoot(asPrime(7), 1)).toBe(false);
+		expect(isPrimitiveRoot(asPrime(11), 3)).toBe(false);
+	});
+
+	it("should reject non-integers and out-of-range values", () => {
+		expect(isPrimitiveRoot(asPrime(7), 3.5)).toBe(false);
+		expect(isPrimitiveRoot(asPrime(7), 0)).toBe(false);
+		expect(isPrimitiveRoot(asPrime(7), 7)).toBe(false);
+		expect(isPrimitiveRoot(asPrime(7), -1)).toBe(false);
 	});
 });
 describe("findPrimitiveMod", () => {

@@ -13,7 +13,7 @@ export interface ExtendedGcdResult {
  * Computes the Extended Euclidean Algorithm.
  * Returns the greatest common divisor (gcd) of two numbers a and b,
  * along with the coefficients x and y such that ax + by = gcd(a, b).
- * 
+ *
  * @param a A non-negative integer.
  * @param b A non-negative integer.
  * @returns An object containing the gcd and the Bézout coefficients.
@@ -21,7 +21,10 @@ export interface ExtendedGcdResult {
  */
 import type { PositiveInteger } from "../types/units";
 
-export function extendedGcd(a: PositiveInteger, b: PositiveInteger): ExtendedGcdResult {
+export function extendedGcd(
+	a: PositiveInteger,
+	b: PositiveInteger,
+): ExtendedGcdResult {
 	if (a < 0 || b < 0) {
 		throw new RangeError("Arguments must be non-negative");
 	}

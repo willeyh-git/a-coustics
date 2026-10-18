@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { asPrime } from "./helpers";
+import { findPrimitiveRoot, modPow } from "./number-theory";
 import { generateQRDSequence, generatePRDSequence } from "./sequences";
 
 describe("generateQRDSequence", () => {
@@ -129,8 +130,30 @@ describe("generatePRDSequence", () => {
 		it("should succeed for prime numbers", () => {
 			const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
 			primes.forEach((p) => {
-				expect(() => generatePRDSequence(asPrime(p), 1)).not.toThrow();
+				const prime = asPrime(p);
+				expect(() =>
+					generatePRDSequence(prime, findPrimitiveRoot(prime)),
+				).not.toThrow();
 			});
+		});
+
+		it("should remain exact for large primes (no floating point drift)", () => {
+			const prime = asPrime(97);
+			const g = findPrimitiveRoot(prime);
+			const sequence = generatePRDSequence(prime, g);
+
+			expect(sequence).toHaveLength(97);
+			expect(sequence[0]).toBe(1);
+			expect(sequence[96]).toBe(1);
+
+			for (let i = 0; i < 97; i++) {
+				expect(sequence[i]).toBe(modPow(g, i, prime));
+				expect(sequence[i]).toBeGreaterThanOrEqual(1);
+				expect(sequence[i]).toBeLessThan(97);
+			}
+
+			// Sequence has period p-1 over i in [0, p-1]: exactly one repeat (last === first).
+			expect(new Set(sequence).size).toBe(96);
 		});
 
 		it("should work with different primitive roots", () => {
