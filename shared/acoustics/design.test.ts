@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { asFrequency, asLength, asPositiveInteger, asPrime } from "../math/helpers";
+import { asFrequency, asPrime } from "../math/helpers";
+import type { Prime } from "../types/units";
+import { m } from "../types/units";
 import { SPEED_OF_SOUND } from "./constants";
 import { designUnitDepth } from "./design";
 import {
@@ -34,7 +36,7 @@ describe("wavelength", () => {
 
 describe("QRD unit depth", () => {
 	it("should compute unit depth from wavelength and prime", () => {
-		const lambda = 1 as Length; // normalized wavelength
+		const lambda = m; // normalized wavelength
 		const p = asPrime(7);
 
 		const result = calculateUnitDepth(lambda, p);
@@ -43,7 +45,7 @@ describe("QRD unit depth", () => {
 	});
 
 	it("should scale inversely with prime number", () => {
-		const lambda = 1 as Length;
+		const lambda = m;
 
 		const smallP = calculateUnitDepth(lambda, asPrime(5));
 		const largeP = calculateUnitDepth(lambda, asPrime(11));
@@ -79,8 +81,9 @@ describe("acoustic sanity constraints", () => {
 	});
 
 	it("should reject non-prime p", () => {
-		// Using as any to bypass asPrime's internal validation to test designUnitDepth's validation
-		expect(() => designUnitDepth(asFrequency(343), 8 as any)).toThrow(
+		// Branded types are compile-time; pass a runtime value that fails validation.
+		const fakePrime = 8 as unknown as Prime;
+		expect(() => designUnitDepth(asFrequency(343), fakePrime)).toThrow(
 			"p must be a prime number",
 		);
 	});

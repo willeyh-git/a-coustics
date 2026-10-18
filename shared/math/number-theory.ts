@@ -19,7 +19,7 @@ export function isPrime(n: number): boolean {
 
 /**
  * Greatest Common Divisor of two numbers.
- * 
+ *
  * @param a A non-negative integer.
  * @param b A non-negative integer.
  * @returns The greatest common divisor of a and b.
@@ -97,6 +97,34 @@ export function getQuadraticResidues(p: Prime): number[] {
 }
 
 /**
+ * Checks whether g is a primitive root modulo p.
+ * g is a primitive root modulo p iff its multiplicative order modulo p is p - 1,
+ * i.e. g^((p-1)/q) ≢ 1 (mod p) for every prime factor q of p - 1.
+ *
+ * @param p A prime number.
+ * @param g The candidate base.
+ * @returns True if g is a primitive root modulo p, false otherwise.
+ * @throws RangeError if p is not a prime number.
+ */
+export function isPrimitiveRoot(p: Prime, g: number): boolean {
+	if (!isPrime(p)) {
+		throw new RangeError("p must be prime");
+	}
+	if (!Number.isInteger(g)) {
+		return false;
+	}
+	const r = mod(g, p);
+	if (r === 0) {
+		return false;
+	}
+
+	const phi = p - 1;
+	const uniqueFactors = Array.from(new Set(getPrimeFactors(phi)));
+
+	return uniqueFactors.every((q) => modPow(r, phi / q, p) !== 1);
+}
+
+/**
  * Finds the smallest primitive root modulo p.
  * A primitive root modulo p is a number g such that every number coprime to p
  * is congruent to a power of g modulo p.
@@ -110,23 +138,8 @@ export function findPrimitiveRoot(p: Prime): number {
 		throw new RangeError("p must be prime");
 	}
 
-	if (p === 2) {
-		return 1;
-	}
-
-	const phi = p - 1;
-	const factors = getPrimeFactors(phi);
-	const uniqueFactors = Array.from(new Set(factors));
-
-	for (let g = 2; g < p; g++) {
-		let isPrimitive = true;
-		for (const q of uniqueFactors) {
-			if (modPow(g, phi / q, p) === 1) {
-				isPrimitive = false;
-				break;
-			}
-		}
-		if (isPrimitive) {
+	for (let g = 1; g < p; g++) {
+		if (isPrimitiveRoot(p, g)) {
 			return g;
 		}
 	}

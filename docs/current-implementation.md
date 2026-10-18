@@ -10,7 +10,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 2 | Shared Geometry | ✅ Complete |
 | 3 | Shared Acoustic Utilities | ✅ Complete |
 | 4 | QRD (Quadratic Residue Diffuser) | ✅ Complete |
-| 5 | PRD (Primitive Root Diffuser) | 🟡 Partial |
+| 5 | PRD (Primitive Root Diffuser) | ✅ Complete |
 | 6 | Skyline Diffuser | ❌ Not started |
 | 7 | Poly Diffuser | ❌ Not started |
 | 8 | Helmholtz Resonator | ❌ Not started |
@@ -21,7 +21,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 ### Phase 1 — Shared Math Foundations
 
 **Files:**
-- `shared/math/number-theory.ts` — `isPrime()`, `gcd()`, `isCoprime()`, `mod()`, `modPow()`, `getQuadraticResidues()`, `findPrimitiveRoot()`
+- `shared/math/number-theory.ts` — `isPrime()`, `gcd()`, `isCoprime()`, `mod()`, `modPow()`, `getQuadraticResidues()`, `findPrimitiveRoot()`, `isPrimitiveRoot()`
 - `shared/math/sequences.ts` — `generateQRDSequence()`, `generatePRDSequence()`
 - `shared/math/helpers.ts` — Type assertion and construction helpers
 - `shared/math/number-theory/` — Extended GCD, modular inverse (submodule)
@@ -53,18 +53,52 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 **Test coverage:** `design/qrd.test.ts`
 
-## Partial Work
+## Completed Work
 
-### PRD — Sequence Generation Only
+### Phase 1 — Shared Math Foundations
 
-**Done:**
-- `generatePRDSequence(p: Prime, g: number): number[]` in `shared/math/sequences.ts`
-- Full test coverage in `shared/math/sequences.test.ts`
+**Files:**
+- `shared/math/number-theory.ts` — `isPrime()`, `gcd()`, `isCoprime()`, `mod()`, `modPow()`, `getQuadraticResidues()`, `findPrimitiveRoot()`, `isPrimitiveRoot()`
+- `shared/math/sequences.ts` — `generateQRDSequence()`, `generatePRDSequence()`
+- `shared/math/helpers.ts` — Type assertion and construction helpers
+- `shared/math/number-theory/` — Extended GCD, modular inverse (submodule)
 
-**Not done (Phase 5 of pre-plan):**
-- ❌ `shared/design/prd.ts` — No `designPRD()` function
-- ❌ `shared/validators/prd.ts` — No PRD validation
-- ❌ No dedicated PRD test file beyond sequence tests
+**Test coverage:** 12 test files covering all number theory and sequence functions.
+
+### Phase 2 — Shared Geometry
+
+**Files:**
+- `shared/geometry/depths.ts` — `sequenceToDepths()`
+- `shared/geometry/scaling.ts` — Unit conversion utilities
+
+**Test coverage:** `geometry/depths.test.ts`
+
+### Phase 3 — Shared Acoustic Utilities
+
+**Files:**
+- `shared/acoustics/constants.ts` — `SPEED_OF_SOUND`
+- `shared/acoustics/frequency.ts` — `calculateWavelength()`, `frequencyFromWavelength()`, `quarterWavelength()`, `halfWavelength()`
+- `shared/acoustics/design.ts` — `designUnitDepth()`
+
+**Test coverage:** `acoustics/design.test.ts`
+
+### Phase 4 — QRD (Reference Implementation)
+
+**Files:**
+- `shared/design/qrd.ts` — `designQRD()` with `DesignQRDInput` / `DesignQRDResult` types
+- `shared/acoustics/qrd-physics.ts` — `calculateUnitDepth()` for QRD
+
+**Test coverage:** `design/qrd.test.ts`
+
+### Phase 5 — PRD
+
+**Files:**
+- `shared/design/prd.ts` — `designPRD()` with `DesignPRDInput` / `DesignPRDResult` types
+- Auto-selects primitive root via `findPrimitiveRoot()` if not provided
+- Rejects explicitly provided non-primitive roots via `isPrimitiveRoot()`
+- `generatePRDSequence()` uses `modPow()` (exact for large primes)
+
+**Test coverage:** `design/prd.test.ts` (7 tests)
 
 ## Not Started
 

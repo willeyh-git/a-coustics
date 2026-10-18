@@ -13,7 +13,7 @@ describe("gcd", () => {
 	});
 
 	it("should handle zero correctly in gcd", () => {
-		// Note: gcd(0, 0) or gcd(0, x) with 0 is technically undefined or 0, 
+		// Note: gcd(0, 0) or gcd(0, x) with 0 is technically undefined or 0,
 		// but our PositiveInteger brand excludes 0.
 		// If we need to support 0, we'd need a NonNegativeInteger brand and update gcd signature.
 		// Since current requirements for gcd are PositiveInteger, we skip 0 for now.

@@ -1,7 +1,7 @@
 import { calculateWavelength } from "./frequency";
 import { calculateUnitDepth } from "./qrd-physics";
 import { isPrime } from "../math/number-theory";
-import type { Frequency, Prime } from "../types/units";
+import type { Frequency, Length, Prime } from "../types/units";
 
 /**
  * Derives the unit depth for a QRD design based on frequency and prime number.
@@ -10,7 +10,7 @@ import type { Frequency, Prime } from "../types/units";
  * @returns The unit depth in meters.
  * @throws Error if frequency is non-positive or p is not prime.
  */
-export function designUnitDepth(frequency: Frequency, p: Prime): number {
+export function designUnitDepth(frequency: Frequency, p: Prime): Length {
 	if (frequency <= 0) {
 		throw new Error("Frequency must be greater than zero");
 	}
