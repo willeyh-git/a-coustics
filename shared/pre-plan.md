@@ -13,6 +13,8 @@ Supported panel types:
 5. Helmholtz Resonator
 6. ABFUSOR (Absorbing Binary Diffuser)
 
+Diffuser type specifications and lookup: see `docs/` (e.g., `docs/QRD.md`, `docs/PRD.md`, `docs/SKYLINE.md`, etc.)
+
 The application must provide:
 
 - Accurate physical calculations

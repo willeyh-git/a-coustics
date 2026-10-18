@@ -40,6 +40,12 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
   - `types/`: Global TypeScript types and interfaces.
   - `utils/`: Helper functions.
 - `public/`: Static assets.
+- `docs/`: Documentation and diffuser type lookup (individual files per diffuser type, e.g., `docs/QRD.md`, `docs/PRD.md`, `docs/SKYLINE.md`).
+
+## Documentation
+
+- Diffuser type specifications and lookup: `docs/`
+- Implementation plan and detailed instructions: `shared/pre-plan.md`
 
 ## Development Commands
 
