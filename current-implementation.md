@@ -13,6 +13,8 @@ The project aims to build a strongly-typed, test-driven Nuxt application for des
     3. **Acoustics**: Conversion of geometry into acoustic behavior.
 - **Roadmap**: Foundations first (Math -> Geometry -> Acoustics), followed by specific panel implementations (QRD, PRD, Skyline, Poly, Helmholtz, ABFUSOR).
 
+**Diffuser type specifications and lookup:** see `docs/` (e.g., `docs/QRD.md`, `docs/PRD.md`, `docs/SKYLINE.md`, etc.)
+
 ---
 
 ## Project Structure & Implementation
