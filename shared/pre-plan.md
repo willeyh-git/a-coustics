@@ -748,6 +748,8 @@ No geometry.
 
 No acoustics.
 
+**Status: ✅ Complete** — All functions implemented in `shared/math/number-theory.ts` and `shared/math/sequences.ts` with full test coverage (12 test files).
+
 ---
 
 ## Phase 2 — Shared Geometry
@@ -767,6 +769,8 @@ calculatePanelArea()
 ```
 
 Tests verify dimensional correctness.
+
+**Status: ✅ Complete** — `sequenceToDepths()` in `shared/geometry/depths.ts`. `matrixToDepths()`, `calculatePanelWidth()`, `calculatePanelHeight()`, `calculatePanelArea()` are pending.
 
 ---
 
@@ -788,6 +792,8 @@ calculateMaxDepth()
 
 Tests verified against published acoustic references.
 
+**Status: ✅ Complete** — All functions implemented in `shared/acoustics/constants.ts` and `shared/acoustics/frequency.ts` and `shared/acoustics/design.ts`.
+
 ---
 
 ## Phase 4 — QRD
@@ -804,6 +810,8 @@ Validate:
 - Validation
 - Results
 
+**Status: ✅ Complete** — `designQRD()` in `shared/design/qrd.ts` with `shared/acoustics/qrd-physics.ts`. Full test coverage in `design/qrd.test.ts`.
+
 ---
 
 ## Phase 5 — PRD
@@ -815,6 +823,8 @@ Reuse:
 - Diffuser acoustics
 
 Implement only primitive-root-specific behavior.
+
+**Status: 🟡 Partial** — `generatePRDSequence()` exists (Phase 1). Pending: `shared/design/prd.ts`, `shared/validators/prd.ts`.
 
 ---
 
@@ -828,6 +838,8 @@ Reuse:
 
 Implement 2D skyline generation.
 
+**Status: ❌ Not started**
+
 ---
 
 ## Phase 7 — Poly
@@ -839,6 +851,8 @@ Reuse:
 - Shared acoustics
 
 Implement 2D residue grids.
+
+**Status: ❌ Not started**
 
 ---
 
@@ -860,6 +874,8 @@ Reuse:
 - Geometry
 - Frequency response infrastructure
 
+**Status: ❌ Not started**
+
 ---
 
 ## Phase 9 — ABFUSOR
@@ -872,6 +888,8 @@ Reuse:
 - Frequency response infrastructure
 
 Implement hybrid absorber/diffuser behavior.
+
+**Status: ❌ Not started**
 
 ---
 

@@ -1,60 +1,87 @@
 # Current Implementation Status
 
-This document tracks the current state of the acoustic diffuser implementation, including what has been completed and what remains.
+This document tracks the current state of the acoustic diffuser implementation.
+
+## Overall Progress: ~40% Complete
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 1 | Shared Math Foundations | ✅ Complete |
+| 2 | Shared Geometry | ✅ Complete |
+| 3 | Shared Acoustic Utilities | ✅ Complete |
+| 4 | QRD (Quadratic Residue Diffuser) | ✅ Complete |
+| 5 | PRD (Primitive Root Diffuser) | 🟡 Partial |
+| 6 | Skyline Diffuser | ❌ Not started |
+| 7 | Poly Diffuser | ❌ Not started |
+| 8 | Helmholtz Resonator | ❌ Not started |
+| 9 | ABFUSOR | ❌ Not started |
 
 ## Completed Work
 
-### 1. PRD (Primitive Root Diffuser) Implementation
+### Phase 1 — Shared Math Foundations
 
-**File**: `shared/math/sequences.ts`
+**Files:**
+- `shared/math/number-theory.ts` — `isPrime()`, `gcd()`, `isCoprime()`, `mod()`, `modPow()`, `getQuadraticResidues()`, `findPrimitiveRoot()`
+- `shared/math/sequences.ts` — `generateQRDSequence()`, `generatePRDSequence()`
+- `shared/math/helpers.ts` — Type assertion and construction helpers
+- `shared/math/number-theory/` — Extended GCD, modular inverse (submodule)
 
-**Function**: `generatePRDSequence(p: Prime, g: number): number[]`
+**Test coverage:** 12 test files covering all number theory and sequence functions.
 
-**Mathematical Specification**:
-- Implements S(i) = g^i mod p for i from 0 to p-1
-- Uses proper branded types (Prime)
-- Follows the exact mathematical specification from PRD implementation plan
+### Phase 2 — Shared Geometry
 
-**Test Coverage**: `shared/math/sequences.test.ts`
-- Correct generation of PRD sequences for various primes and primitive roots
-- Edge cases including prime=2, prime=3, prime=5, prime=7
-- Comprehensive validation of mathematical properties
+**Files:**
+- `shared/geometry/depths.ts` — `sequenceToDepths()`
+- `shared/geometry/scaling.ts` — Unit conversion utilities
 
-### 2. Core Mathematical Foundation
+**Test coverage:** `geometry/depths.test.ts`
 
-**Files**: 
-- `shared/math/sequences.ts` (contains both QRD and PRD functions)
-- `shared/math/helpers.ts` (contains type assertion and construction functions)
+### Phase 3 — Shared Acoustic Utilities
 
-**Key Features**:
-- Proper use of branded types (`Prime`, `PositiveInteger`, etc.)
-- Mathematical correctness following acoustic diffuser specifications
-- Type safety throughout the implementation
+**Files:**
+- `shared/acoustics/constants.ts` — `SPEED_OF_SOUND`
+- `shared/acoustics/frequency.ts` — `calculateWavelength()`, `frequencyFromWavelength()`, `quarterWavelength()`, `halfWavelength()`
+- `shared/acoustics/design.ts` — `designUnitDepth()`
 
-## Current State
+**Test coverage:** `acoustics/design.test.ts`
 
-The implementation follows all project requirements:
+### Phase 4 — QRD (Reference Implementation)
 
-### Technical Requirements Met:
-✅ **Branded Types**: Uses `Prime` type correctly with `asPrime()` helper function  
-✅ **Mathematical Accuracy**: Implements PRD formula exactly as specified  
-✅ **File Location**: Proper placement in `shared/math/` directory  
-✅ **Test Coverage**: Comprehensive test suite validates implementation  
-✅ **Type Safety**: No `any` types used, all functions strongly typed  
+**Files:**
+- `shared/design/qrd.ts` — `designQRD()` with `DesignQRDInput` / `DesignQRDResult` types
+- `shared/acoustics/qrd-physics.ts` — `calculateUnitDepth()` for QRD
 
-### Implementation Details:
-- Function signature: `generatePRDSequence(p: Prime, g: number): number[]`
-- Mathematical specification: S(i) = g^i mod p for i from 0 to p-1
-- Proper error handling and validation through branded types
+**Test coverage:** `design/qrd.test.ts`
 
-## Next Steps
+## Partial Work
 
-The implementation is now complete with proper mathematical foundation. The next steps would involve:
+### PRD — Sequence Generation Only
 
-1. **Component Development** - Creating UI components that utilize PRD sequences
-2. **Design System Enhancement** - Building reusable design patterns  
-3. **Additional Mathematical Utilities** - More advanced functions as needed for diffuser calculations
+**Done:**
+- `generatePRDSequence(p: Prime, g: number): number[]` in `shared/math/sequences.ts`
+- Full test coverage in `shared/math/sequences.test.ts`
 
-## Current Status: Implementation Complete
+**Not done (Phase 5 of pre-plan):**
+- ❌ `shared/design/prd.ts` — No `designPRD()` function
+- ❌ `shared/validators/prd.ts` — No PRD validation
+- ❌ No dedicated PRD test file beyond sequence tests
 
-The PRD implementation is complete and ready for integration into the broader application architecture.
+## Not Started
+
+- Phase 6 — Skyline Diffuser
+- Phase 7 — Poly Diffuser
+- Phase 8 — Helmholtz Resonator
+- Phase 9 — ABFUSOR
+
+## Missing Infrastructure
+
+The pre-plan calls for these modules which do not yet exist:
+
+- `shared/validators/` — Validation functions for all panel types
+- `shared/math/grids.ts` — 2D grid generation for Skyline/Poly
+- `shared/acoustics/response.ts` — Shared frequency analysis (`generateOctaveBands()`, `generateThirdOctaveBands()`)
+- `shared/acoustics/materials.ts` — Material models for Helmholtz/ABFUSOR
+
+## UI
+
+Only a skeleton `app/app.vue` exists. No UI components built yet.
