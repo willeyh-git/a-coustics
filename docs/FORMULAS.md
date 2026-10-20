@@ -41,7 +41,8 @@ d_ij = r_ij × u
 u  = λ₀ / (2p)
 ```
 - p: prime number (grid order).
-- q1, q2: quadratic-residue coefficients weighting the row (i²) and column (j²) axes.
+- q1, q2: nonzero quadratic-residue coefficients (congruence classes mod p) weighting the row (i²) and column (j²) axes.
+- Convention: any integer coefficient is normalized to its canonical representative in [0, p); equivalent representatives give identical grids. Coefficients congruent to 0 mod p are rejected as degenerate (they collapse one axis).
 - r_ij: residue at grid position (i, j).
 - u: unit depth derived from the design frequency (λ₀ = c / f_design, p the source prime).
 - Equivalently, when a target maximum depth d is given: d_ij = d × r_ij / R_max, where R_max is the maximum residue reached.

@@ -117,15 +117,15 @@ This document tracks the current state of the acoustic diffuser implementation.
 **Files:**
 - `shared/design/poly.ts` — `designPoly()` with `DesignPolyInput` / `DesignPolyResult` types and `PolyCoefficient` type
 - Residue rule `S(i,j) = (q1 × i² + q2 × j²) mod p`, scaled by the QRD unit depth
-- Reuses shared infrastructure: `buildGrid` (grids.ts), `matrixToLengths` (depths.ts), `designUnitDepth` (acoustics/design.ts)
-- Validates that `q1` and `q2` are quadratic residues modulo `p` via `getQuadraticResidues()`
-- Supports asymmetric grids when `q1 ≠ q2`
+- Reuses shared infrastructure: `buildGrid` and `maxInGrid` (grids.ts), `matrixToLengths` (depths.ts), `designUnitDepth` (acoustics/design.ts)
+- Treats `q1` and `q2` as congruence classes modulo `p`: any integer is accepted, normalized with `mod()`, then validated as a nonzero quadratic residue via `getQuadraticResidues()`; `q ≡ 0` is rejected as a degenerate axis-collapse
+- Reports the normalized coefficients and supports asymmetric grids when `q1 ≠ q2`; with `q1 = q2 = 1` the grid coincides with the QRD-sourced Skyline grid
+- Adds `maxInGrid()` to `shared/math/grids.ts`, shared with Skyline (`designSkyline` now uses it), covered by `math/grids.test.ts`
 
-**Test coverage:** `design/poly.test.ts` (11 tests)
+**Test coverage:** `design/poly.test.ts` (16 tests)
 
 ## Not Started
 
-- Phase 7 — Poly Diffuser
 - Phase 8 — Helmholtz Resonator
 - Phase 9 — ABFUSOR
 

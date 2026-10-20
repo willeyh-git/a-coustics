@@ -4,6 +4,7 @@ import { asPrime } from "../math/helpers";
 import { getQuadraticResidues } from "../math/number-theory";
 import { Hz } from "../types/units";
 import { designPoly } from "./poly";
+import { designSkyline } from "./skyline";
 
 describe("designPoly", () => {
 	const prime = asPrime(7);
@@ -82,6 +83,54 @@ describe("designPoly", () => {
 
 		expect(result.q1).toBe(1);
 		expect(result.q2).toBe(2);
+	});
+
+	it("normalizes equivalent coefficients modulo p", () => {
+		// Congruence classes: 9 ≡ 2 (mod 7) and -3 ≡ 4 (mod 7), both QRs.
+		const result = designPoly({ prime, designFrequency: freq, q1: 9, q2: -3 });
+
+		expect(result.q1).toBe(2);
+		expect(result.q2).toBe(4);
+		expect(result.grid).toEqual(expectedGrid(2, 4, 7));
+	});
+
+	it("rejects coefficients congruent to 0 modulo p", () => {
+		// 0 and the canonical-equivalent p collapse one axis of the rule.
+		expect(() =>
+			designPoly({ prime, designFrequency: freq, q1: 0, q2: 1 }),
+		).toThrow(/congruent to 0/);
+		expect(() =>
+			designPoly({ prime, designFrequency: freq, q1: 7, q2: 1 }),
+		).toThrow(/congruent to 0/);
+	});
+
+	it("rejects non-integer coefficients", () => {
+		expect(() =>
+			designPoly({ prime, designFrequency: freq, q1: 1.5, q2: 1 }),
+		).toThrow(/must be an integer/);
+		expect(() =>
+			designPoly({ prime, designFrequency: freq, q1: 1, q2: 2.5 }),
+		).toThrow(/must be an integer/);
+	});
+
+	it("rejects non-residue congruence classes out of range", () => {
+		// 10 ≡ 3 (mod 7); 3 is not a quadratic residue modulo 7.
+		expect(() =>
+			designPoly({ prime, designFrequency: freq, q1: 10, q2: 1 }),
+		).toThrow(/q1/);
+	});
+
+	it("matches the QRD-sourced skyline grid for q1 = q2 = 1", () => {
+		const poly = designPoly({ prime, designFrequency: freq, q1: 1, q2: 1 });
+		const skyline = designSkyline({
+			prime,
+			designFrequency: freq,
+			sequenceType: "QRD",
+		});
+
+		expect(poly.grid).toEqual(skyline.grid);
+		expect(poly.unitDepth).toBeCloseTo(skyline.unitHeight, 6);
+		expect(poly.maxResidue).toBe(skyline.maxResidue);
 	});
 
 	it("validates that q1 is a quadratic residue mod p", () => {

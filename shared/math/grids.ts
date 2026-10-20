@@ -32,3 +32,26 @@ export function buildGrid(
 
 	return grid;
 }
+
+/**
+ * Finds the maximum residue value in a 2D grid of integer residues.
+ * Shared by the grid-based diffusers (Skyline, Poly) to derive `R_max`, the
+ * maximum residue reached, used to compute the maximum physical dimension.
+ *
+ * Residues are assumed non-negative (they come from a `mod p` rule), so an
+ * empty grid yields 0.
+ *
+ * @param grid - A matrix of non-negative integer residues.
+ * @returns The maximum residue value in the grid.
+ */
+export function maxInGrid(grid: number[][]): number {
+	let max = 0;
+	for (const row of grid) {
+		for (const value of row) {
+			if (value > max) {
+				max = value;
+			}
+		}
+	}
+	return max;
+}
