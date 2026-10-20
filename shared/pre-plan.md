@@ -833,12 +833,12 @@ Implement only primitive-root-specific behavior.
 Reuse:
 
 - QRD/PRD sequences
-- Shared geometry
-- Shared acoustics
+- Shared geometry (`matrixToLengths`)
+- Shared acoustics (`designUnitDepth`)
 
 Implement 2D skyline generation.
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/math/grids.ts` (`matrixToLengths`, `buildGrid`) and `shared/design/skyline.ts` (`designSkyline`) with QRD/PRD sources. Full test coverage.
 
 ---
 

@@ -2,7 +2,7 @@
 
 This document tracks the current state of the acoustic diffuser implementation.
 
-## Overall Progress: ~40% Complete
+## Overall Progress: ~55% Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -11,7 +11,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 3 | Shared Acoustic Utilities | ✅ Complete |
 | 4 | QRD (Quadratic Residue Diffuser) | ✅ Complete |
 | 5 | PRD (Primitive Root Diffuser) | ✅ Complete |
-| 6 | Skyline Diffuser | ❌ Not started |
+| 6 | Skyline Diffuser | ✅ Complete |
 | 7 | Poly Diffuser | ❌ Not started |
 | 8 | Helmholtz Resonator | ❌ Not started |
 | 9 | ABFUSOR | ❌ Not started |
@@ -100,9 +100,17 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 **Test coverage:** `design/prd.test.ts` (7 tests)
 
+### Phase 6 — Skyline
+
+**Files:**
+- `shared/math/grids.ts` — `matrixToLengths()`, `buildGrid()` (2D grid infrastructure shared with Poly)
+- `shared/design/skyline.ts` — `designSkyline()` with `DesignSkylineInput` / `DesignSkylineResult` types
+- Supports QRD or PRD sequence source (`Height(i,j) = (S(i) + S(j)) mod p`)
+
+**Test coverage:** `math/grids.test.ts`, `design/skyline.test.ts` (17 tests)
+
 ## Not Started
 
-- Phase 6 — Skyline Diffuser
 - Phase 7 — Poly Diffuser
 - Phase 8 — Helmholtz Resonator
 - Phase 9 — ABFUSOR
@@ -112,9 +120,10 @@ This document tracks the current state of the acoustic diffuser implementation.
 The pre-plan calls for these modules which do not yet exist:
 
 - `shared/validators/` — Validation functions for all panel types
-- `shared/math/grids.ts` — 2D grid generation for Skyline/Poly
 - `shared/acoustics/response.ts` — Shared frequency analysis (`generateOctaveBands()`, `generateThirdOctaveBands()`)
 - `shared/acoustics/materials.ts` — Material models for Helmholtz/ABFUSOR
+
+`shared/math/grids.ts` (2D grid generation for Skyline/Poly) is now implemented.
 
 ## UI
 
