@@ -25,12 +25,14 @@ Note: Exact normalization and indexing depend on the PRD design convention.
 
 ## 3. Skyline Diffuser
 ```
-h_ij = H * r_ij / R_max
+h_ij = r_ij × u
+u  = λ₀ / (2p)
 ```
 - h_ij: height of block at grid position (i,j).
-- r_ij: value from a 2D sequence or designed pattern.
-- H: maximum block height.
-- R_max: maximum sequence value.
+- r_ij: residue from the 2D sequence, r_ij = (S(i) + S(j)) mod p, with S a QRD or PRD sequence.
+- u: unit height derived from the design frequency (λ₀ = c / f_design, p the source prime).
+- Equivalently, when a target maximum height H is given: h_ij = H × r_ij / R_max, where R_max is the maximum residue reached.
+- H = R_max × u is the maximum block height.
 
 ## 4. Fractal Diffuser
 ```

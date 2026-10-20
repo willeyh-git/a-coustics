@@ -523,6 +523,12 @@ d(i,j)
 Height(i,j) × d_unit
 ```
 
+Note: when the source is PRD, the sequence has p entries (S(i) = g^i mod p,
+i = 0..p-1, matching `generatePRDSequence()`). By Fermat's little theorem
+g^(p-1) ≡ g^0 = 1, so the first and last grid rows and columns coincide.
+This is the established repo convention (the PRD phase example shows p-1
+values; the implemented sequence uses p and the duplication is tested).
+
 Constraints:
 
 - Equal X/Y spacing
@@ -833,12 +839,12 @@ Implement only primitive-root-specific behavior.
 Reuse:
 
 - QRD/PRD sequences
-- Shared geometry
-- Shared acoustics
+- Shared geometry (`matrixToLengths`)
+- Shared acoustics (`designUnitDepth`)
 
 Implement 2D skyline generation.
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/math/grids.ts` (`buildGrid`), `shared/geometry/depths.ts` (`matrixToLengths`) and `shared/design/skyline.ts` (`designSkyline`) with QRD/PRD sources. Full test coverage.
 
 ---
 

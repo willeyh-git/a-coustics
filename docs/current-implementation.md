@@ -2,7 +2,7 @@
 
 This document tracks the current state of the acoustic diffuser implementation.
 
-## Overall Progress: ~40% Complete
+## Overall Progress: ~55% Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -11,7 +11,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 3 | Shared Acoustic Utilities | ✅ Complete |
 | 4 | QRD (Quadratic Residue Diffuser) | ✅ Complete |
 | 5 | PRD (Primitive Root Diffuser) | ✅ Complete |
-| 6 | Skyline Diffuser | ❌ Not started |
+| 6 | Skyline Diffuser | ✅ Complete |
 | 7 | Poly Diffuser | ❌ Not started |
 | 8 | Helmholtz Resonator | ❌ Not started |
 | 9 | ABFUSOR | ❌ Not started |
@@ -100,9 +100,20 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 **Test coverage:** `design/prd.test.ts` (7 tests)
 
+### Phase 6 — Skyline
+
+**Files:**
+- `shared/math/grids.ts` — `buildGrid()` (2D grid generation shared with Poly)
+- `shared/geometry/depths.ts` — `matrixToLengths()` (2D counterpart of `sequenceToDepths()`)
+- `shared/design/skyline.ts` — `designSkyline()` with `DesignSkylineInput` / `DesignSkylineResult` types
+- Supports QRD or PRD sequence source (`Height(i,j) = (S(i) + S(j)) mod p`)
+- PRD convention: source sequence has p entries; first/last grid rows and columns coincide (g^(p-1) = g^0 = 1)
+- QRD result omits `primitiveRoot` (no sentinel value)
+
+**Test coverage:** `math/grids.test.ts`, `design/skyline.test.ts` (19 tests); `matrixToLengths` covered in `geometry/depths.test.ts`
+
 ## Not Started
 
-- Phase 6 — Skyline Diffuser
 - Phase 7 — Poly Diffuser
 - Phase 8 — Helmholtz Resonator
 - Phase 9 — ABFUSOR
@@ -112,9 +123,10 @@ This document tracks the current state of the acoustic diffuser implementation.
 The pre-plan calls for these modules which do not yet exist:
 
 - `shared/validators/` — Validation functions for all panel types
-- `shared/math/grids.ts` — 2D grid generation for Skyline/Poly
 - `shared/acoustics/response.ts` — Shared frequency analysis (`generateOctaveBands()`, `generateThirdOctaveBands()`)
 - `shared/acoustics/materials.ts` — Material models for Helmholtz/ABFUSOR
+
+`shared/math/grids.ts` (2D grid generation for Skyline/Poly) is now implemented.
 
 ## UI
 
