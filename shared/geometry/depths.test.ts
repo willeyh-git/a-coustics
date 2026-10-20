@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { m } from "../types/units";
-import { sequenceToDepths } from "./depths";
+import { sequenceToDepths, matrixToLengths } from "./depths";
 import { toLength } from "./scaling";
 
 describe("sequenceToDepths", () => {
@@ -54,5 +54,34 @@ describe("sequenceToDepths", () => {
 		expect(result[0]).toBe(0);
 		expect(result[1]).toBe(0.01);
 		expect(result[2]).toBe(0.02);
+	});
+});
+
+describe("matrixToLengths", () => {
+	const unit = toLength(1 / 14, m);
+
+	it("scales every entry by the unit value", () => {
+		const matrix = [
+			[0, 1, 4],
+			[2, 2, 4],
+			[1, 0, 3],
+		];
+		const lengths = matrixToLengths(matrix, unit);
+
+		expect(lengths).toHaveLength(3);
+		expect(lengths[0][0]).toBeCloseTo(0, 6);
+		expect(lengths[0][1]).toBeCloseTo(1 / 14, 6);
+		expect(lengths[0][2]).toBeCloseTo(4 / 14, 6);
+		expect(lengths[2][2]).toBeCloseTo(3 / 14, 6);
+	});
+
+	it("preserves the matrix shape", () => {
+		const matrix = [
+			[1, 2],
+			[3, 4],
+			[5, 6],
+		];
+		expect(matrixToLengths(matrix, unit)).toHaveLength(3);
+		expect(matrixToLengths(matrix, unit)[0]).toHaveLength(2);
 	});
 });

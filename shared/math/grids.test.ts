@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toLength } from "../geometry/scaling";
-import { m } from "../types/units";
-import { buildGrid, matrixToLengths } from "./grids";
+import { buildGrid } from "./grids";
 
 describe("buildGrid", () => {
 	const sequence = [0, 1, 4, 2, 2, 4, 1];
@@ -42,34 +40,5 @@ describe("buildGrid", () => {
 				expect(value).toBeLessThan(p);
 			}
 		}
-	});
-});
-
-describe("matrixToLengths", () => {
-	const unit = toLength(1 / 14, m);
-
-	it("scales every entry by the unit value", () => {
-		const matrix = [
-			[0, 1, 4],
-			[2, 2, 4],
-			[1, 0, 3],
-		];
-		const lengths = matrixToLengths(matrix, unit);
-
-		expect(lengths).toHaveLength(3);
-		expect(lengths[0][0]).toBeCloseTo(0, 6);
-		expect(lengths[0][1]).toBeCloseTo(1 / 14, 6);
-		expect(lengths[0][2]).toBeCloseTo(4 / 14, 6);
-		expect(lengths[2][2]).toBeCloseTo(3 / 14, 6);
-	});
-
-	it("preserves the matrix shape", () => {
-		const matrix = [
-			[1, 2],
-			[3, 4],
-			[5, 6],
-		];
-		expect(matrixToLengths(matrix, unit)).toHaveLength(3);
-		expect(matrixToLengths(matrix, unit)[0]).toHaveLength(2);
 	});
 });

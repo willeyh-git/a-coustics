@@ -103,11 +103,14 @@ This document tracks the current state of the acoustic diffuser implementation.
 ### Phase 6 — Skyline
 
 **Files:**
-- `shared/math/grids.ts` — `matrixToLengths()`, `buildGrid()` (2D grid infrastructure shared with Poly)
+- `shared/math/grids.ts` — `buildGrid()` (2D grid generation shared with Poly)
+- `shared/geometry/depths.ts` — `matrixToLengths()` (2D counterpart of `sequenceToDepths()`)
 - `shared/design/skyline.ts` — `designSkyline()` with `DesignSkylineInput` / `DesignSkylineResult` types
 - Supports QRD or PRD sequence source (`Height(i,j) = (S(i) + S(j)) mod p`)
+- PRD convention: source sequence has p entries; first/last grid rows and columns coincide (g^(p-1) = g^0 = 1)
+- QRD result omits `primitiveRoot` (no sentinel value)
 
-**Test coverage:** `math/grids.test.ts`, `design/skyline.test.ts` (17 tests)
+**Test coverage:** `math/grids.test.ts`, `design/skyline.test.ts` (19 tests); `matrixToLengths` covered in `geometry/depths.test.ts`
 
 ## Not Started
 

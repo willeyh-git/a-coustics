@@ -62,11 +62,30 @@ describe("designSkyline", () => {
 	it("reports the max residue and max height", () => {
 		const result = designSkyline({ prime, designFrequency: freq });
 
-		// Max residue for (S(i)+S(j)) mod 7 is 6 (e.g. 4 + 4 = 8 mod 7 = 1,
-		// but 4 + 3 not present; check the true maximum reached).
-		expect(result.maxResidue).toBeGreaterThanOrEqual(0);
-		expect(result.maxResidue).toBeLessThan(7);
-		expect(result.maxHeight).toBeCloseTo(result.maxResidue / 14, 3);
+		// Max residue for (S(i)+S(j)) mod 7 is 6, reached by 4 + 2.
+		expect(result.maxResidue).toBe(6);
+		expect(result.maxHeight).toBeCloseTo(6 / 14, 3);
+	});
+
+	it("has no primitive root for QRD", () => {
+		const result = designSkyline({ prime, designFrequency: freq });
+
+		expect(result.primitiveRoot).toBeUndefined();
+	});
+
+	it("handles small primes (p = 3)", () => {
+		const result = designSkyline({
+			prime: asPrime(3),
+			designFrequency: freq,
+		});
+
+		expect(result.sequence).toEqual([0, 1, 1]);
+		expect(result.grid).toHaveLength(3);
+		expect(result.grid[1][1]).toBe(2);
+		expect(result.maxResidue).toBe(2);
+		// Unit height is λ/(2p) = 1/6 at 343 Hz.
+		expect(result.unitHeight).toBeCloseTo(1 / 6, 3);
+		expect(result.maxHeight).toBeCloseTo(2 / 6, 3);
 	});
 
 	it("defaults to QRD when sequenceType is omitted", () => {
@@ -84,6 +103,39 @@ describe("designSkyline", () => {
 		expect(result.sequenceType).toBe("PRD");
 		expect(result.primitiveRoot).toBe(3); // primitive root of 7
 		expect(result.grid).toHaveLength(7);
+		expect(result.sequence).toEqual([1, 3, 2, 6, 4, 5, 1]);
+	});
+
+	it("derives the PRD grid from the source sequence", () => {
+		const result = designSkyline({
+			prime,
+			designFrequency: freq,
+			sequenceType: "PRD",
+		});
+
+		// First sequence value is 1: (1 + 1) mod 7 = 2, (1 + 6) mod 7 = 0.
+		expect(result.grid[0][0]).toBe(2);
+		expect(result.grid[0][1]).toBe(4);
+		expect(result.grid[0][3]).toBe(0);
+
+		for (let i = 0; i < 7; i++) {
+			for (let j = 0; j < 7; j++) {
+				expect(result.grid[i][j]).toBe((result.sequence[i] + result.sequence[j]) % 7);
+			}
+		}
+	});
+
+	it("repeats the first row/column for PRD (g^(p-1) = g^0 = 1)", () => {
+		const result = designSkyline({
+			prime,
+			designFrequency: freq,
+			sequenceType: "PRD",
+		});
+
+		for (let j = 0; j < 7; j++) {
+			expect(result.grid[0][j]).toBe(result.grid[6][j]);
+			expect(result.grid[j][0]).toBe(result.grid[j][6]);
+		}
 	});
 
 	it("accepts an explicitly valid primitive root for PRD", () => {
@@ -95,6 +147,7 @@ describe("designSkyline", () => {
 		});
 
 		expect(result.primitiveRoot).toBe(5);
+		expect(result.sequence).toEqual([1, 5, 4, 6, 2, 3, 1]);
 	});
 
 	it("rejects an explicitly invalid primitive root", () => {

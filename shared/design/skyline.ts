@@ -1,5 +1,7 @@
 import { designUnitDepth } from "../acoustics/design";
-import { buildGrid, matrixToLengths } from "../math/grids";
+import { matrixToLengths } from "../geometry/depths";
+import { toLength } from "../geometry/scaling";
+import { buildGrid } from "../math/grids";
 import { findPrimitiveRoot, isPrimitiveRoot } from "../math/number-theory";
 import { generatePRDSequence, generateQRDSequence } from "../math/sequences";
 import type { Frequency, Length, Prime } from "../types/units";
@@ -30,7 +32,8 @@ export interface DesignSkylineResult {
 	/** The maximum block height in meters. */
 	maxHeight: Length;
 	sequenceType: SkylineSequenceType;
-	primitiveRoot: number;
+	/** The primitive root used. Only present when the PRD source is used. */
+	primitiveRoot?: number;
 }
 
 /**
@@ -52,8 +55,11 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 	const type: SkylineSequenceType = sequenceType === "PRD" ? "PRD" : "QRD";
 
 	let sequence: number[];
-	let primitiveRoot: number;
+	let primitiveRoot: number | undefined;
 
+	// Convention: the PRD source sequence has p entries (g^0..g^(p-1) mod p).
+	// By Fermat's little theorem g^(p-1) ≡ g^0 = 1, so the first and last
+	// sequence values (and therefore the first and last grid rows/columns) coincide.
 	if (type === "PRD") {
 		if (gInput === undefined) {
 			primitiveRoot = findPrimitiveRoot(prime);
@@ -67,7 +73,6 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 		sequence = generatePRDSequence(prime, primitiveRoot);
 	} else {
 		sequence = generateQRDSequence(prime);
-		primitiveRoot = 0;
 	}
 
 	const unitHeight = designUnitDepth(designFrequency, prime);
@@ -87,9 +92,9 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 		}
 	}
 
-	const maxHeight = matrixToLengths([[maxResidue]], unitHeight)[0][0];
+	const maxHeight = toLength(maxResidue, unitHeight);
 
-	return {
+	const result: DesignSkylineResult = {
 		sequence,
 		grid,
 		unitHeight,
@@ -97,6 +102,11 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 		maxResidue,
 		maxHeight,
 		sequenceType: type,
-		primitiveRoot,
 	};
+
+	if (primitiveRoot !== undefined) {
+		result.primitiveRoot = primitiveRoot;
+	}
+
+	return result;
 }
