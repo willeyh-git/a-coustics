@@ -34,7 +34,21 @@ u  = λ₀ / (2p)
 - Equivalently, when a target maximum height H is given: h_ij = H × r_ij / R_max, where R_max is the maximum residue reached.
 - H = R_max × u is the maximum block height.
 
-## 4. Fractal Diffuser
+## 4. Poly Diffuser
+```
+r_ij = (q1 * i² + q2 * j²) mod p
+d_ij = r_ij × u
+u  = λ₀ / (2p)
+```
+- p: prime number (grid order).
+- q1, q2: nonzero quadratic-residue coefficients (congruence classes mod p) weighting the row (i²) and column (j²) axes.
+- Convention: any integer coefficient is normalized to its canonical representative in [0, p); equivalent representatives give identical grids. Coefficients congruent to 0 mod p are rejected as degenerate (they collapse one axis).
+- r_ij: residue at grid position (i, j).
+- u: unit depth derived from the design frequency (λ₀ = c / f_design, p the source prime).
+- Equivalently, when a target maximum depth d is given: d_ij = d × r_ij / R_max, where R_max is the maximum residue reached.
+- d = R_max × u is the maximum well depth.
+
+## 5. Fractal Diffuser
 ```
 P_{k+1} = T(P_k)
 h(x,y) = sum_{k=0}^K a_k P_k(x,y)
@@ -46,7 +60,7 @@ h(x,y) = sum_{k=0}^K a_k P_k(x,y)
 
 This is a general mathematical model, not a unique fractal-diffuser formula.
 
-## 5. Pyramid Diffuser
+## 6. Pyramid Diffuser
 
 For a square-based pyramid with base width w and height H:
 ```
@@ -60,7 +74,7 @@ for |x|,|y| ≤ w/2.
 
 This describes the surface geometry, not its complete acoustic performance.
 
-## 6. QBarrel / Curved Diffuser
+## 7. QBarrel / Curved Diffuser
 
 For a cylindrical convex surface:
 ```

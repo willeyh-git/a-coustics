@@ -559,6 +559,10 @@ Constraints:
 - Prime p
 - Valid quadratic residues q₁ and q₂
 
+Note: q₁ and q₂ are congruence classes modulo p; any integer is accepted and
+normalized to its canonical representative in [0, p). Coefficients congruent to
+0 modulo p are rejected because they collapse one axis of the rule.
+
 ---
 
 ## Helmholtz Resonator
@@ -858,7 +862,7 @@ Reuse:
 
 Implement 2D residue grids.
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/design/poly.ts` (`designPoly`) with residue rule `S(i,j) = (q1 × i² + q2 × j²) mod p`, coefficients validated as nonzero quadratic-residue congruence classes modulo p (normalized with `mod`, `q ≡ 0` rejected as degenerate) and a shared `maxInGrid()` helper in `shared/math/grids.ts`. Full test coverage (`design/poly.test.ts`, 16 tests).
 
 ---
 

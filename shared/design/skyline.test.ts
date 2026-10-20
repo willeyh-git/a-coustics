@@ -120,7 +120,9 @@ describe("designSkyline", () => {
 
 		for (let i = 0; i < 7; i++) {
 			for (let j = 0; j < 7; j++) {
-				expect(result.grid[i][j]).toBe((result.sequence[i] + result.sequence[j]) % 7);
+				expect(result.grid[i][j]).toBe(
+					(result.sequence[i] + result.sequence[j]) % 7,
+				);
 			}
 		}
 	});

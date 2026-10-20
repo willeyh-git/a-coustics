@@ -1,7 +1,7 @@
 import { designUnitDepth } from "../acoustics/design";
 import { matrixToLengths } from "../geometry/depths";
 import { toLength } from "../geometry/scaling";
-import { buildGrid } from "../math/grids";
+import { buildGrid, maxInGrid } from "../math/grids";
 import { findPrimitiveRoot, isPrimitiveRoot } from "../math/number-theory";
 import { generatePRDSequence, generateQRDSequence } from "../math/sequences";
 import type { Frequency, Length, Prime } from "../types/units";
@@ -83,15 +83,7 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 	);
 	const heights = matrixToLengths(grid, unitHeight);
 
-	let maxResidue = 0;
-	for (const row of grid) {
-		for (const value of row) {
-			if (value > maxResidue) {
-				maxResidue = value;
-			}
-		}
-	}
-
+	const maxResidue = maxInGrid(grid);
 	const maxHeight = toLength(maxResidue, unitHeight);
 
 	const result: DesignSkylineResult = {
