@@ -12,7 +12,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 4 | QRD (Quadratic Residue Diffuser) | ✅ Complete |
 | 5 | PRD (Primitive Root Diffuser) | ✅ Complete |
 | 6 | Skyline Diffuser | ✅ Complete |
-| 7 | Poly Diffuser | ❌ Not started |
+| 7 | Poly Diffuser | ✅ Complete |
 | 8 | Helmholtz Resonator | ❌ Not started |
 | 9 | ABFUSOR | ❌ Not started |
 
@@ -111,6 +111,17 @@ This document tracks the current state of the acoustic diffuser implementation.
 - QRD result omits `primitiveRoot` (no sentinel value)
 
 **Test coverage:** `math/grids.test.ts`, `design/skyline.test.ts` (19 tests); `matrixToLengths` covered in `geometry/depths.test.ts`
+
+### Phase 7 — Poly
+
+**Files:**
+- `shared/design/poly.ts` — `designPoly()` with `DesignPolyInput` / `DesignPolyResult` types and `PolyCoefficient` type
+- Residue rule `S(i,j) = (q1 × i² + q2 × j²) mod p`, scaled by the QRD unit depth
+- Reuses shared infrastructure: `buildGrid` (grids.ts), `matrixToLengths` (depths.ts), `designUnitDepth` (acoustics/design.ts)
+- Validates that `q1` and `q2` are quadratic residues modulo `p` via `getQuadraticResidues()`
+- Supports asymmetric grids when `q1 ≠ q2`
+
+**Test coverage:** `design/poly.test.ts` (11 tests)
 
 ## Not Started
 

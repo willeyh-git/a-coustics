@@ -858,7 +858,7 @@ Reuse:
 
 Implement 2D residue grids.
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/design/poly.ts` (`designPoly`) with residue rule `S(i,j) = (q1 × i² + q2 × j²) mod p`, coefficient validation, and full test coverage (`design/poly.test.ts`, 11 tests).
 
 ---
 
