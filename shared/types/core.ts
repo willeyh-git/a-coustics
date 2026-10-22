@@ -1,4 +1,9 @@
-import type { Density, FlowResistivity, Frequency, Length } from "./units";
+import type {
+	Density,
+	FlowResistivity,
+	Frequency,
+	Length,
+} from "./units";
 
 /**
  * Frequency Range.
@@ -6,6 +11,14 @@ import type { Density, FlowResistivity, Frequency, Length } from "./units";
 export interface FrequencyRange {
 	min: Frequency;
 	max: Frequency;
+}
+
+/**
+ * A frequency-domain response: values sampled along a frequency axis.
+ */
+export interface FrequencyResponse {
+	frequencies: Frequency[];
+	values: number[];
 }
 
 /**

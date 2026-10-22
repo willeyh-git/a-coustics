@@ -1,4 +1,11 @@
-import type { Frequency, Length } from "../types/units";
+import type {
+	AcousticResistance,
+	Area,
+	Density,
+	Frequency,
+	Length,
+	Volume,
+} from "../types/units";
 
 /**
  * Converts a scalar value into a Length using a unit multiplier.
@@ -14,4 +21,40 @@ export function toLength(value: number, unit: Length): Length {
  */
 export function toFrequency(value: number, unit: Frequency): Frequency {
 	return (value * unit) as Frequency;
+}
+
+/**
+ * Converts a scalar value into an Area using a unit multiplier.
+ * This is the ONLY place raw number → Area conversion should happen.
+ */
+export function toArea(value: number, unit: Area): Area {
+	return (value * unit) as Area;
+}
+
+/**
+ * Converts a scalar value into a Volume using a unit multiplier.
+ * This is the ONLY place raw number → Volume conversion should happen.
+ */
+export function toVolume(value: number, unit: Volume): Volume {
+	return (value * unit) as Volume;
+}
+
+/**
+ * Converts a scalar value into a Density using a unit multiplier.
+ * This is the ONLY place raw number → Density conversion should happen.
+ */
+export function toDensity(value: number, unit: Density): Density {
+	return (value * unit) as Density;
+}
+
+/**
+ * Converts a scalar value into an AcousticResistance using a unit multiplier.
+ * This is a pure scaling; validate the magnitude with
+ * `asAcousticResistance` when entering from untrusted values.
+ */
+export function toAcousticResistance(
+	value: number,
+	unit: AcousticResistance,
+): AcousticResistance {
+	return (value * unit) as AcousticResistance;
 }

@@ -38,6 +38,12 @@ export type Density = Brand<number, "kg/m³">;
 export type FlowResistivity = Brand<number, "rayls">;
 
 /**
+ * Acoustic (neck) resistance of a Helmholtz resonator in rayls/m⁴
+ * (Pa·s/m⁴).
+ */
+export type AcousticResistance = Brand<number, "rayls/m⁴">;
+
+/**
  * Mathematical branded types.
  */
 export type Prime = Brand<number, "prime">;
@@ -50,4 +56,8 @@ export type NonNegativeInteger = Brand<number, "nonNegativeInteger">;
  * Base units constants.
  */
 export const m = 1 as Length;
+export const m2 = 1 as Area;
+export const m3 = 1 as Volume;
 export const Hz = 1 as Frequency;
+export const kgPerM3 = 1 as Density;
+export const raylsPerM4 = 1 as AcousticResistance;
