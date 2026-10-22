@@ -50,4 +50,6 @@ export type NonNegativeInteger = Brand<number, "nonNegativeInteger">;
  * Base units constants.
  */
 export const m = 1 as Length;
+export const m2 = 1 as Area;
+export const m3 = 1 as Volume;
 export const Hz = 1 as Frequency;

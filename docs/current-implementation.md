@@ -2,7 +2,7 @@
 
 This document tracks the current state of the acoustic diffuser implementation.
 
-## Overall Progress: ~55% Complete
+## Overall Progress: ~85% Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -13,7 +13,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 5 | PRD (Primitive Root Diffuser) | ✅ Complete |
 | 6 | Skyline Diffuser | ✅ Complete |
 | 7 | Poly Diffuser | ✅ Complete |
-| 8 | Helmholtz Resonator | ❌ Not started |
+| 8 | Helmholtz Resonator | ✅ Complete |
 | 9 | ABFUSOR | ❌ Not started |
 
 ## Completed Work
@@ -126,8 +126,24 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 ## Not Started
 
-- Phase 8 — Helmholtz Resonator
 - Phase 9 — ABFUSOR
+
+## Phase 8 — Helmholtz Resonator
+
+**Files:**
+- `shared/acoustics/helmholtz-physics.ts` — `calculateNeckArea()`, `calculateEffectiveLength()` (`L + 1.7r`), `calculateResonantFrequency()` (`f = (c/2π)·√(A/(V·L_eff))`), `calculateAbsorptionCurve()` (impedance model `α = 4r/((r+1)²+x²)`), `calculateBandwidth()` (analytic −3 dB solution)
+- `shared/design/helmholtz.ts` — `designHelmholtz()` with `DesignHelmholtzInput` / `DesignHelmholtzResult` types
+- `shared/acoustics/helmholtz-physics.test.ts`, `shared/design/helmholtz.test.ts`
+
+**Model:**
+- Lumped-parameter mass–spring resonator. Neck area `A = πr²`, effective neck length `L_eff = L + 1.7r` (both-ends end correction), cavity volume `V`.
+- Resonant frequency `f₀ = (c/2π)·√(A/(V·L_eff))`.
+- Absorption coefficient derived from the Z₀-referenced specific impedance `z = r + jx`; peaks at `f₀` where `x = 0`. Default assumes a critically-matched neck (`r = 1`, `α = 1` at resonance); an explicit `acousticResistance` (rayls/m⁴) overrides this.
+- Bandwidth is the −3 dB (half-power) width, solved analytically from `α = 0.5` so it is independent of any sampling axis; returns 0 when absorption never reaches 0.5 (over- or under-damped).
+- `designHelmholtz` returns the resonant frequency, normalized/acoustic resistance, an absorption curve over a logarithmic axis (f₀/3 … f₀·3, or an explicit `frequencyAxis`), and the bandwidth.
+
+**Test coverage:** 25 tests across the two files.
+
 
 ## Missing Infrastructure
 

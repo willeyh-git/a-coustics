@@ -884,7 +884,7 @@ Reuse:
 - Geometry
 - Frequency response infrastructure
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/acoustics/helmholtz-physics.ts` (`calculateNeckArea`, `calculateEffectiveLength`, `calculateResonantFrequency`, `calculateAbsorptionCurve`, `calculateBandwidth`) and `shared/design/helmholtz.ts` (`designHelmholtz`) with full test coverage (`shared/acoustics/helmholtz-physics.test.ts`, `shared/design/helmholtz.test.ts`, 25 tests). Resonant frequency uses `f = (c/2π)·√(A/(V·L_eff))` with `L_eff = L + 1.7r`; absorption from the Z₀-referenced impedance model; bandwidth solved analytically from the −3 dB point.
 
 ---
 
