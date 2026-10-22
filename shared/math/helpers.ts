@@ -1,5 +1,7 @@
 import { isPrime } from "./number-theory";
 import type {
+	AcousticResistance,
+	Frequency,
 	Prime,
 	PositiveInteger,
 	Integer,
@@ -107,4 +109,17 @@ export function asFrequency(n: number): Frequency {
 		throw new RangeError(`Value ${n} must be a positive number.`);
 	}
 	return n as Frequency;
+}
+
+/**
+ * Constructs an AcousticResistance from a number (rayls/m⁴).
+ * @param n The number to convert.
+ * @returns The branded AcousticResistance.
+ * @throws RangeError if n is not a positive number.
+ */
+export function asAcousticResistance(n: number): AcousticResistance {
+	if (n <= 0) {
+		throw new RangeError(`Value ${n} must be a positive number.`);
+	}
+	return n as AcousticResistance;
 }

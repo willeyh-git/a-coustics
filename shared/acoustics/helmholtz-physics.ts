@@ -1,13 +1,33 @@
-import { toArea, toFrequency, toLength } from "../geometry/scaling";
-import type { Area, Frequency, Length, Volume } from "../types/units";
-import { Hz, m, m2 } from "../types/units";
+import {
+	toAcousticResistance,
+	toArea,
+	toDensity,
+	toFrequency,
+	toLength,
+} from "../geometry/scaling";
+import type {
+	AcousticResistance,
+	Area,
+	Density,
+	Frequency,
+	Length,
+	Volume,
+} from "../types/units";
+import { Hz, kgPerM3, m, m2, raylsPerM4 } from "../types/units";
 import { SPEED_OF_SOUND } from "./constants";
 
 /**
- * Air density (kg/m³) at ~20 °C. Used to derive the characteristic impedance
- * of air `Z₀ = ρ₀ · c` for the acoustic-impedance absorption model.
+ * Air density (kg/m³) at 20 °C. Used to derive the characteristic impedance
+ * of air `Z₀ = ρ₀ · c` for the acoustic-impedance absorption model. Matches
+ * the temperature assumed by `SPEED_OF_SOUND` (343 m/s at ~20 °C).
  */
-export const AIR_DENSITY = 1.21;
+export const AIR_DENSITY: Density = toDensity(1.204, kgPerM3);
+
+/**
+ * Characteristic impedance of air `Z₀ = ρ₀ · c` (rayls/m²), the reference
+ * impedance against which the resonator's specific impedance is normalized.
+ */
+export const CHARACTERISTIC_IMPEDANCE_OF_AIR = AIR_DENSITY * SPEED_OF_SOUND;
 
 /**
  * End-correction factor for the neck. The oscillating air column in the neck
@@ -23,7 +43,7 @@ export const END_CORRECTION_FACTOR = 1.7;
  * the incident sound. When the (dimensionless, Z₀-referenced) resistance equals
  * 1 the resonator is "critically matched": at resonance all incident energy is
  * absorbed (α = 1). This is the natural design target and the default used when
- * no explicit acoustic resistance is supplied.
+ * no explicit `acousticResistance` is supplied.
  */
 export const DEFAULT_NORMALIZED_RESISTANCE = 1;
 
@@ -52,7 +72,31 @@ export function calculateEffectiveLength(
 ): Length {
 	const L = Number(neckLength);
 	const r = Number(neckRadius);
+	if (L <= 0 || r <= 0) {
+		throw new RangeError(
+			`neckLength and neckRadius must be positive (got ${L}, ${r})`,
+		);
+	}
 	return toLength(L + END_CORRECTION_FACTOR * r, m);
+}
+
+/**
+ * Shared validation for resonator geometry; rejects non-positive areas,
+ * volumes, and lengths.
+ */
+function assertPositiveGeometry(
+	neckArea: Area,
+	cavityVolume: Volume,
+	effectiveLength: Length,
+): void {
+	const A = Number(neckArea);
+	const V = Number(cavityVolume);
+	const L = Number(effectiveLength);
+	if (A <= 0 || V <= 0 || L <= 0) {
+		throw new RangeError(
+			`neckArea, cavityVolume, and effectiveLength must be positive (got ${A}, ${V}, ${L})`,
+		);
+	}
 }
 
 /**
@@ -73,15 +117,11 @@ export function calculateResonantFrequency(
 	cavityVolume: Volume,
 	effectiveLength: Length,
 ): Frequency {
+	assertPositiveGeometry(neckArea, cavityVolume, effectiveLength);
+
 	const A = Number(neckArea);
 	const V = Number(cavityVolume);
 	const L = Number(effectiveLength);
-
-	if (A <= 0 || V <= 0 || L <= 0) {
-		throw new RangeError(
-			`neckArea, cavityVolume, and effectiveLength must be positive (got ${A}, ${V}, ${L})`,
-		);
-	}
 
 	const raw = (SPEED_OF_SOUND / (2 * Math.PI)) * Math.sqrt(A / (V * L));
 	return toFrequency(raw, Hz);
@@ -95,28 +135,37 @@ export interface HelmholtzAcousticParams {
 	cavityVolume: Volume;
 	effectiveLength: Length;
 	/**
-	 * Acoustic resistance of the neck in rayls/m⁴ (Pa·s/m⁴). When omitted the
-	 * resonator is assumed critically matched, i.e. the resistance is chosen so
-	 * that the normalized resistance equals `DEFAULT_NORMALIZED_RESISTANCE`.
+	 * Acoustic resistance of the neck in rayls/m⁴ (Pa·s/m⁴). Must be positive
+	 * when supplied. When omitted the resonator is assumed critically matched,
+	 * i.e. the resistance is chosen so that the normalized resistance equals
+	 * `DEFAULT_NORMALIZED_RESISTANCE`.
 	 */
-	acousticResistance?: number;
+	acousticResistance?: AcousticResistance;
 }
 
 /**
  * Resolves the acoustic resistance (rayls/m⁴) from an optional explicit value
- * or the critically-matched default.
+ * or the critically-matched default. Single source of truth for the default so
+ * consumers cannot drift.
+ * @throws RangeError if a supplied resistance is not positive.
  */
-function resolveAcousticResistance(params: HelmholtzAcousticParams): number {
-	const A = Number(params.neckArea);
+export function resolveAcousticResistance(
+	params: HelmholtzAcousticParams,
+): AcousticResistance {
 	if (params.acousticResistance !== undefined) {
-		if (params.acousticResistance < 0) {
-			throw new RangeError("acousticResistance must be non-negative");
+		if (Number(params.acousticResistance) <= 0) {
+			throw new RangeError(
+				`acousticResistance must be positive (got ${Number(params.acousticResistance)})`,
+			);
 		}
 		return params.acousticResistance;
 	}
-	const z0 = AIR_DENSITY * SPEED_OF_SOUND;
-	// r = A · Ra / Z₀ = DEFAULT_NORMALIZED_RESISTANCE  →  Ra = Z₀ / A
-	return (z0 / A) * DEFAULT_NORMALIZED_RESISTANCE;
+	// r = A · Ra / Z₀ = DEFAULT_NORMALIZED_RESISTANCE  →  Ra = Z₀ · DEFAULT / A
+	return toAcousticResistance(
+		(CHARACTERISTIC_IMPEDANCE_OF_AIR / Number(params.neckArea)) *
+			DEFAULT_NORMALIZED_RESISTANCE,
+		raylsPerM4,
+	);
 }
 
 /**
@@ -131,10 +180,9 @@ function normalizedImpedance(
 	const A = Number(params.neckArea);
 	const V = Number(params.cavityVolume);
 	const L = Number(params.effectiveLength);
-	const z0 = AIR_DENSITY * SPEED_OF_SOUND;
 	const Ra = resolveAcousticResistance(params);
 
-	const r = (A * Ra) / z0;
+	const r = (A * Number(Ra)) / CHARACTERISTIC_IMPEDANCE_OF_AIR;
 	const w = 2 * Math.PI * Number(frequency);
 	const x = (w * L) / SPEED_OF_SOUND - (A * SPEED_OF_SOUND) / (w * V);
 
@@ -183,20 +231,26 @@ export function calculateAbsorptionCurve(
  * @param effectiveLength The end-corrected neck length (m).
  * @param acousticResistance Optional acoustic resistance (rayls/m⁴).
  * @returns The bandwidth in Hz.
+ * @throws RangeError if any input is not positive.
  */
 export function calculateBandwidth(
 	neckArea: Area,
 	cavityVolume: Volume,
 	effectiveLength: Length,
-	acousticResistance?: number,
+	acousticResistance?: AcousticResistance,
 ): Frequency {
+	assertPositiveGeometry(neckArea, cavityVolume, effectiveLength);
+
 	const A = Number(neckArea);
 	const V = Number(cavityVolume);
 	const L = Number(effectiveLength);
-
-	const z0 = AIR_DENSITY * SPEED_OF_SOUND;
-	const Ra = acousticResistance ?? (z0 / A) * DEFAULT_NORMALIZED_RESISTANCE;
-	const r = (A * Ra) / z0;
+	const Ra = resolveAcousticResistance({
+		neckArea,
+		cavityVolume,
+		effectiveLength,
+		acousticResistance,
+	});
+	const r = (A * Number(Ra)) / CHARACTERISTIC_IMPEDANCE_OF_AIR;
 
 	const discriminant = 8 * r - (r + 1) ** 2;
 	if (discriminant <= 0) {
@@ -209,9 +263,11 @@ export function calculateBandwidth(
 	const b = (A * SPEED_OF_SOUND) / V;
 	const root = Math.sqrt(x0 * x0 + 4 * a * b);
 
-	const wHigh = (x0 + root) / (2 * a); // +x0 branch (upper cutoff)
-	const wLow = (-x0 + root) / (2 * a); // −x0 branch (lower cutoff)
+	const wHigh = (x0 + root) / (2 * a); // upper cutoff (+x₀ branch)
+	// The lower cutoff is the same quadratic root written as 2b / (x₀ + root),
+	// algebraically identical to (−x₀ + root) / (2a) but free of the
+	// catastrophic cancellation in (−x₀ + root) when 4ab ≪ x₀².
+	const wLow = (2 * b) / (x0 + root);
 
-	const bandwidth = (wHigh - wLow) / (2 * Math.PI);
-	return toFrequency(bandwidth > 0 ? bandwidth : 0, Hz);
+	return toFrequency((wHigh - wLow) / (2 * Math.PI), Hz);
 }

@@ -26,6 +26,7 @@ L_eff = L + 1.7r
 Definitions:
 
 - `c` ≈ 343 m/s — speed of sound in air (~20 °C)
+- `ρ₀` ≈ 1.204 kg/m³ — air density at 20 °C (`Z₀ = ρ₀ · c` ≈ 413)
 - `A` = π r² — neck cross-sectional area
 - `V` — cavity volume
 - `L` — physical neck length (plate thickness)
@@ -54,7 +55,7 @@ which `α = 0.5`, obtained analytically from the impedance model.
 
 Constraints:
 
-- All of `A`, `V`, and `L_eff` must be positive.
+- All of `A`, `V`, and `L_eff` — and `Ra` when supplied — must be positive.
 - The narrower the neck relative to the cavity, the higher the resonant
   frequency and the higher the (sharper) Q.
 

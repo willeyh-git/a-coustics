@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { SPEED_OF_SOUND } from "../acoustics/constants";
 import { AIR_DENSITY } from "../acoustics/helmholtz-physics";
-import { toLength, toVolume } from "../geometry/scaling";
-import { asFrequency } from "../math/helpers";
+import { toAcousticResistance, toLength, toVolume } from "../geometry/scaling";
+import { asAcousticResistance, asFrequency } from "../math/helpers";
 import type { Length, Volume } from "../types/units";
-import { m, m3 } from "../types/units";
+import { m, m3, raylsPerM4 } from "../types/units";
 import { designHelmholtz } from "./helmholtz";
 
 const neckRadius: Length = toLength(0.02, m);
@@ -115,13 +115,42 @@ describe("designHelmholtz", () => {
 			neckRadius,
 			neckLength,
 			cavityVolume,
-			acousticResistance: 5000,
+			acousticResistance: asAcousticResistance(5000),
 		});
 
-		expect(result.acousticResistance).toBeCloseTo(5000, 10);
+		expect(Number(result.acousticResistance)).toBeCloseTo(5000, 10);
 		expect(result.normalizedResistance).toBeLessThan(1);
 		// Higher-than-matched resistance lowers the peak absorption.
 		expect(Math.max(...result.absorptionCurve.values)).toBeLessThan(1);
+	});
+
+	it("rejects a non-positive acoustic resistance", () => {
+		expect(() =>
+			designHelmholtz({
+				neckRadius,
+				neckLength,
+				cavityVolume,
+				acousticResistance: toAcousticResistance(-1000, raylsPerM4),
+			}),
+		).toThrow();
+		expect(() =>
+			designHelmholtz({
+				neckRadius,
+				neckLength,
+				cavityVolume,
+				acousticResistance: toAcousticResistance(0, raylsPerM4),
+			}),
+		).toThrow();
+	});
+
+	it("rejects a non-positive neck radius", () => {
+		expect(() =>
+			designHelmholtz({
+				neckRadius: toLength(0, m),
+				neckLength,
+				cavityVolume,
+			}),
+		).toThrow();
 	});
 
 	it("increases the resonant frequency with a larger neck or smaller cavity", () => {

@@ -1,10 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { toArea, toLength, toVolume } from "../geometry/scaling";
-import { asFrequency } from "../math/helpers";
-import type { Area, Length, Volume } from "../types/units";
-import { m, m2, m3 } from "../types/units";
+import {
+	toAcousticResistance,
+	toArea,
+	toLength,
+	toVolume,
+} from "../geometry/scaling";
+import { asAcousticResistance, asFrequency } from "../math/helpers";
+import type {
+	AcousticResistance,
+	Area,
+	Frequency,
+	Length,
+	Volume,
+} from "../types/units";
+import { m, m2, m3, raylsPerM4 } from "../types/units";
 import { SPEED_OF_SOUND } from "./constants";
 import {
+	AIR_DENSITY,
 	calculateAbsorptionCurve,
 	calculateBandwidth,
 	calculateEffectiveLength,
@@ -35,6 +47,48 @@ function params(
 	};
 }
 
+/**
+ * Builds an acoustic resistance (rayls/m⁴) that yields the requested
+ * normalized resistance r for the canonical neck: r = A · Ra / Z₀.
+ */
+function raFor(normalizedResistance: number): AcousticResistance {
+	return toAcousticResistance(
+		(normalizedResistance * AIR_DENSITY * SPEED_OF_SOUND) / Number(neckArea),
+		raylsPerM4,
+	);
+}
+
+function alphaAt(
+	frequency: Frequency,
+	helmholtzParams: HelmholtzAcousticParams,
+): number {
+	return calculateAbsorptionCurve([frequency], helmholtzParams)[0];
+}
+
+/**
+ * Locates the frequency inside the (log) bracket whose absorption equals
+ * `target` by geometric bisection, assuming the absorption curve is
+ * monotonic across the bracket and α(a) < target < α(b).
+ */
+function halfPowerFrequency(
+	lowAlphaFrequency: number,
+	highAlphaFrequency: number,
+	target: number,
+	helmholtzParams: HelmholtzAcousticParams,
+): number {
+	let lo = lowAlphaFrequency;
+	let hi = highAlphaFrequency;
+	for (let step = 0; step < 200; step = step + 1) {
+		const mid = Math.sqrt(lo * hi);
+		if (alphaAt(asFrequency(mid), helmholtzParams) < target) {
+			lo = mid;
+		} else {
+			hi = mid;
+		}
+	}
+	return Math.sqrt(lo * hi);
+}
+
 describe("calculateNeckArea", () => {
 	it("computes π·r²", () => {
 		expect(Number(calculateNeckArea(toLength(0.01, m)))).toBeCloseTo(
@@ -54,6 +108,15 @@ describe("calculateEffectiveLength", () => {
 		const expected = 0.01 + END_CORRECTION_FACTOR * 0.02;
 		expect(Number(effectiveLength)).toBeCloseTo(expected, 10);
 		expect(END_CORRECTION_FACTOR).toBeCloseTo(1.7, 10);
+	});
+
+	it("rejects non-positive neck geometry", () => {
+		expect(() =>
+			calculateEffectiveLength(toLength(0, m), neckRadius),
+		).toThrow();
+		expect(() =>
+			calculateEffectiveLength(neckLength, toLength(-1, m)),
+		).toThrow();
 	});
 });
 
@@ -160,30 +223,27 @@ describe("calculateAbsorptionCurve", () => {
 		const matched = calculateAbsorptionCurve([asFrequency(92.3)], params());
 		const lossy = calculateAbsorptionCurve(
 			[asFrequency(92.3)],
-			params({ acousticResistance: 1e6 }),
+			params({ acousticResistance: asAcousticResistance(1e6) }),
 		);
 		expect(lossy[0]).toBeLessThan(matched[0]);
 	});
 });
 
 describe("calculateBandwidth", () => {
-	function _baseParams(
-		overrides: Partial<HelmholtzAcousticParams> = {},
-	): HelmholtzAcousticParams {
-		return { neckArea, cavityVolume, effectiveLength, ...overrides };
-	}
-
-	it("matches the analytic −3 dB solution for the matched resonator", () => {
-		// r = 1 → x₀ = √(8−4) = 2; solve x(ω) = ±2 for the two cutoffs.
+	it("matches the half-power crossings of the absorption curve", () => {
+		// The closed-form bandwidth must equal the width between the two
+		// α = 0.5 crossings located by bisection on the curve itself.
 		const f0 = Number(
 			calculateResonantFrequency(neckArea, cavityVolume, effectiveLength),
 		);
+		const helmholtzParams = params();
+		const lower = halfPowerFrequency(f0 / 1e6, f0, 0.5, helmholtzParams);
+		const upper = halfPowerFrequency(f0 * 1e6, f0, 0.5, helmholtzParams);
 		const bw = Number(
 			calculateBandwidth(neckArea, cavityVolume, effectiveLength),
 		);
-		expect(bw).toBeGreaterThan(2000);
-		expect(bw).toBeLessThan(3000);
-		// Bandwidth is large but finite; the resonator is strongly broadened.
+		expect(bw).toBeCloseTo(upper - lower, 6);
+		// Sanity: the passband is wider than the resonant frequency itself.
 		expect(bw).toBeGreaterThan(f0);
 	});
 
@@ -193,7 +253,7 @@ describe("calculateBandwidth", () => {
 				neckArea,
 				cavityVolume,
 				effectiveLength,
-				1e7, // huge resistance → r large → discriminant < 0
+				raFor(30), // r = 30 → 8r − (r+1)² < 0
 			),
 		);
 		expect(bw).toBe(0);
@@ -205,24 +265,49 @@ describe("calculateBandwidth", () => {
 				neckArea,
 				cavityVolume,
 				effectiveLength,
-				1, // tiny resistance → r tiny → discriminant < 0
+				raFor(0.1), // r = 0.1 → 8r − (r+1)² < 0
 			),
 		);
 		expect(bw).toBe(0);
 	});
 
-	it("narrows as the resistance decreases from the over-damped case toward matched", () => {
-		const tiny = Number(
-			calculateBandwidth(neckArea, cavityVolume, effectiveLength, 1),
+	it("grows with normalized resistance across the passband window (up to its peak at r = 3)", () => {
+		const widths = [0.3, 0.5, 1, 2, 3].map((r: number) =>
+			Number(
+				calculateBandwidth(neckArea, cavityVolume, effectiveLength, raFor(r)),
+			),
 		);
-		const matched = Number(
-			calculateBandwidth(neckArea, cavityVolume, effectiveLength),
-		);
-		const huge = Number(
-			calculateBandwidth(neckArea, cavityVolume, effectiveLength, 1e7),
-		);
-		// tiny and huge are both zero (outside the passband window); matched is positive.
-		expect(matched).toBeGreaterThan(tiny);
-		expect(matched).toBeGreaterThan(huge);
+		expect(widths[0]).toBeLessThan(widths[1]);
+		expect(widths[1]).toBeLessThan(widths[2]);
+		expect(widths[2]).toBeLessThan(widths[3]);
+		expect(widths[3]).toBeLessThan(widths[4]);
+	});
+
+	it("rejects non-positive acoustic resistance", () => {
+		expect(() =>
+			calculateBandwidth(
+				neckArea,
+				cavityVolume,
+				effectiveLength,
+				toAcousticResistance(-1000, raylsPerM4),
+			),
+		).toThrow();
+		expect(() =>
+			calculateBandwidth(
+				neckArea,
+				cavityVolume,
+				effectiveLength,
+				toAcousticResistance(0, raylsPerM4),
+			),
+		).toThrow();
+	});
+
+	it("rejects non-positive geometry", () => {
+		expect(() =>
+			calculateBandwidth(toArea(0, m2), cavityVolume, effectiveLength),
+		).toThrow();
+		expect(() =>
+			calculateBandwidth(neckArea, toVolume(0, m3), effectiveLength),
+		).toThrow();
 	});
 });

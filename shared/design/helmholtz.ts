@@ -1,16 +1,23 @@
-import { SPEED_OF_SOUND } from "../acoustics/constants";
 import {
-	AIR_DENSITY,
+	CHARACTERISTIC_IMPEDANCE_OF_AIR,
 	calculateAbsorptionCurve,
 	calculateBandwidth,
 	calculateEffectiveLength,
 	calculateNeckArea,
 	calculateResonantFrequency,
+	resolveAcousticResistance,
 	type HelmholtzAcousticParams,
 } from "../acoustics/helmholtz-physics";
-import { toArea, toFrequency } from "../geometry/scaling";
-import type { Area, Frequency, Length, Volume } from "../types/units";
-import { Hz, m2 } from "../types/units";
+import { toFrequency } from "../geometry/scaling";
+import type { FrequencyResponse } from "../types/core";
+import type {
+	Area,
+	AcousticResistance,
+	Frequency,
+	Length,
+	Volume,
+} from "../types/units";
+import { Hz } from "../types/units";
 
 /**
  * Input for designing a Helmholtz resonator from its geometry.
@@ -23,10 +30,11 @@ export interface DesignHelmholtzInput {
 	/** Cavity volume behind the neck (m³). */
 	cavityVolume: Volume;
 	/**
-	 * Optional explicit acoustic resistance (rayls/m⁴). When omitted the
-	 * resonator is assumed critically matched (normalized resistance = 1).
+	 * Optional explicit acoustic resistance (rayls/m⁴). Must be positive when
+	 * supplied. When omitted the resonator is assumed critically matched
+	 * (normalized resistance = 1).
 	 */
-	acousticResistance?: number;
+	acousticResistance?: AcousticResistance;
 	/**
 	 * Optional frequency axis over which to evaluate the absorption curve and
 	 * bandwidth. When omitted, a logarithmic axis from f₀/3 to 3·f₀ is used.
@@ -42,11 +50,8 @@ export interface DesignHelmholtzResult {
 	effectiveLength: Length;
 	resonantFrequency: Frequency;
 	normalizedResistance: number;
-	acousticResistance: number;
-	absorptionCurve: {
-		frequencies: Frequency[];
-		values: number[];
-	};
+	acousticResistance: AcousticResistance;
+	absorptionCurve: FrequencyResponse;
 	bandwidth: Frequency;
 }
 
@@ -54,12 +59,18 @@ export interface DesignHelmholtzResult {
  * Builds a logarithmically spaced frequency axis from `center / 3` to
  * `center * 3` with `points` samples, used when no explicit axis is supplied.
  */
-function generateFrequencyAxis(center: Frequency, points = 400): Frequency[] {
+function generateFrequencyAxis(
+	center: Frequency,
+	points: number = 400,
+): Frequency[] {
+	if (points < 2) {
+		throw new RangeError(`points must be at least 2 (got ${points})`);
+	}
 	const c = Number(center);
 	const lo = c / 3;
 	const hi = c * 3;
 	const axis: Frequency[] = [];
-	for (let i = 0; i < points; i++) {
+	for (let i = 0; i < points; i = i + 1) {
 		const t = i / (points - 1);
 		const f = lo * (hi / lo) ** t;
 		axis.push(toFrequency(f, Hz));
@@ -95,16 +106,20 @@ export function designHelmholtz(
 		effectiveLength,
 	);
 
-	const z0 = AIR_DENSITY * SPEED_OF_SOUND;
-	const resolvedResistance = acousticResistance ?? z0 / Number(neckArea);
-	const normalizedResistance = (resolvedResistance * Number(neckArea)) / z0;
-
-	const params: HelmholtzAcousticParams = {
+	const baseParams: HelmholtzAcousticParams = {
 		neckArea,
 		cavityVolume,
 		effectiveLength,
+		acousticResistance,
+	};
+	const resolvedResistance = resolveAcousticResistance(baseParams);
+	const params: HelmholtzAcousticParams = {
+		...baseParams,
 		acousticResistance: resolvedResistance,
 	};
+	const normalizedResistance =
+		(Number(resolvedResistance) * Number(neckArea)) /
+		CHARACTERISTIC_IMPEDANCE_OF_AIR;
 
 	const frequencies = frequencyAxis ?? generateFrequencyAxis(resonantFrequency);
 	const absorptionCurve = {
@@ -119,7 +134,7 @@ export function designHelmholtz(
 	);
 
 	return {
-		neckArea: toArea(Number(neckArea), m2),
+		neckArea,
 		effectiveLength,
 		resonantFrequency,
 		normalizedResistance,
