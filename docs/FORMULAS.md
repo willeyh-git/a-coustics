@@ -88,6 +88,30 @@ theta = arcsin(x / R)
 
 This describes the curvature; slats or QRD patterns can add further scattering.
 
+## 8. ABFUSOR — Absorbing Binary Diffuser
+
+Hybrid absorber/diffuser built on QRD well depths. Shallow wells (ascending by
+depth, fraction `absorptiveRatio`) are filled with absorptive material and become
+`ABSORPTIVE`; deep wells remain `DIFFUSIVE` (plain QRD depth).
+
+Diffusive wells: identical diffusion profile to the underlying QRD design.
+
+Absorptive wells are rigid-backed porous layers (Delany–Bazley equivalent fluid).
+Let σ = complex flow resistivity, ρ₀ = air density, γ = 1.4, c = speed of sound,
+Z₀ = ρ₀c (air characteristic impedance), L = layer thickness, f = frequency:
+
+```
+ρ̂ = ρ₀·α∞ + σ̂/(jω)         (α∞ ≈ 1 tortuosity; σ̂ = σ(1 + 0.0571·(100/f)^0.754 − j0.087·(100/f)^0.718))
+ĉ = γp0 / (γ − (γ − 1)·F),  F = 1 / sqrt(1 + (0.59 − j0.124)·(100/f)^0.5)
+Zc = sqrt(ρ̂ · ĉ)            (characteristic impedance)
+k = ω · sqrt(ρ̂ / ĉ)         (wavenumber)
+Zs = Rs + Zc · coth(j·k·L)   (Rs ≈ 0 rigid backing; backed-layer surface impedance)
+α = 1 − |Zs − Z₀| / |Zs + Z₀| (normal-incidence power absorption)
+```
+
+The overall absorption profile is the per-well average (diffusive wells
+contribute 0). A well's absorptive-layer thickness equals that well's QRD depth.
+
 ## Useful frequency estimate
 
 For a well diffuser, a rough quarter-wavelength depth estimate is

@@ -2,10 +2,12 @@ import { isPrime } from "./number-theory";
 import type {
 	AcousticResistance,
 	Frequency,
+	FlowResistivity,
 	Prime,
 	PositiveInteger,
 	Integer,
 	NonNegativeInteger,
+	SurfaceResistance,
 } from "../types/units";
 
 /**
@@ -122,4 +124,30 @@ export function asAcousticResistance(n: number): AcousticResistance {
 		throw new RangeError(`Value ${n} must be a positive number.`);
 	}
 	return n as AcousticResistance;
+}
+
+/**
+ * Constructs a FlowResistivity from a number (rayls/m³).
+ * @param n The number to convert.
+ * @returns The branded FlowResistivity.
+ * @throws RangeError if n is not a positive number.
+ */
+export function asFlowResistivity(n: number): FlowResistivity {
+	if (n <= 0) {
+		throw new RangeError(`Value ${n} must be a positive number.`);
+	}
+	return n as FlowResistivity;
+}
+
+/**
+ * Constructs a SurfaceResistance from a number (rayls/m²).
+ * @param n The number to convert.
+ * @returns The branded SurfaceResistance.
+ * @throws RangeError if n is not a non-negative number.
+ */
+export function asSurfaceResistance(n: number): SurfaceResistance {
+	if (n < 0) {
+		throw new RangeError(`Value ${n} must be non-negative.`);
+	}
+	return n as SurfaceResistance;
 }

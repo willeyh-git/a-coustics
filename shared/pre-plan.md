@@ -899,7 +899,14 @@ Reuse:
 
 Implement hybrid absorber/diffuser behavior.
 
-**Status: ❌ Not started**
+**Status: ✅ Complete** — `shared/design/abfusor.ts` (`designABFUSOR`) reuses the
+QRD sequence and well depths (`designUnitDepth`, `generateQRDSequence`,
+`sequenceToDepths`); the shallowest `absorptiveRatio` fraction of wells (by
+ascending depth) are converted to absorptive wells filled per `materials.ts`
+(Delany–Bazley rigid-backed porous model), the rest remain diffusive. Returns
+per-well state/absorption, the overall absorption profile, peak absorption, and
+absorptive/diffusive fractions. Full test coverage (`acoustics/materials.test.ts`,
+7; `design/abfusor.test.ts`, 10).
 
 ---
 

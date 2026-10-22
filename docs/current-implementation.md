@@ -2,7 +2,7 @@
 
 This document tracks the current state of the acoustic diffuser implementation.
 
-## Overall Progress: ~85% Complete
+## Overall Progress: ~92% Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -14,7 +14,7 @@ This document tracks the current state of the acoustic diffuser implementation.
 | 6 | Skyline Diffuser | ✅ Complete |
 | 7 | Poly Diffuser | ✅ Complete |
 | 8 | Helmholtz Resonator | ✅ Complete |
-| 9 | ABFUSOR | ❌ Not started |
+| 9 | ABFUSOR | ✅ Complete |
 
 ## Completed Work
 
@@ -126,7 +126,22 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 ## Not Started
 
-- Phase 9 — ABFUSOR
+- Shared validators (`shared/validators/`)
+- Shared frequency analysis (`shared/acoustics/response.ts`)
+- UI components (only a skeleton `app/app.vue` exists)
+
+## Phase 9 — ABFUSOR (Absorbing Binary Diffuser)
+
+**Files:**
+- `shared/acoustics/materials.ts` — rigid-backed porous-absorber model (Delany–Bazley equivalent fluid). `calculatePorousAbsorption()` computes the normal-incidence power-absorption coefficient of a porous layer from its complex flow resistivity, density, thermal bulk modulus, characteristic impedance and wavenumber, then the backed-layer surface impedance `Zs = Rs + Zc·coth(j·k·L)` and `α = 1 - |Zs - Z₀| / |Zs + Z₀|`. Also `porousAbsorptionResponse()` and `DEFAULT_FLOW_RESISTIVITY_FOAM`.
+- `shared/design/abfusor.ts` — `designABFUSOR()` with `DesignABFUSORInput` / `DesignABFUSORResult` / `ABFUSORWell` / `ABFUSORWellState` types.
+
+**Model:**
+- Hybrid absorber/diffuser built on the QRD infrastructure: the same QRD sequence and well depths are generated, then the shallowest `absorptiveRatio` fraction of wells (by ascending depth) are converted from `DIFFUSIVE` to `ABSORPTIVE` (completely filled with absorptive material), while the deep wells remain diffusive. Shallow wells are poor phase-modulators, so filling them costs little diffusion while adding genuine absorption.
+- `designABFUSOR` reuses `designUnitDepth`, `generateQRDSequence`, `sequenceToDepths` and the shared frequency-axis pattern. For each absorptive well the porous layer thickness equals that well's depth; the overall absorption curve is the per-well average (diffusive wells contribute 0). Rejects `absorptiveRatio` outside `[0, 1)`, non-prime order, and non-positive flow resistivity.
+- Outputs per-well state and absorption, the overall absorption profile, peak absorption, and absorptive/diffusive fractions.
+
+**Test coverage:** `acoustics/materials.test.ts` (7), `design/abfusor.test.ts` (10).
 
 ## Phase 8 — Helmholtz Resonator
 
@@ -151,7 +166,7 @@ The pre-plan calls for these modules which do not yet exist:
 
 - `shared/validators/` — Validation functions for all panel types
 - `shared/acoustics/response.ts` — Shared frequency analysis (`generateOctaveBands()`, `generateThirdOctaveBands()`)
-- `shared/acoustics/materials.ts` — Material models for Helmholtz/ABFUSOR
+- `shared/acoustics/materials.ts` (Shared Material Models for Helmholtz/ABFUSOR) is now implemented (Phase 9).
 
 `shared/math/grids.ts` (2D grid generation for Skyline/Poly) is now implemented.
 

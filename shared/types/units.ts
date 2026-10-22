@@ -33,9 +33,15 @@ export type Frequency = Brand<number, "Hz">;
 export type Density = Brand<number, "kg/m³">;
 
 /**
- * Flow Resistivity in rayls.
+ * Flow resistivity in rayls/m³.
  */
-export type FlowResistivity = Brand<number, "rayls">;
+export type FlowResistivity = Brand<number, "rayls/m³">;
+
+/**
+ * Surface (reluctance) resistance in rayls/m² (Pa·s/m²), added in series with
+ * a porous absorber's front surface.
+ */
+export type SurfaceResistance = Brand<number, "rayls/m²">;
 
 /**
  * Acoustic (neck) resistance of a Helmholtz resonator in rayls/m⁴
@@ -61,3 +67,5 @@ export const m3 = 1 as Volume;
 export const Hz = 1 as Frequency;
 export const kgPerM3 = 1 as Density;
 export const raylsPerM4 = 1 as AcousticResistance;
+export const raylsPerM3 = 1 as FlowResistivity;
+export const raylsPerM2 = 1 as SurfaceResistance;
