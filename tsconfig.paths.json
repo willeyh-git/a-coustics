@@ -5,14 +5,15 @@
 			"@design/*": ["./shared/design/*"],
 			"@geometry/*": ["./shared/geometry/*"],
 			"@math/*": ["./shared/math/*"],
+			"@validators/*": ["./shared/validators/*"],
 			"@units/*": ["./shared/types/*"]
-		}
-	},
-	"include": [
-		"shared/**/*",
-		"app/**/*",
-		"test/nuxt/**/*",
-		"tests/nuxt/**/*",
-		"*.ts"
-	]
+		},
+		"include": [
+			"shared/**/*",
+			"app/**/*",
+			"test/nuxt/**/*",
+			"tests/nuxt/**/*",
+			"*.ts"
+		]
+	}
 }

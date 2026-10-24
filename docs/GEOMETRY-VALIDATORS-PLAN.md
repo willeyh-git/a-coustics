@@ -296,8 +296,12 @@ file the `design*` refactor as a follow-up so this plan ships incrementally.
 ## Ordering & dependencies
 
 ```
+PART A — geometry (foundation; must be stable and green first)
 A.1 calculateWellWidth        (needs @acoustics/frequency.calculateWavelength — exists)
 A.2–A.5 panel width/height/area/volume  (pure geometry; no deps)
+  └─ panel.test.ts green (22 tests); full suite green; lint clean
+
+PART B — validators (built on top of stable geometry)
 B.1 common.ts                 (needs @math/number-theory — exists)
 B.2 per-type validators        (needs B.1; each design type exists for reference)
 B.3 refactor design* (follow-up)
@@ -305,6 +309,9 @@ B.3 refactor design* (follow-up)
 
 No phase depends on another across A/B except B.1 before B.2. All inputs
 already exist in `shared/design/*` to reference against.
+
+**Execution order used:** Part A fully implemented and green before any
+Part B code was written.
 
 ## Acceptance criteria (per the plan's Success Criteria)
 
@@ -323,20 +330,30 @@ Existing design modules carry ~7–30 tests each. Target:
 - `validators/common.test.ts`: ≥ 12
 - each `validators/*.test.ts`: ≥ 6 (valid + one invalid per field + boundaries)
 
-## Files to create
+## Files created
 
-| File | Part |
-|------|------|
-| `shared/geometry/panel.ts` | A |
-| `shared/geometry/panel.test.ts` | A |
-| `shared/validators/common.ts` | B |
-| `shared/validators/common.test.ts` | B |
-| `shared/validators/qrd.ts` + `.test.ts` | B |
-| `shared/validators/prd.ts` + `.test.ts` | B |
-| `shared/validators/skyline.ts` + `.test.ts` | B |
-| `shared/validators/poly.ts` + `.test.ts` | B |
-| `shared/validators/helmholtz.ts` + `.test.ts` | B |
-| `shared/validators/abfusor.ts` + `.test.ts` | B |
+| File | Part | Status |
+|------|------|--------|
+| `shared/geometry/panel.ts` | A | ✅ |
+| `shared/geometry/panel.test.ts` | A | ✅ (22 tests) |
+| `shared/validators/common.ts` | B | ✅ |
+| `shared/validators/common.test.ts` | B | ✅ (19 tests) |
+| `shared/validators/qrd.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/prd.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/skyline.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/poly.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/helmholtz.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/abfusor.ts` + `.test.ts` | B | ✅ |
+| `tsconfig.paths.json` added `@validators/*` alias | infra | ✅ |
+
+**Result:** all 53 validator tests pass; full suite 277 tests green; lint clean.
+
+## Still pending (follow-ups)
+
+- `shared/acoustics/qrd-physics.ts` `calculateMaxDepth` (acoustic, deferred).
+- **Part B.3:** refactor `shared/design/*` to validate-and-return. Option A was
+  chosen — validators are a new non-breaking front door; the `design*` functions
+  still `throw` for now. Not yet done.
 
 Optionally (follow-up): `shared/acoustics/qrd-physics.ts` `calculateMaxDepth`;
 refactor `shared/design/*` to validate-and-return.

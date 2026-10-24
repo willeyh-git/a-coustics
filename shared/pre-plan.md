@@ -764,23 +764,35 @@ No acoustics.
 
 ## Phase 2 — Shared Geometry
 
-Implement:
+Implement (all in `shared/geometry/`, TDD with tests in the same folder):
 
 ```ts
-sequenceToDepths()
+// existing
+sequenceToDepths()          // depths.ts
+matrixToLengths()           // depths.ts (2D counterpart of sequenceToDepths)
 
-matrixToDepths()
-
-calculatePanelWidth()
-
-calculatePanelHeight()
-
-calculatePanelArea()
+// panel dimensions — shared/geometry/panel.ts
+calculateWellWidth()        // w = c / (2·fHigh): well width from highest operating frequency
+calculatePanelWidth()       // W = count · w
+calculatePanelHeight()      // H = count · cellHeight
+calculatePanelArea()        // A = W · H
+calculatePanelVolume()      // V = W · H · D
 ```
 
-Tests verify dimensional correctness.
+Tests verify dimensional correctness, unit branding (conversions only via
+`scaling.ts`), and linearity/scaling invariants.
 
-**Status: ✅ Complete** — `sequenceToDepths()` in `shared/geometry/depths.ts`. `matrixToDepths()`, `calculatePanelWidth()`, `calculatePanelHeight()`, `calculatePanelArea()` are pending.
+**Sequencing rule (authoritative): geometry (Part A) must be stable and fully
+tested before the validation layer (Part B) is built on top.** Part A closes
+Phase 2; Part B (validators) is Phase 2b and depends on Part A being green. See
+`docs/GEOMETRY-VALIDATORS-PLAN.md` for the full spec.
+
+**Status: ✅ Complete** — `sequenceToDepths()` and `matrixToLengths()` in
+`shared/geometry/depths.ts`. Panel-dimension geometry
+(`calculateWellWidth()`, `calculatePanelWidth()`, `calculatePanelHeight()`,
+`calculatePanelArea()`, `calculatePanelVolume()`) implemented in
+`shared/geometry/panel.ts` with full test coverage in
+`shared/geometry/panel.test.ts`.
 
 ---
 
