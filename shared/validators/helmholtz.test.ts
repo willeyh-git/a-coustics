@@ -13,60 +13,118 @@ describe("validateHelmholtzDesign", () => {
 	});
 
 	it("rejects a non-positive neck radius", () => {
-		const res = validateHelmholtzDesign({
+		const result = validateHelmholtzDesign({
 			neckRadius: 0,
 			neckLength: 0.01,
 			cavityVolume: 0.001,
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("neckRadius");
+
+		expect(result).toEqual({
+			valid: false,
+			errors: [
+				{
+					field: "neckRadius",
+					message: "Value must be greater than zero (got 0).",
+				},
+			],
+		});
 	});
 
 	it("rejects a non-positive cavity volume", () => {
-		const res = validateHelmholtzDesign({
+		const result = validateHelmholtzDesign({
 			neckRadius: 0.02,
 			neckLength: 0.01,
 			cavityVolume: 0,
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("cavityVolume");
+
+		if (!result.valid) {
+			expect(result.errors).toEqual([
+				{
+					field: "cavityVolume",
+					message: "Value must be greater than zero (got 0).",
+				},
+			]);
+		}
 	});
 
 	it("rejects a non-positive explicit acoustic resistance", () => {
-		const res = validateHelmholtzDesign({
+		const result = validateHelmholtzDesign({
 			neckRadius: 0.02,
 			neckLength: 0.01,
 			cavityVolume: 0.001,
 			acousticResistance: -1,
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("acousticResistance");
+
+		if (!result.valid) {
+			expect(result.errors).toEqual([
+				{
+					field: "acousticResistance",
+					message: "Value must be greater than zero (got -1).",
+				},
+			]);
+		}
+	});
+
+	it("accepts the critical-matched default (no acoustic resistance)", () => {
+		expect(
+			validateHelmholtzDesign({
+				neckRadius: 0.02,
+				neckLength: 0.01,
+				cavityVolume: 0.001,
+			}),
+		).toEqual({ valid: true });
 	});
 
 	it("rejects an empty frequency axis", () => {
-		const res = validateHelmholtzDesign({
+		const result = validateHelmholtzDesign({
 			neckRadius: 0.02,
 			neckLength: 0.01,
 			cavityVolume: 0.001,
 			frequencyAxis: [],
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("frequencyAxis");
+
+		if (!result.valid) {
+			expect(result.errors).toEqual([
+				{
+					field: "frequencyAxis",
+					message:
+						"Value must be a non-empty array (got [array of 0 entry(s)]).",
+				},
+			]);
+		}
 	});
 
-	it("collects all errors at once", () => {
-		const res = validateHelmholtzDesign({
+	it("names the bad axis entry by index", () => {
+		const result = validateHelmholtzDesign({
+			neckRadius: 0.02,
+			neckLength: 0.01,
+			cavityVolume: 0.001,
+			frequencyAxis: [100, -5],
+		});
+
+		if (!result.valid) {
+			expect(result.errors.map((error) => error.field)).toEqual([
+				"frequencyAxis",
+			]);
+			expect(result.errors.map((error) => error.message).join(" ")).toContain(
+				"entry 1",
+			);
+		}
+	});
+
+	it("reports every geometry problem at once, in checked order", () => {
+		const result = validateHelmholtzDesign({
 			neckRadius: 0,
 			neckLength: -1,
 			cavityVolume: 0,
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) {
-			const fields = res.errors.map((e) => e.field).sort();
-			expect(fields).toEqual([
-				"cavityVolume",
-				"neckLength",
+
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.map((error) => error.field)).toEqual([
 				"neckRadius",
+				"neckLength",
+				"cavityVolume",
 			]);
 		}
 	});

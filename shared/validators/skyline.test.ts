@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { validateSkylineDesign } from "@validators/skyline";
+import {
+	SKYLINE_SEQUENCE_TYPES,
+	validateSkylineDesign,
+} from "@validators/skyline";
 
 describe("validateSkylineDesign", () => {
-	it("accepts a valid QRD-sourced design", () => {
-		expect(
-			validateSkylineDesign({ prime: 7, designFrequency: 1000 }),
-		).toEqual({ valid: true });
+	it("accepts a QRD-sourced design", () => {
+		expect(validateSkylineDesign({ prime: 7, designFrequency: 1000 })).toEqual({
+			valid: true,
+		});
 	});
 
 	it("accepts a PRD-sourced design with a valid primitive root", () => {
@@ -29,19 +32,28 @@ describe("validateSkylineDesign", () => {
 		).toEqual({ valid: true });
 	});
 
-	it("rejects a PRD-sourced design with a non-primitive root", () => {
-		const res = validateSkylineDesign({
+	it("rejects a PRD-sourced design whose root is not a primitive root", () => {
+		const result = validateSkylineDesign({
 			prime: 7,
 			designFrequency: 1000,
 			sequenceType: "PRD",
 			primitiveRoot: 2,
 		});
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("primitiveRoot");
+
+		expect(result).toEqual({
+			valid: false,
+			errors: [
+				{
+					field: "primitiveRoot",
+					message: "Value 2 must be a primitive root modulo 7.",
+				},
+			],
+		});
 	});
 
-	it("does not flag the root when the source is QRD", () => {
-		// With QRD source a primitiveRoot field is irrelevant; it must not error.
+	it("does not flag a root when the source is QRD", () => {
+		// designSkyline ignores primitiveRoot for a QRD source, so it is not an
+		// error either.
 		expect(
 			validateSkylineDesign({
 				prime: 7,
@@ -52,9 +64,60 @@ describe("validateSkylineDesign", () => {
 		).toEqual({ valid: true });
 	});
 
-	it("rejects a non-prime order", () => {
-		const res = validateSkylineDesign({ prime: 9, designFrequency: 1000 });
-		expect(res.valid).toBe(false);
-		if (!res.valid) expect(res.errors[0].field).toBe("prime");
+	it("rejects a sequence source the design cannot build", () => {
+		// designSkyline would otherwise fall back to QRD behind the user's back.
+		const result = validateSkylineDesign({
+			prime: 7,
+			designFrequency: 1000,
+			sequenceType: "prd",
+		});
+
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors).toEqual([
+				{
+					field: "sequenceType",
+					message:
+						`Value must be one of: ${SKYLINE_SEQUENCE_TYPES.join(", ")} ` +
+						`(got "prd").`,
+				},
+			]);
+		}
+	});
+
+	it("does not flag an omitted sequence source (defaults to QRD)", () => {
+		expect(validateSkylineDesign({ prime: 7, designFrequency: 1000 })).toEqual({
+			valid: true,
+		});
+	});
+
+	it("reports an unusable order once, without a follow-on root error", () => {
+		const result = validateSkylineDesign({
+			prime: 8,
+			designFrequency: 1000,
+			sequenceType: "PRD",
+			primitiveRoot: 3,
+		});
+
+		if (!result.valid) {
+			expect(result.errors.map((error) => error.field)).toEqual(["prime"]);
+		}
+	});
+
+	it("collects independent problems in one pass", () => {
+		const result = validateSkylineDesign({
+			prime: 9,
+			designFrequency: -1,
+			sequenceType: "SQ",
+		});
+
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.map((error) => error.field)).toEqual([
+				"prime",
+				"designFrequency",
+				"sequenceType",
+			]);
+		}
 	});
 });

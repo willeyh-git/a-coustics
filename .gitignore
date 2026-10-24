@@ -21,6 +21,11 @@ logs
 # TypeScript incremental build artifacts
 *.tsbuildinfo
 
+# Stray `tsc` output. The project only ever ships `.ts` sources; Vite/Nuxt
+# compile in memory, so a `.js` file beside a `.ts` source is an accidental
+# emission from a bare `tsc` run (no `--outDir`, no `--compile false`).
+shared/**/*.js
+
 # Local env files
 .env
 .env.*

@@ -782,17 +782,33 @@ calculatePanelVolume()      // V = W · H · D
 Tests verify dimensional correctness, unit branding (conversions only via
 `scaling.ts`), and linearity/scaling invariants.
 
-**Sequencing rule (authoritative): geometry (Part A) must be stable and fully
-tested before the validation layer (Part B) is built on top.** Part A closes
-Phase 2; Part B (validators) is Phase 2b and depends on Part A being green. See
-`docs/GEOMETRY-VALIDATORS-PLAN.md` for the full spec.
+**Sequencing rule:** geometry (Part A) is the foundation and must be stable and
+fully tested before the validation layer (Part B) is built on top of it. The
+full spec, its status and the review follow-ups live in
+`docs/GEOMETRY-VALIDATORS-PLAN.md` — that file is the source of truth here; do
+not restate its rules in this plan.
 
 **Status: ✅ Complete** — `sequenceToDepths()` and `matrixToLengths()` in
 `shared/geometry/depths.ts`. Panel-dimension geometry
-(`calculateWellWidth()`, `calculatePanelWidth()`, `calculatePanelHeight()`,
+(`calculateWellWidth()`, `calculateWellWidthWithWall()`,
+`calculatePanelWidth()`, `calculatePanelHeight()`,
 `calculatePanelArea()`, `calculatePanelVolume()`) implemented in
 `shared/geometry/panel.ts` with full test coverage in
 `shared/geometry/panel.test.ts`.
+
+---
+
+## Phase 2b — Validators
+
+Implement structured, non-throwing validation for every panel type in
+`shared/validators/` (`common.ts` shared predicates plus one module and test
+file per design type), returning `ValidationResult` so user errors are reported
+as data instead of thrown. `shared/design/*` keeps its existing throws
+(programmer-error guards); the validators are the new user-facing front door.
+
+**Status: ✅ Complete** — `shared/validators/{common,qrd,prd,skyline,poly,helmholtz,abfusor}.ts`
+with a matching `*.test.ts` each. See
+`docs/GEOMETRY-VALIDATORS-PLAN.md` for the spec and the open follow-ups.
 
 ---
 

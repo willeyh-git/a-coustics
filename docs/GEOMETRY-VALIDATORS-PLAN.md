@@ -297,9 +297,10 @@ file the `design*` refactor as a follow-up so this plan ships incrementally.
 
 ```
 PART A — geometry (foundation; must be stable and green first)
-A.1 calculateWellWidth        (needs @acoustics/frequency.calculateWavelength — exists)
+A.1 calculateWellWidth / calculateWellWidthWithWall
+                                (needs @acoustics/frequency.halfWavelength — exists)
 A.2–A.5 panel width/height/area/volume  (pure geometry; no deps)
-  └─ panel.test.ts green (22 tests); full suite green; lint clean
+  └─ panel.test.ts green (32 tests); full suite green; lint clean
 
 PART B — validators (built on top of stable geometry)
 B.1 common.ts                 (needs @math/number-theory — exists)
@@ -335,18 +336,125 @@ Existing design modules carry ~7–30 tests each. Target:
 | File | Part | Status |
 |------|------|--------|
 | `shared/geometry/panel.ts` | A | ✅ |
-| `shared/geometry/panel.test.ts` | A | ✅ (22 tests) |
+| `shared/geometry/panel.test.ts` | A | ✅ (32 tests) |
 | `shared/validators/common.ts` | B | ✅ |
-| `shared/validators/common.test.ts` | B | ✅ (19 tests) |
-| `shared/validators/qrd.ts` + `.test.ts` | B | ✅ |
-| `shared/validators/prd.ts` + `.test.ts` | B | ✅ |
-| `shared/validators/skyline.ts` + `.test.ts` | B | ✅ |
-| `shared/validators/poly.ts` + `.test.ts` | B | ✅ |
-| `shared/validators/helmholtz.ts` + `.test.ts` | B | ✅ |
-| `shared/validators/abfusor.ts` + `.test.ts` | B | ✅ |
+| `shared/validators/common.test.ts` | B | ✅ (41 tests) |
+| `shared/validators/qrd.ts` + `.test.ts` | B | ✅ (6 tests) |
+| `shared/validators/prd.ts` + `.test.ts` | B | ✅ (6 tests) |
+| `shared/validators/skyline.ts` + `.test.ts` | B | ✅ (9 tests) |
+| `shared/validators/poly.ts` + `.test.ts` | B | ✅ (7 tests) |
+| `shared/validators/helmholtz.ts` + `.test.ts` | B | ✅ (8 tests) |
+| `shared/validators/abfusor.ts` + `.test.ts` | B | ✅ (11 tests) |
 | `tsconfig.paths.json` added `@validators/*` alias | infra | ✅ |
+| `shared/math/helpers.ts` added `assertModulus` / `asModulus` | infra | ✅ |
+| `AGENTS.md` documents the `@validators/*` alias and `shared/validators/` | infra | ✅ |
 
-**Result:** all 53 validator tests pass; full suite 277 tests green; lint clean.
+**Result:** 88 validator tests + 32 geometry tests pass; full suite 29 files /
+322 tests green; `biome lint` and `biome format` clean; the new files also
+type-check clean under `tsc` (see "Review round 2").
+
+## Review round 2 — findings and what was done about them
+
+A second-pass review of the change above found, and this round fixed:
+
+1. **Nothing in the workflow type-checked the code.** `npm run test` (Vitest
+   through esbuild) and `biome lint` both ignore types, so the change shipped
+   with 21 `tsc` errors in its own files. Fixing them was only possible once a
+   check existed: the files were verified with
+   `tsc -p .nuxt/tsconfig.shared.json` (the Nuxt-generated project, which
+   carries the alias map and the repo's `strict` + `noUncheckedIndexedAccess`
+   settings).
+2. **Committed `.js` build artifacts.** 16 `.js` files sat beside their `.ts`
+   sources in `shared/` and were tracked by git. They are TypeScript compiler
+   output — a bare `tsc` run with no `--outDir` and no `"compile": false` emits
+   next to the sources — and they were silently corrupting the suite: Vitest
+   collected `panel.test.js` and `common.test.js` as test files, which is why
+   the suite above reported 31 files / 318 tests rather than the real 29 / 277,
+   and it made Vite warn about duplicated `@units/units` imports. Fix: deleted
+   from disk and from the index, and `.gitignore` now carries
+   `shared/**/*.js` so the next stray emission cannot be committed again.
+3. **`panel.test.ts` built frequencies with the `Length` converter**
+   (`toLength(1000, Hz)`), which the branded types reject but nothing checked;
+   all `m` and `Hz` constants are `1`, so the tests passed while being unit-
+   incoherent. Now uses `toFrequency(…, Hz)`.
+4. **`calculateWellWidthWithWall` shipped untested** despite being an exported
+   new function; it now has six tests (divider subtraction, the zero-thickness
+   identity with `calculateWellWidth`, positivity, the two guard throws).
+5. **Five tests asserted `typeof value === "number"` on branded results** — a
+   tautology, since a brand is a phantom type erased at runtime. Replaced with
+   real boundary/invariant tests.
+6. **Guard policy in `panel.ts` was inconsistent with its own docs:** a
+   `wallThickness` equal to the opening yielded a zero-width well (its JSDoc
+   promised a positive one), negative thickness was accepted under a doc saying
+   "must be positive", and `calculatePanelArea`/`calculatePanelVolume` accepted
+   any length. Now: `wallThickness` non-negative, opening strictly positive,
+   plan dimensions positive, `depth` non-negative so a zero-depth box projects
+   onto its plan area. `count` also moved from `isInteger` to
+   `isSafeInteger`.
+7. **`calculateWellWidth` re-derived the half wavelength by hand** instead of
+   reusing `halfWavelength()` from `@acoustics/frequency`, duplicating acoustic
+   knowledge in the geometry layer. Now delegates to it.
+8. **One root cause reported as three errors.** A bad `prime` in `poly` also
+   produced two "cannot validate coefficient" errors, and `prd`/`skyline` only
+   suppressed the follow-on root error for non-integer primes, so `prime: 8`
+   still complained that `3` "must be a primitive root modulo 8". Coefficient
+   and root follow-ups are now gated on the prime actually having validated.
+9. **Prime order had no range bound**, so untrusted UI input could request a
+   `10⁶`-entry sequence or a `10¹²`-cell poly grid. `validatePrime` now
+   enforces `MIN_PRIME = 3` … `MAX_PRIME = 100` (2D grids grow as `p²`,
+   bounded at `10⁴` wells); `MIN_PRIME` also removes the physically meaningless
+   order-2 panel.
+10. **`sequenceType` was not validated**, so `"prd"` fell back to QRD inside
+    `designSkyline` while the validator said the input was fine. Now checked
+    against `SKYLINE_SEQUENCE_TYPES`, whose element type is
+    `SkylineSequenceType` so the list cannot drift from the union.
+11. **A supplied material without `flowResistivity` passed validation**, and
+    `designABFUSOR` only defaults the whole field, so it propagated `NaN` into
+    the absorption curves. `material` must now be an object (a non-object used
+    to be ignored), `material.flowResistivity` is required when a spec is
+    supplied, and the optional `material.surfaceResistance` is checked
+    non-negative.
+12. **Unit confusion in the shared predicates:** three byte-identical
+    Length/Volume/Frequency bodies, and `validatePositiveFrequency` was used
+    for `acousticResistance` and `flowResistivity`. There is now one
+    `validatePositiveNumber` body plus thin unit wrappers, and unit-bearing
+    call sites use the unit-agnostic form with a comment saying why.
+13. **Validator input types restated the design input shapes**, which can drift
+    silently. Each module now derives its input type from the design input
+    (`{ [field in keyof Design<Input>]?: unknown }`), and error `field`s for
+    nested values use dotted paths (`material.flowResistivity`).
+14. **Number-theory predicates were called with unbranded numbers**
+    (`isPrimitiveRoot(p, g)` with `p: number`, `mod(value, p)` with
+    `value: unknown`) — the project's rule is that entry into the math system
+    goes through assertion → branding. Added the non-throwing narrowing
+    bridges `asPrimeValue` / `asModulusValue` in `common.ts` (built on
+    `asPrime`, and on a new `asModulus` / `assertModulus` in
+    `@math/helpers`), and `validatePrimitiveRoot` now takes a branded
+    `Prime` modulus.
+15. **Test assertions were skippable.** Every per-type test guarded its
+    assertions with `if (!result.valid)`, which passes vacuously when the
+    precondition is wrong, and asserted `errors[0].field` (ordering-coupled and
+    invalid under `noUncheckedIndexedAccess`). They now compare the whole
+    `errors` list — fields and, for the representative cases, the exact
+    message — so the user-facing wording is covered by tests too.
+16. **`combine` had a dead guard and a swallowing branch**: `result.errors`
+    was tested on a narrowed union (always truthy), and a `valid: false`
+    result carrying `errors: []` returned `{ valid: true }`, i.e. an invalid
+    input reported as valid. Both removed.
+17. **Message wording drifted from the `RangeError`s the design layer emits**
+    (`Value q1=… must be an integer.`, `Value g must be a primitive root modulo
+    p.`, `absorptiveRatio must satisfy 0 <= … < 1 (got …)`). The validator
+    messages now mirror them, so wiring the validators in front of the design
+    keeps the user-visible text stable.
+
+Still open from that review (not code defects in this change):
+
+- **The rest of the repo is not `tsc`-clean.** ~117 errors remain in files this
+  change did not touch (`shared/math/number-theory.ts`, `shared/design/abfusor.ts`,
+  several `*.test.ts` indexing under `noUncheckedIndexedAccess`, …). They are a
+  separate chore; a `tsc` gate in the workflow would surface them all at once
+  once the repo is clean. This change's own files are clean.
+- **The validators are still not consumed by `app/`** (Option A of B.3).
 
 ## Still pending (follow-ups)
 

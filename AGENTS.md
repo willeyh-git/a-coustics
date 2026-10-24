@@ -23,6 +23,7 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
   - `@geometry/*` → `shared/geometry/*`
   - `@math/*` → `shared/math/*`
   - `@units/*` → `shared/types/*` (do not use `@types/*`, that name belongs to the npm `@types` namespace)
+  - `@validators/*` → `shared/validators/*`
 - **Single source of truth**: `tsconfig.paths.json` holds the alias map. `nuxt.config.ts` derives the Nuxt `alias` option from it (runtime + generated editor configs) and `vitest.config.ts` feeds it to `vite-tsconfig-paths` (Vitest resolves test files with its own Vite pipeline). Add new aliases only in `tsconfig.paths.json`; do not redeclare them in `tsconfig.json`.
 
 ### Type Safety
@@ -49,6 +50,7 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
   - `math/`: Fundamental mathematical functions, sequences, and number theory.
   - `physics/`: Physical properties and behavior models.
   - `types/`: Global TypeScript types and interfaces.
+  - `validators/`: Structured, non-throwing validation for every panel type.
   - `utils/`: Helper functions.
 - `tsconfig.paths.json`: alias map (single source of truth for shared-module import paths). Do not duplicate the map in `tsconfig.json` — that file only wires the editor to the `.nuxt/tsconfig.*.json` configs that Nuxt generates.
 - `docs/`: Documentation and diffuser type lookup (individual files per diffuser type, e.g., `docs/QRD.md`, `docs/PRD.md`, `docs/SKYLINE.md`).

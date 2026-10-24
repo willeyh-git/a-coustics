@@ -3,10 +3,11 @@ import type {
 	AcousticResistance,
 	Frequency,
 	FlowResistivity,
-	Prime,
-	PositiveInteger,
 	Integer,
+	Modulus,
 	NonNegativeInteger,
+	PositiveInteger,
+	Prime,
 	SurfaceResistance,
 } from "@units/units";
 
@@ -54,6 +55,30 @@ export function assertPrime(n: number): asserts n is Prime {
 	if (!Number.isInteger(n) || !isPrime(n)) {
 		throw new RangeError(`Value ${n} must be a prime number.`);
 	}
+}
+
+/**
+ * Asserts that the given value is a usable modulus.
+ *
+ * Every residue rule in this project (quadratic residues, primitive roots,
+ * skyline/poly grids) is only defined over a prime modulus, so a modulus is
+ * validated with the same primality check as a {@link Prime}.
+ * @param n The value to check.
+ * @throws RangeError if n is not a prime number.
+ */
+export function assertModulus(n: number): asserts n is Modulus {
+	assertPrime(n);
+}
+
+/**
+ * Constructs a Modulus from a number.
+ * @param n The number to convert.
+ * @returns The branded Modulus.
+ * @throws RangeError if n is not a prime number.
+ */
+export function asModulus(n: number): Modulus {
+	assertModulus(n);
+	return n;
 }
 
 /**

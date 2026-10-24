@@ -1,24 +1,31 @@
-import { combine, validatePositiveFrequency, validatePrime } from "@validators/common";
+import {
+	combine,
+	validatePositiveFrequency,
+	validatePrime,
+} from "@validators/common";
+import type { DesignQRDInput } from "@design/qrd";
 import type { ValidationResult } from "@validators/common";
 
 /**
- * Input for {@link validateQRDDesign}. Accepts a plain object of untrusted
- * values (e.g. from a UI form); fields are validated independently of their
- * runtime brand.
+ * Unbranded, all-optional view of {@link DesignQRDInput}: the front door for
+ * untrusted values from a UI form. Derived from the design input type so the
+ * accepted field names cannot drift away from what `designQRD` consumes.
  */
-export interface ValidateQRDDesignInput {
-	prime?: unknown;
-	designFrequency?: unknown;
-}
+export type ValidateQRDDesignInput = {
+	[field in keyof DesignQRDInput]?: unknown;
+};
 
 /**
  * Validates a QRD design input.
  *
- * Checks: `prime` is prime; `designFrequency` is positive.
+ * Checks: `prime` is a prime panel order within the accepted range;
+ * `designFrequency` is a positive frequency.
  * @param input - The untrusted design input.
- * @returns `{ valid: true }` or `{ valid: false; errors }` collecting every problem.
+ * @returns `{ valid: true }` or every problem found in one pass.
  */
-export function validateQRDDesign(input: ValidateQRDDesignInput): ValidationResult {
+export function validateQRDDesign(
+	input: ValidateQRDDesignInput,
+): ValidationResult {
 	return combine([
 		validatePrime(input.prime),
 		validatePositiveFrequency(input.designFrequency, "designFrequency"),

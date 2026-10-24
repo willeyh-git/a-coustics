@@ -1,50 +1,52 @@
 import {
+	asPrimeValue,
 	combine,
 	validatePositiveFrequency,
 	validatePrime,
 	validatePrimitiveRoot,
 } from "@validators/common";
+import type { DesignPRDInput } from "@design/prd";
 import type { ValidationResult } from "@validators/common";
 
 /**
- * Input for {@link validatePRDDesign}.
+ * Unbranded, all-optional view of {@link DesignPRDInput}: the front door for
+ * untrusted values from a UI form. Derived from the design input type so the
+ * accepted field names cannot drift away from what `designPRD` consumes.
  */
-export interface ValidatePRDDesignInput {
-	prime?: unknown;
-	primitiveRoot?: unknown;
-	designFrequency?: unknown;
-}
+export type ValidatePRDDesignInput = {
+	[field in keyof DesignPRDInput]?: unknown;
+};
 
 /**
  * Validates a PRD design input.
  *
- * Checks: `prime` is prime; `designFrequency` is positive; when `primitiveRoot`
- * is supplied it must be a primitive root modulo `prime`.
+ * Checks: `prime` is a prime panel order within the accepted range;
+ * `designFrequency` is positive; when `primitiveRoot` is supplied it must be a
+ * primitive root modulo `prime`. Omitting the root is not an error — the
+ * design auto-selects one.
+ *
+ * When `prime` is unusable the root is not checked: the prime error already
+ * explains the problem, and reporting a root error against a non-prime
+ * modulus would be a second, misleading message for the same cause.
  * @param input - The untrusted design input.
+ * @returns `{ valid: true }` or every problem found in one pass.
  */
-export function validatePRDDesign(input: ValidatePRDDesignInput): ValidationResult {
+export function validatePRDDesign(
+	input: ValidatePRDDesignInput,
+): ValidationResult {
+	const primeResult = validatePrime(input.prime);
 	const checks: ValidationResult[] = [
-		validatePrime(input.prime),
+		primeResult,
 		validatePositiveFrequency(input.designFrequency, "designFrequency"),
 	];
 
-	if (input.primitiveRoot !== undefined) {
-		const p = input.prime;
-		if (typeof p === "number" && Number.isInteger(p)) {
-			checks.push(validatePrimitiveRoot(p, input.primitiveRoot));
-		} else {
-			// Cannot meaningfully validate a root without a valid prime; the
-			// prime error above already explains the problem.
-			checks.push({
-				valid: false,
-				errors: [
-					{
-						field: "primitiveRoot",
-						message: "Cannot validate primitiveRoot without a valid prime.",
-					},
-				],
-			});
-		}
+	const prime = asPrimeValue(input.prime);
+	if (
+		primeResult.valid &&
+		prime !== undefined &&
+		input.primitiveRoot !== undefined
+	) {
+		checks.push(validatePrimitiveRoot(prime, input.primitiveRoot));
 	}
 
 	return combine(checks);

@@ -3,7 +3,10 @@ import { toLength, toFrequency } from "@geometry/scaling";
 import { asFlowResistivity } from "@math/helpers";
 import type { Frequency } from "@units/units";
 import { Hz, m } from "@units/units";
-import { calculatePorousAbsorption, type PorousMaterial } from "@acoustics/materials";
+import {
+	calculatePorousAbsorption,
+	type PorousMaterial,
+} from "@acoustics/materials";
 
 const axis = (freqs: number[]): Frequency[] =>
 	freqs.map((f) => toFrequency(f, Hz));
