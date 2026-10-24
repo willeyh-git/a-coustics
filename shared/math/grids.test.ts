@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildGrid, maxInGrid } from "./grids";
+import { buildGrid, maxInGrid } from "@math/grids";
 
 describe("buildGrid", () => {
 	const sequence = [0, 1, 4, 2, 2, 4, 1];

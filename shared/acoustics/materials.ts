@@ -1,15 +1,15 @@
-import { SPEED_OF_SOUND } from "./constants";
+import { SPEED_OF_SOUND } from "@acoustics/constants";
 import {
 	CHARACTERISTIC_IMPEDANCE_OF_AIR,
 	AIR_DENSITY,
-} from "./helmholtz-physics";
+} from "@acoustics/helmholtz-physics";
 import type {
 	FlowResistivity,
 	Frequency,
 	FrequencyResponse,
 	Length,
 	SurfaceResistance,
-} from "../types/units";
+} from "@units/units";
 
 /**
  * A rigidly-backed porous absorber (fibrous or foamic) modelled as an

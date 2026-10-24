@@ -1,10 +1,10 @@
-import { designUnitDepth } from "../acoustics/design";
-import { matrixToLengths } from "../geometry/depths";
-import { toLength } from "../geometry/scaling";
-import { buildGrid, maxInGrid } from "../math/grids";
-import { findPrimitiveRoot, isPrimitiveRoot } from "../math/number-theory";
-import { generatePRDSequence, generateQRDSequence } from "../math/sequences";
-import type { Frequency, Length, Prime } from "../types/units";
+import { designUnitDepth } from "@acoustics/design";
+import { matrixToLengths } from "@geometry/depths";
+import { toLength } from "@geometry/scaling";
+import { buildGrid, maxInGrid } from "@math/grids";
+import { findPrimitiveRoot, isPrimitiveRoot } from "@math/number-theory";
+import { generatePRDSequence, generateQRDSequence } from "@math/sequences";
+import type { Frequency, Length, Prime } from "@units/units";
 
 /**
  * The 1D sequence source used to build the 2D skyline grid.

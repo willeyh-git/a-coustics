@@ -1,5 +1,5 @@
-import { isPrime, modPow } from "./number-theory";
-import type { Prime } from "../types/units";
+import { isPrime, modPow } from "@math/number-theory";
+import type { Prime } from "@units/units";
 
 /**
  * Generates a Quadratic Residue Diffuser (QRD) sequence for a given prime p.

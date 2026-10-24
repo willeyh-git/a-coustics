@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { extendedGcd } from "../extended-gcd";
-import { asPositiveInteger } from "../helpers";
+import { extendedGcd } from "@math/extended-gcd";
+import { asPositiveInteger } from "@math/helpers";
 
 describe("extendedGcd", () => {
 	it("returns gcd and Bézout coefficients", () => {

@@ -5,7 +5,7 @@ import type {
 	Frequency,
 	Length,
 	Volume,
-} from "../types/units";
+} from "@units/units";
 
 /**
  * Converts a scalar value into a Length using a unit multiplier.

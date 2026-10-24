@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { asPositiveInteger } from "../helpers";
-import { isCoprime } from "../number-theory";
+import { asPositiveInteger } from "@math/helpers";
+import { isCoprime } from "@math/number-theory";
 
 describe("isCoprime", () => {
 	it("should return true for coprime numbers", () => {

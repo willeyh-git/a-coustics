@@ -1,5 +1,5 @@
-import type { Modulus, PositiveInteger } from "../../types/units";
-import { extendedGcd } from "../extended-gcd";
+import type { Modulus, PositiveInteger } from "@units/units";
+import { extendedGcd } from "@math/extended-gcd";
 
 /**
  * Computes the modular multiplicative inverse of a modulo m.

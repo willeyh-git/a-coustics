@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { toLength, toFrequency } from "../geometry/scaling";
-import { asFlowResistivity } from "../math/helpers";
-import type { Frequency } from "../types/units";
-import { Hz, m } from "../types/units";
-import { calculatePorousAbsorption, type PorousMaterial } from "./materials";
+import { toLength, toFrequency } from "@geometry/scaling";
+import { asFlowResistivity } from "@math/helpers";
+import type { Frequency } from "@units/units";
+import { Hz, m } from "@units/units";
+import { calculatePorousAbsorption, type PorousMaterial } from "@acoustics/materials";
 
 const axis = (freqs: number[]): Frequency[] =>
 	freqs.map((f) => toFrequency(f, Hz));

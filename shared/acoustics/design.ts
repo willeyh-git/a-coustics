@@ -1,7 +1,7 @@
-import { calculateWavelength } from "./frequency";
-import { calculateUnitDepth } from "./qrd-physics";
-import { isPrime } from "../math/number-theory";
-import type { Frequency, Length, Prime } from "../types/units";
+import { calculateWavelength } from "@acoustics/frequency";
+import { calculateUnitDepth } from "@acoustics/qrd-physics";
+import { isPrime } from "@math/number-theory";
+import type { Frequency, Length, Prime } from "@units/units";
 
 /**
  * Derives the unit depth for a QRD design based on frequency and prime number.

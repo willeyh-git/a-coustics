@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { asPrime } from "../helpers";
-import { getQuadraticResidues } from "../number-theory";
+import { asPrime } from "@math/helpers";
+import { getQuadraticResidues } from "@math/number-theory";
 
 describe("quadratic residues", () => {
 	it("should return quadratic residues for p=7", () => {

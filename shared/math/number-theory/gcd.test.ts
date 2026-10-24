@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { asPositiveInteger } from "../helpers";
-import { gcd } from "../number-theory";
+import { asPositiveInteger } from "@math/helpers";
+import { gcd } from "@math/number-theory";
 
 describe("gcd", () => {
 	it("should calculate the greatest common divisor", () => {

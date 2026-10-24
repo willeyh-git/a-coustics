@@ -1,4 +1,4 @@
-import { isPrime } from "./number-theory";
+import { isPrime } from "@math/number-theory";
 import type {
 	AcousticResistance,
 	Frequency,
@@ -8,7 +8,7 @@ import type {
 	Integer,
 	NonNegativeInteger,
 	SurfaceResistance,
-} from "../types/units";
+} from "@units/units";
 
 /**
  * Asserts that the given value is an integer.
