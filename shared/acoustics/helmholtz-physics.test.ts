@@ -4,17 +4,17 @@ import {
 	toArea,
 	toLength,
 	toVolume,
-} from "../geometry/scaling";
-import { asAcousticResistance, asFrequency } from "../math/helpers";
+} from "@geometry/scaling";
+import { asAcousticResistance, asFrequency } from "@math/helpers";
 import type {
 	AcousticResistance,
 	Area,
 	Frequency,
 	Length,
 	Volume,
-} from "../types/units";
-import { m, m2, m3, raylsPerM4 } from "../types/units";
-import { SPEED_OF_SOUND } from "./constants";
+} from "@units/units";
+import { m, m2, m3, raylsPerM4 } from "@units/units";
+import { SPEED_OF_SOUND } from "@acoustics/constants";
 import {
 	AIR_DENSITY,
 	calculateAbsorptionCurve,
@@ -24,7 +24,7 @@ import {
 	calculateResonantFrequency,
 	END_CORRECTION_FACTOR,
 	type HelmholtzAcousticParams,
-} from "./helmholtz-physics";
+} from "@acoustics/helmholtz-physics";
 
 // Canonical resonator used across the tests.
 const neckRadius: Length = toLength(0.02, m); // 2 cm

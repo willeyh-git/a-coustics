@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { asFrequency, asPrime } from "../math/helpers";
-import type { Prime } from "../types/units";
-import { m } from "../types/units";
-import { SPEED_OF_SOUND } from "./constants";
-import { designUnitDepth } from "./design";
+import { asFrequency, asPrime } from "@math/helpers";
+import type { Prime } from "@units/units";
+import { m } from "@units/units";
+import { SPEED_OF_SOUND } from "@acoustics/constants";
+import { designUnitDepth } from "@acoustics/design";
 import {
 	calculateWavelength,
 	frequencyFromWavelength,
 	halfWavelength,
 	quarterWavelength,
-} from "./frequency";
-import { calculateUnitDepth } from "./qrd-physics";
+} from "@acoustics/frequency";
+import { calculateUnitDepth } from "@acoustics/qrd-physics";
 
 describe("acoustics constants", () => {
 	it("should define speed of sound at room temperature", () => {

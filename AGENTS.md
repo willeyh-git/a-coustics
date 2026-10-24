@@ -14,6 +14,17 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
 
 ## Coding Guidelines
 
+### Import Paths
+
+- **Aliases**: Import shared modules with an alias, not a relative path. Relative paths (`./`, `../`) are reserved for imports inside the same `shared/<area>/` directory.
+  - `#shared/*` → `shared/*` (provided by Nuxt, prefer for cross-area imports when no shorter alias exists)
+  - `@acoustics/*` → `shared/acoustics/*`
+  - `@design/*` → `shared/design/*`
+  - `@geometry/*` → `shared/geometry/*`
+  - `@math/*` → `shared/math/*`
+  - `@units/*` → `shared/types/*` (do not use `@types/*`, that name belongs to the npm `@types` namespace)
+- **Single source of truth**: `tsconfig.paths.json` holds the alias map. `nuxt.config.ts` derives the Nuxt `alias` option from it (runtime + generated editor configs) and `vitest.config.ts` feeds it to `vite-tsconfig-paths` (Vitest resolves test files with its own Vite pipeline). Add new aliases only in `tsconfig.paths.json`; do not redeclare them in `tsconfig.json`.
+
 ### Type Safety
 
 - **Strongly Typed**: Every function, variable, and object must have explicit types.
@@ -39,7 +50,7 @@ Implementation plan and detailed instructions in `shared/pre-plan.md`
   - `physics/`: Physical properties and behavior models.
   - `types/`: Global TypeScript types and interfaces.
   - `utils/`: Helper functions.
-- `public/`: Static assets.
+- `tsconfig.paths.json`: alias map (single source of truth for shared-module import paths). Do not duplicate the map in `tsconfig.json` — that file only wires the editor to the `.nuxt/tsconfig.*.json` configs that Nuxt generates.
 - `docs/`: Documentation and diffuser type lookup (individual files per diffuser type, e.g., `docs/QRD.md`, `docs/PRD.md`, `docs/SKYLINE.md`).
 
 ## Documentation

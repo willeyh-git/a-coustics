@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { toFrequency } from "../geometry/scaling";
-import { asPrime } from "../math/helpers";
-import { Hz } from "../types/units";
-import { designSkyline } from "./skyline";
+import { toFrequency } from "@geometry/scaling";
+import { asPrime } from "@math/helpers";
+import { Hz } from "@units/units";
+import { designSkyline } from "@design/skyline";
 
 describe("designSkyline", () => {
 	const prime = asPrime(7);

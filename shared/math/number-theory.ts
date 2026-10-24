@@ -1,5 +1,5 @@
-import { getPrimeFactors } from "./factors";
-import type { Prime, Modulus, PositiveInteger } from "../types/units";
+import { getPrimeFactors } from "@math/factors";
+import type { Prime, Modulus, PositiveInteger } from "@units/units";
 
 /**
  * Checks if a number is prime.

@@ -19,7 +19,7 @@ export interface ExtendedGcdResult {
  * @returns An object containing the gcd and the Bézout coefficients.
  * @throws RangeError if a or b is negative.
  */
-import type { PositiveInteger } from "../types/units";
+import type { PositiveInteger } from "@units/units";
 
 export function extendedGcd(
 	a: PositiveInteger,

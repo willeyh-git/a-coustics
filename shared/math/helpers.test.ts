@@ -4,7 +4,7 @@ import {
 	assertNonNegativeInteger,
 	assertPositiveInteger,
 	assertPrime,
-} from "./helpers";
+} from "@math/helpers";
 
 describe("Math Helpers", () => {
 	describe("assertInteger", () => {

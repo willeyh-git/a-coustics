@@ -1,6 +1,6 @@
-import { toLength } from "../geometry/scaling";
-import type { Length } from "../types/units";
-import { m } from "../types/units";
+import { toLength } from "@geometry/scaling";
+import type { Length } from "@units/units";
+import { m } from "@units/units";
 
 /**
  * Calculates the unit depth for a QRD (Quadratic Residue Diffuser).

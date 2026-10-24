@@ -1,7 +1,7 @@
-import { designUnitDepth } from "../acoustics/design";
-import { sequenceToDepths } from "../geometry/depths";
-import { generateQRDSequence } from "../math/sequences";
-import type { Frequency, Length, Prime } from "../types/units";
+import { designUnitDepth } from "@acoustics/design";
+import { sequenceToDepths } from "@geometry/depths";
+import { generateQRDSequence } from "@math/sequences";
+import type { Frequency, Length, Prime } from "@units/units";
 
 export interface DesignQRDInput {
 	prime: Prime;

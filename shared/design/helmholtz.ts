@@ -7,17 +7,17 @@ import {
 	calculateResonantFrequency,
 	resolveAcousticResistance,
 	type HelmholtzAcousticParams,
-} from "../acoustics/helmholtz-physics";
-import { toFrequency } from "../geometry/scaling";
-import type { FrequencyResponse } from "../types/core";
+} from "@acoustics/helmholtz-physics";
+import { toFrequency } from "@geometry/scaling";
+import type { FrequencyResponse } from "@units/core";
 import type {
 	Area,
 	AcousticResistance,
 	Frequency,
 	Length,
 	Volume,
-} from "../types/units";
-import { Hz } from "../types/units";
+} from "@units/units";
+import { Hz } from "@units/units";
 
 /**
  * Input for designing a Helmholtz resonator from its geometry.

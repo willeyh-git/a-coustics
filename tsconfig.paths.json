@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"@acoustics/*": ["./shared/acoustics/*"],
+			"@design/*": ["./shared/design/*"],
+			"@geometry/*": ["./shared/geometry/*"],
+			"@math/*": ["./shared/math/*"],
+			"@units/*": ["./shared/types/*"]
+		}
+	},
+	"include": [
+		"shared/**/*",
+		"app/**/*",
+		"test/nuxt/**/*",
+		"tests/nuxt/**/*",
+		"*.ts"
+	]
+}

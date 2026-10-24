@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPrime } from "../number-theory";
+import { isPrime } from "@math/number-theory";
 
 describe("isPrime", () => {
 	it("should return true for prime numbers", () => {

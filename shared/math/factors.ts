@@ -1,4 +1,4 @@
-import type { Prime, PositiveInteger } from "../types/units";
+import type { Prime, PositiveInteger } from "@units/units";
 
 /**
  * Returns the prime factorization of a given integer.

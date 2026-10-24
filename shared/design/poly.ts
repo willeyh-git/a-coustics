@@ -1,9 +1,9 @@
-import { designUnitDepth } from "../acoustics/design";
-import { matrixToLengths } from "../geometry/depths";
-import { toLength } from "../geometry/scaling";
-import { buildGrid, maxInGrid } from "../math/grids";
-import { getQuadraticResidues, mod } from "../math/number-theory";
-import type { Frequency, Length, Prime } from "../types/units";
+import { designUnitDepth } from "@acoustics/design";
+import { matrixToLengths } from "@geometry/depths";
+import { toLength } from "@geometry/scaling";
+import { buildGrid, maxInGrid } from "@math/grids";
+import { getQuadraticResidues, mod } from "@math/number-theory";
+import type { Frequency, Length, Prime } from "@units/units";
 
 /**
  * A coefficient (quadratic residue) used in the poly-diffuser residue rule.

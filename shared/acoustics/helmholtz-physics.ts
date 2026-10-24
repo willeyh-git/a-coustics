@@ -4,7 +4,7 @@ import {
 	toDensity,
 	toFrequency,
 	toLength,
-} from "../geometry/scaling";
+} from "@geometry/scaling";
 import type {
 	AcousticResistance,
 	Area,
@@ -12,9 +12,9 @@ import type {
 	Frequency,
 	Length,
 	Volume,
-} from "../types/units";
-import { Hz, kgPerM3, m, m2, raylsPerM4 } from "../types/units";
-import { SPEED_OF_SOUND } from "./constants";
+} from "@units/units";
+import { Hz, kgPerM3, m, m2, raylsPerM4 } from "@units/units";
+import { SPEED_OF_SOUND } from "@acoustics/constants";
 
 /**
  * Air density (kg/m³) at 20 °C. Used to derive the characteristic impedance

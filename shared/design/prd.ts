@@ -1,8 +1,8 @@
-import { designUnitDepth } from "../acoustics/design";
-import { sequenceToDepths } from "../geometry/depths";
-import { findPrimitiveRoot, isPrimitiveRoot } from "../math/number-theory";
-import { generatePRDSequence } from "../math/sequences";
-import type { Frequency, Length, Prime } from "../types/units";
+import { designUnitDepth } from "@acoustics/design";
+import { sequenceToDepths } from "@geometry/depths";
+import { findPrimitiveRoot, isPrimitiveRoot } from "@math/number-theory";
+import { generatePRDSequence } from "@math/sequences";
+import type { Frequency, Length, Prime } from "@units/units";
 
 export interface DesignPRDInput {
 	prime: Prime;
