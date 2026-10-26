@@ -132,8 +132,8 @@ export function asNonNegativeInteger(n: number): NonNegativeInteger {
  * @throws RangeError if n is not a positive number.
  */
 export function asFrequency(n: number): Frequency {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(`Value ${n} must be a finite, positive frequency.`);
 	}
 	return n as Frequency;
 }
@@ -145,8 +145,10 @@ export function asFrequency(n: number): Frequency {
  * @throws RangeError if n is not a positive number.
  */
 export function asAcousticResistance(n: number): AcousticResistance {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(
+			`Value ${n} must be a finite, positive acoustic resistance.`,
+		);
 	}
 	return n as AcousticResistance;
 }
@@ -158,8 +160,10 @@ export function asAcousticResistance(n: number): AcousticResistance {
  * @throws RangeError if n is not a positive number.
  */
 export function asFlowResistivity(n: number): FlowResistivity {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(
+			`Value ${n} must be a finite, positive flow resistivity.`,
+		);
 	}
 	return n as FlowResistivity;
 }
@@ -171,8 +175,10 @@ export function asFlowResistivity(n: number): FlowResistivity {
  * @throws RangeError if n is not a non-negative number.
  */
 export function asSurfaceResistance(n: number): SurfaceResistance {
-	if (n < 0) {
-		throw new RangeError(`Value ${n} must be non-negative.`);
+	if (!Number.isFinite(n) || n < 0) {
+		throw new RangeError(
+			`Value ${n} must be a finite, non-negative number.`,
+		);
 	}
 	return n as SurfaceResistance;
 }

@@ -7,8 +7,8 @@ import type { PositiveInteger, Prime } from "@units/units";
  * @returns An array of prime factors in ascending order.
  */
 export function getPrimeFactors(n: PositiveInteger): Prime[] {
-	if (n < 1) {
-		throw new RangeError("n must be a positive integer");
+	if (!Number.isSafeInteger(n) || n < 1) {
+		throw new RangeError("n must be a finite positive integer");
 	}
 
 	const factors: Prime[] = [];

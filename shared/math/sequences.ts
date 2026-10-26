@@ -1,4 +1,4 @@
-import { isPrime, modPow } from "@math/number-theory";
+import { isPrimitiveRoot, isPrime, modPow } from "@math/number-theory";
 import type { Prime } from "@units/units";
 
 /**
@@ -32,6 +32,10 @@ export function generateQRDSequence(p: Prime): number[] {
 export function generatePRDSequence(p: Prime, g: number): number[] {
 	if (!isPrime(p)) {
 		throw new Error("p must be a prime number");
+	}
+
+	if (!isPrimitiveRoot(p, g)) {
+		throw new RangeError(`g must be a primitive root modulo ${p}`);
 	}
 
 	// Generate sequence S(i) = g^i mod p for i from 0 to p-1

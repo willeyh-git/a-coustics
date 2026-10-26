@@ -8,11 +8,11 @@ import type { PositiveIntegerLike, Prime } from "@units/units";
  * @returns True if prime, false otherwise.
  */
 export function isPrime(n: number): boolean {
-	if (n <= 1) return false;
+	if (!Number.isSafeInteger(n) || n < 2) return false;
 	if (n <= 3) return true;
 	if (n % 2 === 0 || n % 3 === 0) return false;
 
-	for (let i = 5; i * i <= n; i += 6) {
+	for (let i = 5; i <= n / i; i += 6) {
 		if (n % i === 0 || n % (i + 2) === 0) return false;
 	}
 	return true;
@@ -76,6 +76,9 @@ export function modPow(
 	exp: number,
 	modulus: PositiveIntegerLike,
 ): number {
+	if (!Number.isSafeInteger(exp) || exp < 0) {
+		throw new RangeError("exp must be a non-negative integer");
+	}
 	let res = 1;
 	base = mod(base, modulus);
 	while (exp > 0) {

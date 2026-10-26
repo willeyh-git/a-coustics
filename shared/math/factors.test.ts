@@ -24,4 +24,38 @@ describe("getPrimeFactors", () => {
 	it("returns factors for semiprimes", () => {
 		expect(getPrimeFactors(asPositiveInteger(77))).toEqual([7, 11]);
 	});
+
+	describe("non-finite and non-integer boundaries", () => {
+		it("throws for Infinity", () => {
+			expect(() => getPrimeFactors(Infinity as unknown as PositiveInteger)).toThrow(
+				RangeError,
+			);
+		});
+
+		it("throws for -Infinity", () => {
+			expect(() =>
+				getPrimeFactors(-Infinity as unknown as PositiveInteger),
+			).toThrow(RangeError);
+		});
+
+		it("throws for NaN", () => {
+			expect(() => getPrimeFactors(NaN as unknown as PositiveInteger)).toThrow(
+				RangeError,
+			);
+		});
+
+		it("throws for fractional values", () => {
+			expect(() => getPrimeFactors(2.5 as unknown as PositiveInteger)).toThrow(
+				RangeError,
+			);
+		});
+
+		it("returns itself for a large safe prime", () => {
+			// Largest prime below Number.MAX_SAFE_INTEGER (MAX_SAFE_INTEGER itself is composite).
+			const LARGE_PRIME = 9007199254740881;
+			expect(getPrimeFactors(asPositiveInteger(LARGE_PRIME))).toEqual([
+				LARGE_PRIME,
+			]);
+		});
+	});
 });

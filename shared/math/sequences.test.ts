@@ -163,3 +163,37 @@ describe("generatePRDSequence", () => {
 		});
 	});
 });
+
+describe("generatePRDSequence primitive root validation", () => {
+	it("produces values covering 1..p-1 for a valid primitive root", () => {
+		const p = 7;
+		const sequence = generatePRDSequence(asPrime(p), 3);
+
+		// Sequence has p elements over one period; distinct values cover 1..p-1.
+		const distinct = new Set(sequence);
+		for (let v = 1; v < p; v++) {
+			expect(distinct.has(v)).toBe(true);
+		}
+		expect(distinct.size).toBe(p - 1);
+	});
+
+	it("throws a RangeError for g = 1 (not a primitive root)", () => {
+		expect(() => generatePRDSequence(asPrime(7), 1)).toThrow(RangeError);
+	});
+
+	it("throws a RangeError for g = 0", () => {
+		expect(() => generatePRDSequence(asPrime(7), 0)).toThrow(RangeError);
+	});
+
+	it("throws a RangeError for g = p", () => {
+		expect(() => generatePRDSequence(asPrime(7), 7)).toThrow(RangeError);
+	});
+
+	it("throws a RangeError for negative g", () => {
+		expect(() => generatePRDSequence(asPrime(7), -1)).toThrow(RangeError);
+	});
+
+	it("throws a RangeError for fractional g", () => {
+		expect(() => generatePRDSequence(asPrime(7), 3.5)).toThrow(RangeError);
+	});
+});
