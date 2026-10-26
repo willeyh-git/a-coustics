@@ -1,15 +1,15 @@
+import type { DesignABFUSORInput } from "@design/abfusor";
+import type { ValidationResult } from "@validators/common";
 import {
 	combine,
 	describeValue,
 	fail,
 	validateNonNegativeNumber,
-	validatePositiveNumber,
 	validatePositiveFrequencyArray,
+	validatePositiveNumber,
 	validatePrime,
 	validateRatioInRange,
 } from "@validators/common";
-import type { DesignABFUSORInput } from "@design/abfusor";
-import type { ValidationResult } from "@validators/common";
 
 /**
  * Structural view of the absorber material spec, with every field left `unknown`

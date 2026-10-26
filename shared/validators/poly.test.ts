@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { validatePolyDesign } from "@validators/poly";
+import { describe, expect, it } from "vitest";
 
 // Non-zero quadratic residues mod 7 are {1, 2, 4}; 3 and 5 are not.
 describe("validatePolyDesign", () => {

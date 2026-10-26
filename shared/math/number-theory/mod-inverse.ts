@@ -1,6 +1,6 @@
-import type { PositiveIntegerLike } from "@units/units";
 import { extendedGcd } from "@math/extended-gcd";
 import { mod } from "@math/number-theory";
+import type { PositiveIntegerLike } from "@units/units";
 
 /**
  * Computes the modular multiplicative inverse of a modulo m.

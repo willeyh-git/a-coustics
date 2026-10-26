@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { designPRD } from "@design/prd";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
 import { Hz } from "@units/units";
-import { designPRD } from "@design/prd";
+import { describe, expect, it } from "vitest";
 
 describe("designPRD", () => {
 	it("should generate a complete PRD design with explicit primitive root", () => {

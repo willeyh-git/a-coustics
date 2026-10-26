@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import {
 	SKYLINE_SEQUENCE_TYPES,
 	validateSkylineDesign,
 } from "@validators/skyline";
+import { describe, expect, it } from "vitest";
 
 describe("validateSkylineDesign", () => {
 	it("accepts a QRD-sourced design", () => {

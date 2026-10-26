@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { designPoly } from "@design/poly";
+import { designSkyline } from "@design/skyline";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
 import { getQuadraticResidues } from "@math/number-theory";
-import { at } from "@utils/at";
 import { Hz } from "@units/units";
-import { designPoly } from "@design/poly";
-import { designSkyline } from "@design/skyline";
+import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 describe("designPoly", () => {
 	const prime = asPrime(7);

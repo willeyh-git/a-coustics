@@ -1,6 +1,6 @@
+import { fileURLToPath } from "node:url";
 import { defineVitestConfig } from "@nuxt/test-utils/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { fileURLToPath } from "node:url";
 
 export default defineVitestConfig({
 	vite: {

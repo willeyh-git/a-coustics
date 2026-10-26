@@ -1,7 +1,7 @@
 import { SPEED_OF_SOUND } from "@acoustics/constants";
 import {
-	CHARACTERISTIC_IMPEDANCE_OF_AIR,
 	AIR_DENSITY,
+	CHARACTERISTIC_IMPEDANCE_OF_AIR,
 } from "@acoustics/helmholtz-physics";
 import type { FrequencyResponse } from "@units/core";
 import type {

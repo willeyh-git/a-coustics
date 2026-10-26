@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { asInteger, asModulus, asPrime } from "@math/helpers";
 import { findPrimitiveRoot, isPrimitiveRoot, mod } from "@math/number-theory";
+import { describe, expect, it } from "vitest";
 
 describe("findPrimitiveRoot", () => {
 	it("finds primitive root of 3", () => {

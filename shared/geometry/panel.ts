@@ -1,7 +1,7 @@
 import { halfWavelength } from "@acoustics/frequency";
 import { toArea, toLength, toVolume } from "@geometry/scaling";
-import { m, m2, m3 } from "@units/units";
 import type { Area, Frequency, Length, Volume } from "@units/units";
+import { m, m2, m3 } from "@units/units";
 
 /**
  * Derives the well width (opening) of a well diffuser from its highest

@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { designSkyline } from "@design/skyline";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
-import { at } from "@utils/at";
 import { Hz } from "@units/units";
-import { designSkyline } from "@design/skyline";
+import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 describe("designSkyline", () => {
 	const prime = asPrime(7);

@@ -5,14 +5,14 @@ import {
 	calculateEffectiveLength,
 	calculateNeckArea,
 	calculateResonantFrequency,
-	resolveAcousticResistance,
 	type HelmholtzAcousticParams,
+	resolveAcousticResistance,
 } from "@acoustics/helmholtz-physics";
 import { toFrequency } from "@geometry/scaling";
 import type { FrequencyResponse } from "@units/core";
 import type {
-	Area,
 	AcousticResistance,
+	Area,
 	Frequency,
 	Length,
 	Volume,

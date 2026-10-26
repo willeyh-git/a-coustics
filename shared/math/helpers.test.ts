@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import {
 	assertInteger,
 	assertNonNegativeInteger,
 	assertPositiveInteger,
 	assertPrime,
 } from "@math/helpers";
+import { describe, expect, it } from "vitest";
 
 describe("Math Helpers", () => {
 	describe("assertInteger", () => {

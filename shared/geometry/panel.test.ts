@@ -1,15 +1,15 @@
-import { describe, expect, it } from "vitest";
-import { Hz, m } from "@units/units";
-import { toFrequency, toLength } from "@geometry/scaling";
 import { calculateWavelength, halfWavelength } from "@acoustics/frequency";
 import {
+	calculatePanelArea,
+	calculatePanelHeight,
+	calculatePanelVolume,
+	calculatePanelWidth,
 	calculateWellWidth,
 	calculateWellWidthWithWall,
-	calculatePanelWidth,
-	calculatePanelHeight,
-	calculatePanelArea,
-	calculatePanelVolume,
 } from "@geometry/panel";
+import { toFrequency, toLength } from "@geometry/scaling";
+import { Hz, m } from "@units/units";
+import { describe, expect, it } from "vitest";
 
 describe("calculateWellWidth", () => {
 	it("computes c / (2·fHigh) for a known frequency", () => {

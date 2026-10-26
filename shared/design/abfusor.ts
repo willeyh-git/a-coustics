@@ -1,16 +1,16 @@
+import { designUnitDepth } from "@acoustics/design";
 import {
 	calculatePorousAbsorption,
 	type PorousMaterial,
 } from "@acoustics/materials";
-import { designUnitDepth } from "@acoustics/design";
 import { sequenceToDepths } from "@geometry/depths";
+import { toFrequency } from "@geometry/scaling";
 import { asFlowResistivity } from "@math/helpers";
 import { generateQRDSequence } from "@math/sequences";
-import { toFrequency } from "@geometry/scaling";
-import { at } from "@utils/at";
 import type { FrequencyResponse } from "@units/core";
 import type { Frequency, Length, Prime } from "@units/units";
 import { Hz } from "@units/units";
+import { at } from "@utils/at";
 
 /**
  * State of an individual ABFUSOR well:

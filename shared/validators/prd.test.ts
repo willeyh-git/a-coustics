@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { validatePRDDesign } from "@validators/prd";
+import { describe, expect, it } from "vitest";
 
 describe("validatePRDDesign", () => {
 	it("accepts a valid prime, frequency and primitive root", () => {

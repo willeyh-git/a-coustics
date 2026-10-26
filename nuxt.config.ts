@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { compilerOptions } from "./tsconfig.paths.json";
+
 import { fileURLToPath } from "node:url";
+import { compilerOptions } from "./tsconfig.paths.json";
 
 const sharedAlias: Record<string, string> = {};
 for (const [pattern, [target]] of Object.entries(compilerOptions.paths)) {

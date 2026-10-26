@@ -1,3 +1,4 @@
+import { SPEED_OF_SOUND } from "@acoustics/constants";
 import {
 	toAcousticResistance,
 	toArea,
@@ -14,7 +15,6 @@ import type {
 	Volume,
 } from "@units/units";
 import { Hz, kgPerM3, m, m2, raylsPerM4 } from "@units/units";
-import { SPEED_OF_SOUND } from "@acoustics/constants";
 
 /**
  * Air density (kg/m³) at 20 °C. Used to derive the characteristic impedance

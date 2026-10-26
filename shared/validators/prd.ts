@@ -1,3 +1,5 @@
+import type { DesignPRDInput } from "@design/prd";
+import type { ValidationResult } from "@validators/common";
 import {
 	asPrimeValue,
 	combine,
@@ -5,8 +7,6 @@ import {
 	validatePrime,
 	validatePrimitiveRoot,
 } from "@validators/common";
-import type { DesignPRDInput } from "@design/prd";
-import type { ValidationResult } from "@validators/common";
 
 /**
  * Unbranded, all-optional view of {@link DesignPRDInput}: the front door for

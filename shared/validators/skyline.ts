@@ -1,3 +1,5 @@
+import type { DesignSkylineInput, SkylineSequenceType } from "@design/skyline";
+import type { ValidationResult } from "@validators/common";
 import {
 	asPrimeValue,
 	combine,
@@ -6,9 +8,6 @@ import {
 	validatePrime,
 	validatePrimitiveRoot,
 } from "@validators/common";
-import type { SkylineSequenceType } from "@design/skyline";
-import type { DesignSkylineInput } from "@design/skyline";
-import type { ValidationResult } from "@validators/common";
 
 /**
  * The sequence sources a skyline grid can be built from, as a runtime value to

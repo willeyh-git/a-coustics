@@ -1,5 +1,5 @@
-import type { Length } from "@units/units";
 import { toLength } from "@geometry/scaling";
+import type { Length } from "@units/units";
 
 /**
  * Converts a sequence of integers (residues) into physical depths

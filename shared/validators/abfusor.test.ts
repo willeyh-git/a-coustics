@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { validateABFUSORDesign } from "@validators/abfusor";
+import { describe, expect, it } from "vitest";
 
 describe("validateABFUSORDesign", () => {
 	it("accepts a pure-QRD design (absorptiveRatio 0)", () => {

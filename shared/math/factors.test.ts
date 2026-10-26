@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { getPrimeFactors } from "@math/factors";
 import { asPositiveInteger } from "@math/helpers";
+import { describe, expect, it } from "vitest";
 
 describe("getPrimeFactors", () => {
 	it("returns factors of a prime", () => {

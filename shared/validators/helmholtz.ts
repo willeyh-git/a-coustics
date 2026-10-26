@@ -1,12 +1,12 @@
-import {
-	combine,
-	validatePositiveNumber,
-	validatePositiveFrequencyArray,
-	validatePositiveLength,
-	validatePositiveVolume,
-} from "@validators/common";
 import type { DesignHelmholtzInput } from "@design/helmholtz";
 import type { ValidationResult } from "@validators/common";
+import {
+	combine,
+	validatePositiveFrequencyArray,
+	validatePositiveLength,
+	validatePositiveNumber,
+	validatePositiveVolume,
+} from "@validators/common";
 
 /**
  * Unbranded, all-optional view of {@link DesignHelmholtzInput}: the front door
