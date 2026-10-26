@@ -131,4 +131,17 @@ describe("generateThirdOctaveBands", () => {
 		});
 		expect(bands.frequencies.map((c) => Number(c))).toEqual([630]);
 	});
+
+	it("assigns a sample by the exact ISO band edge, not a linear midpoint", () => {
+		// The 100 Hz third-octave band upper edge is 100 * 10^(1/20) ~= 112.2 Hz.
+		// A sample at 112.5 Hz sits just past that edge, so it belongs to the 125
+		// Hz band even though it is arithmetically closer to 100 than to 125.
+		// Pure nearest-center (linear) distance would mis-assign it to 100.
+		const bands = generateThirdOctaveBands({
+			frequencies: [F(112.5)],
+			values: [0.42],
+		});
+		expect(bands.frequencies.map((c) => Number(c))).toEqual([125]);
+		expect(bands.values[0]).toBeCloseTo(0.42, 6);
+	});
 });

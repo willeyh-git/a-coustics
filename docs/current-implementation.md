@@ -187,8 +187,12 @@ import the shared version.
 - `octaveBandCenters(range)` / `thirdOctaveBandCenters(range)` — band centers
   whose interval overlaps a `FrequencyRange`, branded.
 - `generateOctaveBands(response)` / `generateThirdOctaveBands(response)` —
-  aggregate a finely-sampled `FrequencyResponse` into per-band arithmetic means
-  (nearest-band assignment; empty bands omitted).
+  aggregate a finely-sampled `FrequencyResponse` into per-band arithmetic means.
+  Each sample is assigned to the band whose ISO edge interval contains it, so
+  boundaries are the exact ISO band edges (not a linear midpoint); bands with no
+  samples are omitted. Third-octave bands tile the spectrum exactly; octave
+  bands use two interleaved ISO alignments that overlap, so a sample in an
+  overlap goes to the nearest center among the covering bands.
 
 ## UI
 
