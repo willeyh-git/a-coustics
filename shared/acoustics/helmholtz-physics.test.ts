@@ -6,6 +6,7 @@ import {
 	toVolume,
 } from "@geometry/scaling";
 import { asAcousticResistance, asFrequency } from "@math/helpers";
+import { at } from "@utils/at";
 import type {
 	AcousticResistance,
 	Area,
@@ -62,7 +63,7 @@ function alphaAt(
 	frequency: Frequency,
 	helmholtzParams: HelmholtzAcousticParams,
 ): number {
-	return calculateAbsorptionCurve([frequency], helmholtzParams)[0];
+	return at(calculateAbsorptionCurve([frequency], helmholtzParams), 0);
 }
 
 /**
@@ -198,7 +199,9 @@ describe("calculateAbsorptionCurve", () => {
 			[asFrequency(f0 * 0.5), asFrequency(f0), asFrequency(f0 * 2)],
 			params(),
 		);
-		const [aLow, aRes, aHigh] = curve;
+		const aLow = at(curve, 0);
+		const aRes = at(curve, 1);
+		const aHigh = at(curve, 2);
 		expect(aRes).toBeGreaterThan(aLow);
 		expect(aRes).toBeGreaterThan(aHigh);
 		for (const a of curve) {
@@ -216,7 +219,7 @@ describe("calculateAbsorptionCurve", () => {
 			params(),
 		);
 		// 0.8 and 1.25 are multiplicative inverses about 1 (0.8 × 1.25 = 1).
-		expect(curve[0]).toBeCloseTo(curve[1], 6);
+		expect(at(curve, 0)).toBeCloseTo(at(curve, 1), 6);
 	});
 
 	it("lowers and broadens the peak with higher resistance", () => {
@@ -225,7 +228,7 @@ describe("calculateAbsorptionCurve", () => {
 			[asFrequency(92.3)],
 			params({ acousticResistance: asAcousticResistance(1e6) }),
 		);
-		expect(lossy[0]).toBeLessThan(matched[0]);
+		expect(at(lossy, 0)).toBeLessThan(at(matched, 0));
 	});
 });
 
@@ -277,10 +280,10 @@ describe("calculateBandwidth", () => {
 				calculateBandwidth(neckArea, cavityVolume, effectiveLength, raFor(r)),
 			),
 		);
-		expect(widths[0]).toBeLessThan(widths[1]);
-		expect(widths[1]).toBeLessThan(widths[2]);
-		expect(widths[2]).toBeLessThan(widths[3]);
-		expect(widths[3]).toBeLessThan(widths[4]);
+		expect(at(widths, 0)).toBeLessThan(at(widths, 1));
+		expect(at(widths, 1)).toBeLessThan(at(widths, 2));
+		expect(at(widths, 2)).toBeLessThan(at(widths, 3));
+		expect(at(widths, 3)).toBeLessThan(at(widths, 4));
 	});
 
 	it("rejects non-positive acoustic resistance", () => {

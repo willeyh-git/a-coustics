@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { toLength, toFrequency } from "@geometry/scaling";
 import { asFlowResistivity } from "@math/helpers";
+import { at } from "@utils/at";
 import type { Frequency } from "@units/units";
 import { Hz, m } from "@units/units";
 import {
@@ -53,12 +54,18 @@ describe("calculatePorousAbsorption", () => {
 
 	it("absorbs more low-frequency energy as thickness increases", () => {
 		const mid = toFrequency(2000, Hz);
-		const thin = calculatePorousAbsorption([mid], {
-			material: material(0.02, 40000),
-		})[0];
-		const thick = calculatePorousAbsorption([mid], {
-			material: material(0.06, 40000),
-		})[0];
+		const thin = at(
+			calculatePorousAbsorption([mid], {
+				material: material(0.02, 40000),
+			}),
+			0,
+		);
+		const thick = at(
+			calculatePorousAbsorption([mid], {
+				material: material(0.06, 40000),
+			}),
+			0,
+		);
 		expect(thick).toBeGreaterThan(thin);
 		expect(thick).toBeGreaterThan(0.5);
 	});

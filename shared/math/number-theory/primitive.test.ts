@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { asInteger, asPositiveInteger, asPrime } from "@math/helpers";
+import { asInteger, asModulus, asPrime } from "@math/helpers";
 import { findPrimitiveRoot, isPrimitiveRoot, mod } from "@math/number-theory";
 
 describe("findPrimitiveRoot", () => {
@@ -23,11 +23,15 @@ describe("findPrimitiveRoot", () => {
 	it("finds primitive root of 17", () => {
 		expect(findPrimitiveRoot(asPrime(17))).toBe(3);
 	});
-	it("throws primitive root of 4", () => {
-		expect(() => findPrimitiveRoot(4)).toThrow();
+	// `findPrimitiveRoot` takes a branded `Prime`, so a non-prime literal is
+	// rejected by `asPrime` before `findPrimitiveRoot` is entered. (Primality
+	// itself is covered in `number-theory/isPrime.test.ts`; these assertions
+	// only pin that a non-prime cannot be passed at all.)
+	it("rejects a non-prime 4 at construction", () => {
+		expect(() => findPrimitiveRoot(asPrime(4))).toThrow();
 	});
-	it("throws primitive root of 15", () => {
-		expect(() => findPrimitiveRoot(15)).toThrow();
+	it("rejects a non-prime 15 at construction", () => {
+		expect(() => findPrimitiveRoot(asPrime(15))).toThrow();
 	});
 });
 
@@ -54,15 +58,15 @@ describe("isPrimitiveRoot", () => {
 });
 describe("findPrimitiveMod", () => {
 	it("finds primitive mod of 5, 7", () => {
-		expect(mod(asInteger(5), asPositiveInteger(7))).toBe(5);
+		expect(mod(asInteger(5), asModulus(7))).toBe(5);
 	});
 	it("finds primitive mod of 7, 7", () => {
-		expect(mod(asInteger(7), asPositiveInteger(7))).toBe(0);
+		expect(mod(asInteger(7), asModulus(7))).toBe(0);
 	});
 	it("finds primitive mod of -1, 7", () => {
-		expect(mod(asInteger(-1), asPositiveInteger(7))).toBe(6);
+		expect(mod(asInteger(-1), asModulus(7))).toBe(6);
 	});
 	it("finds primitive mod of -8, 7", () => {
-		expect(mod(asInteger(-8), asPositiveInteger(7))).toBe(6);
+		expect(mod(asInteger(-8), asModulus(7))).toBe(6);
 	});
 });

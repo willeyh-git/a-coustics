@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { m } from "@units/units";
 import { sequenceToDepths, matrixToLengths } from "@geometry/depths";
 import { toLength } from "@geometry/scaling";
+import { at } from "@utils/at";
 
 describe("sequenceToDepths", () => {
 	it("should map sequence values linearly to depths", () => {
@@ -23,11 +24,8 @@ describe("sequenceToDepths", () => {
 		const b = sequenceToDepths(seq, toLength(0.02, m));
 
 		for (let i = 0; i < seq.length; i++) {
-			const valA = a[i];
-			const valB = b[i];
-			if (valA === undefined || valB === undefined) {
-				throw new Error(`Depth at index ${i} is undefined`);
-			}
+			const valA = at(a, i);
+			const valB = at(b, i);
 			expect(valB).toBeCloseTo(valA * 2);
 		}
 	});
@@ -60,6 +58,11 @@ describe("sequenceToDepths", () => {
 describe("matrixToLengths", () => {
 	const unit = toLength(1 / 14, m);
 
+	// Both indices need narrowing before a cell can be read (see `at`).
+	function cellAt(matrix: number[][], i: number, j: number): number {
+		return at(at(matrix, i), j);
+	}
+
 	it("scales every entry by the unit value", () => {
 		const matrix = [
 			[0, 1, 4],
@@ -69,10 +72,10 @@ describe("matrixToLengths", () => {
 		const lengths = matrixToLengths(matrix, unit);
 
 		expect(lengths).toHaveLength(3);
-		expect(lengths[0][0]).toBeCloseTo(0, 6);
-		expect(lengths[0][1]).toBeCloseTo(1 / 14, 6);
-		expect(lengths[0][2]).toBeCloseTo(4 / 14, 6);
-		expect(lengths[2][2]).toBeCloseTo(3 / 14, 6);
+		expect(cellAt(lengths, 0, 0)).toBeCloseTo(0, 6);
+		expect(cellAt(lengths, 0, 1)).toBeCloseTo(1 / 14, 6);
+		expect(cellAt(lengths, 0, 2)).toBeCloseTo(4 / 14, 6);
+		expect(cellAt(lengths, 2, 2)).toBeCloseTo(3 / 14, 6);
 	});
 
 	it("preserves the matrix shape", () => {

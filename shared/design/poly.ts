@@ -124,10 +124,13 @@ export function designPoly(input: DesignPolyInput): DesignPolyResult {
 
 	const unitDepth = designUnitDepth(designFrequency, prime);
 
-	const indices = Array.from({ length: prime }, (_, i) => i);
+	// The poly rule is defined over grid coordinates, so the sequence fed to
+	// `buildGrid` is the coordinate sequence `0..p-1`; `buildGrid` passes those
+	// values to the rule, which squares them directly.
+	const coordinates = Array.from({ length: prime }, (_, k) => k);
 	const grid = buildGrid(
-		indices,
-		(i, j) => (residue1 * (i * i) + residue2 * (j * j)) % prime,
+		coordinates,
+		(a, b) => (residue1 * (a * a) + residue2 * (b * b)) % prime,
 	);
 	const depths = matrixToLengths(grid, unitDepth);
 

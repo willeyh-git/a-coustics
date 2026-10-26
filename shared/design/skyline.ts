@@ -77,10 +77,9 @@ export function designSkyline(input: DesignSkylineInput): DesignSkylineResult {
 
 	const unitHeight = designUnitDepth(designFrequency, prime);
 
-	const grid = buildGrid(
-		sequence,
-		(i, j) => (sequence[i] + sequence[j]) % prime,
-	);
+	// `buildGrid` hands the rule the sequence values, so the skyline rule reads
+	// exactly as documented: Height(i, j) = (S(i) + S(j)) mod p.
+	const grid = buildGrid(sequence, (a, b) => (a + b) % prime);
 	const heights = matrixToLengths(grid, unitHeight);
 
 	const maxResidue = maxInGrid(grid);

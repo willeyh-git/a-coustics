@@ -1,5 +1,6 @@
 import { getPrimeFactors } from "@math/factors";
-import type { Prime, Modulus, PositiveInteger } from "@units/units";
+import { asPositiveInteger } from "@math/helpers";
+import type { PositiveIntegerLike, Prime } from "@units/units";
 
 /**
  * Checks if a number is prime.
@@ -18,28 +19,35 @@ export function isPrime(n: number): boolean {
 }
 
 /**
- * Greatest Common Divisor of two numbers.
+ * Greatest Common Divisor of two positive integers.
  *
- * @param a A non-negative integer.
- * @param b A non-negative integer.
+ * @param a A positive integer.
+ * @param b A positive integer.
  * @returns The greatest common divisor of a and b.
  * @throws RangeError if a or b is negative.
  */
-export function gcd(a: PositiveInteger, b: PositiveInteger): number {
+export function gcd(a: PositiveIntegerLike, b: PositiveIntegerLike): number {
 	if (a < 0 || b < 0) {
 		throw new RangeError("Arguments must be non-negative");
 	}
-	while (b !== 0) {
-		a %= b;
-		[a, b] = [b, a];
+	// Arithmetic strips the brand, so work over plain numbers internally and
+	// return a plain number (the return type is unbranded).
+	let x: number = a;
+	let y: number = b;
+	while (y !== 0) {
+		x %= y;
+		[x, y] = [y, x];
 	}
-	return a;
+	return x;
 }
 
 /**
- * Checks if two numbers are coprime.
+ * Checks if two positive integers are coprime.
  */
-export function isCoprime(a: PositiveInteger, b: PositiveInteger): boolean {
+export function isCoprime(
+	a: PositiveIntegerLike,
+	b: PositiveIntegerLike,
+): boolean {
 	return gcd(a, b) === 1;
 }
 
@@ -49,10 +57,10 @@ export function isCoprime(a: PositiveInteger, b: PositiveInteger): boolean {
  * this function returns a non-negative result.
  *
  * @param n The number to be modulated.
- * @param m The modulus.
+ * @param m A positive integer acting as the modulus.
  * @returns The non-negative remainder of n / m.
  */
-export function mod(n: number, m: Modulus): number {
+export function mod(n: number, m: PositiveIntegerLike): number {
 	return ((n % m) + m) % m;
 }
 
@@ -60,10 +68,14 @@ export function mod(n: number, m: Modulus): number {
  * Modular exponentiation.
  * @param base The base.
  * @param exp The exponent.
- * @param modulus The modulus.
+ * @param modulus A positive integer modulus.
  * @returns (base^exp) % modulus.
  */
-export function modPow(base: number, exp: number, modulus: Modulus): number {
+export function modPow(
+	base: number,
+	exp: number,
+	modulus: PositiveIntegerLike,
+): number {
 	let res = 1;
 	base = mod(base, modulus);
 	while (exp > 0) {
@@ -97,6 +109,39 @@ export function getQuadraticResidues(p: Prime): number[] {
 }
 
 /**
+ * Unique prime factors of `p - 1` for a prime `p`.
+ *
+ * `p - 1` is a plain `number` once arithmetic strips the `Prime` brand, so the
+ * assertion exists only to brand it for {@link getPrimeFactors}; `p ≥ 2` makes
+ * `p - 1` positive, hence the assertion cannot fail here.
+ */
+function uniquePrimeFactorsBelow(p: Prime): Prime[] {
+	return Array.from(new Set(getPrimeFactors(asPositiveInteger(p - 1))));
+}
+
+/**
+ * Whether an already-reduced residue generates the full multiplicative group
+ * modulo `p`: `g` is a primitive root iff `g^((p-1)/q) ≢ 1 (mod p)` for every
+ * prime factor `q` of `p - 1`.
+ *
+ * `factorsOfPhi` is a parameter because `findPrimitiveRoot` tests many
+ * candidate bases against the same `p`; recomputing the factorization per
+ * candidate would repeat the same work `p` times.
+ */
+function hasFullMultiplicativeOrder(
+	r: number,
+	p: Prime,
+	factorsOfPhi: Prime[],
+): boolean {
+	if (r === 0) {
+		return false;
+	}
+	const phi = p - 1;
+
+	return factorsOfPhi.every((q) => modPow(r, phi / q, p) !== 1);
+}
+
+/**
  * Checks whether g is a primitive root modulo p.
  * g is a primitive root modulo p iff its multiplicative order modulo p is p - 1,
  * i.e. g^((p-1)/q) ≢ 1 (mod p) for every prime factor q of p - 1.
@@ -113,15 +158,8 @@ export function isPrimitiveRoot(p: Prime, g: number): boolean {
 	if (!Number.isInteger(g)) {
 		return false;
 	}
-	const r = mod(g, p);
-	if (r === 0) {
-		return false;
-	}
 
-	const phi = p - 1;
-	const uniqueFactors = Array.from(new Set(getPrimeFactors(phi)));
-
-	return uniqueFactors.every((q) => modPow(r, phi / q, p) !== 1);
+	return hasFullMultiplicativeOrder(mod(g, p), p, uniquePrimeFactorsBelow(p));
 }
 
 /**
@@ -138,8 +176,9 @@ export function findPrimitiveRoot(p: Prime): number {
 		throw new RangeError("p must be prime");
 	}
 
+	const factorsOfPhi = uniquePrimeFactorsBelow(p);
 	for (let g = 1; g < p; g++) {
-		if (isPrimitiveRoot(p, g)) {
+		if (hasFullMultiplicativeOrder(mod(g, p), p, factorsOfPhi)) {
 			return g;
 		}
 	}

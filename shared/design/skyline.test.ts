@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
+import { at } from "@utils/at";
 import { Hz } from "@units/units";
 import { designSkyline } from "@design/skyline";
 
 describe("designSkyline", () => {
 	const prime = asPrime(7);
 	const freq = toFrequency(343, Hz);
+
+	// Matrix cells need both indices narrowed (`grid[i][j]` is rejected because
+	// `grid[i]` is `number[] | undefined`), and narrowing both means a wrong
+	// index throws instead of comparing two `undefined`s as equal.
+	function cellAt(matrix: number[][], i: number, j: number): number {
+		return at(at(matrix, i), j);
+	}
 
 	it("generates a square p × p grid (QRD default)", () => {
 		const result = designSkyline({ prime, designFrequency: freq });
@@ -27,11 +35,11 @@ describe("designSkyline", () => {
 	it("computes Height(i, j) = (S(i) + S(j)) mod p", () => {
 		const result = designSkyline({ prime, designFrequency: freq });
 
-		expect(result.grid[0][0]).toBe(0);
-		expect(result.grid[0][1]).toBe(1);
-		expect(result.grid[1][0]).toBe(1);
-		expect(result.grid[2][2]).toBe((4 + 4) % 7);
-		expect(result.grid[3][5]).toBe((2 + 4) % 7);
+		expect(cellAt(result.grid, 0, 0)).toBe(0);
+		expect(cellAt(result.grid, 0, 1)).toBe(1);
+		expect(cellAt(result.grid, 1, 0)).toBe(1);
+		expect(cellAt(result.grid, 2, 2)).toBe((4 + 4) % 7);
+		expect(cellAt(result.grid, 3, 5)).toBe((2 + 4) % 7);
 	});
 
 	it("is symmetric across the diagonal", () => {
@@ -39,7 +47,7 @@ describe("designSkyline", () => {
 
 		for (let i = 0; i < 7; i++) {
 			for (let j = 0; j < 7; j++) {
-				expect(result.grid[i][j]).toBe(result.grid[j][i]);
+				expect(cellAt(result.grid, i, j)).toBe(cellAt(result.grid, j, i));
 			}
 		}
 	});
@@ -54,9 +62,9 @@ describe("designSkyline", () => {
 		const result = designSkyline({ prime, designFrequency: freq });
 
 		expect(result.heights).toHaveLength(7);
-		expect(result.heights[0][0]).toBeCloseTo(0, 3);
-		expect(result.heights[1][1]).toBeCloseTo((1 + 1) / 14, 3);
-		expect(result.heights[2][2]).toBeCloseTo(((4 + 4) % 7) / 14, 3);
+		expect(cellAt(result.heights, 0, 0)).toBeCloseTo(0, 3);
+		expect(cellAt(result.heights, 1, 1)).toBeCloseTo((1 + 1) / 14, 3);
+		expect(cellAt(result.heights, 2, 2)).toBeCloseTo(((4 + 4) % 7) / 14, 3);
 	});
 
 	it("reports the max residue and max height", () => {
@@ -81,7 +89,7 @@ describe("designSkyline", () => {
 
 		expect(result.sequence).toEqual([0, 1, 1]);
 		expect(result.grid).toHaveLength(3);
-		expect(result.grid[1][1]).toBe(2);
+		expect(cellAt(result.grid, 1, 1)).toBe(2);
 		expect(result.maxResidue).toBe(2);
 		// Unit height is λ/(2p) = 1/6 at 343 Hz.
 		expect(result.unitHeight).toBeCloseTo(1 / 6, 3);
@@ -114,14 +122,14 @@ describe("designSkyline", () => {
 		});
 
 		// First sequence value is 1: (1 + 1) mod 7 = 2, (1 + 6) mod 7 = 0.
-		expect(result.grid[0][0]).toBe(2);
-		expect(result.grid[0][1]).toBe(4);
-		expect(result.grid[0][3]).toBe(0);
+		expect(cellAt(result.grid, 0, 0)).toBe(2);
+		expect(cellAt(result.grid, 0, 1)).toBe(4);
+		expect(cellAt(result.grid, 0, 3)).toBe(0);
 
 		for (let i = 0; i < 7; i++) {
 			for (let j = 0; j < 7; j++) {
-				expect(result.grid[i][j]).toBe(
-					(result.sequence[i] + result.sequence[j]) % 7,
+				expect(cellAt(result.grid, i, j)).toBe(
+					(at(result.sequence, i) + at(result.sequence, j)) % 7,
 				);
 			}
 		}
@@ -135,8 +143,8 @@ describe("designSkyline", () => {
 		});
 
 		for (let j = 0; j < 7; j++) {
-			expect(result.grid[0][j]).toBe(result.grid[6][j]);
-			expect(result.grid[j][0]).toBe(result.grid[j][6]);
+			expect(cellAt(result.grid, 0, j)).toBe(cellAt(result.grid, 6, j));
+			expect(cellAt(result.grid, j, 0)).toBe(cellAt(result.grid, j, 6));
 		}
 	});
 

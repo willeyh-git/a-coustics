@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
 import { getQuadraticResidues } from "@math/number-theory";
+import { at } from "@utils/at";
 import { Hz } from "@units/units";
 import { designPoly } from "@design/poly";
 import { designSkyline } from "@design/skyline";
@@ -15,14 +16,21 @@ describe("designPoly", () => {
 
 	function expectedGrid(q1: number, q2: number, p: number): number[][] {
 		const grid: number[][] = [];
-		for (let i = 0; i < p; i++) {
+		for (const iSquared of squaresMod7) {
 			const row: number[] = [];
-			for (let j = 0; j < p; j++) {
-				row.push((q1 * squaresMod7[i] + q2 * squaresMod7[j]) % p);
+			for (const jSquared of squaresMod7) {
+				row.push((q1 * iSquared + q2 * jSquared) % p);
 			}
 			grid.push(row);
 		}
 		return grid;
+	}
+
+	// Matrix cells need both indices narrowed (`grid[i][j]` is rejected because
+	// `grid[i]` is `number[] | undefined`); narrowing both means a wrong index
+	// throws rather than comparing two `undefined`s as equal.
+	function cellAt(matrix: number[][], i: number, j: number): number {
+		return at(at(matrix, i), j);
 	}
 
 	it("generates a square p × p grid", () => {
@@ -38,20 +46,20 @@ describe("designPoly", () => {
 		const result = designPoly({ prime, designFrequency: freq, q1: 1, q2: 1 });
 
 		expect(result.grid).toEqual(expectedGrid(1, 1, 7));
-		expect(result.grid[0][0]).toBe(0);
-		expect(result.grid[0][1]).toBe(1);
-		expect(result.grid[1][0]).toBe(1);
-		expect(result.grid[2][2]).toBe((4 + 4) % 7);
+		expect(cellAt(result.grid, 0, 0)).toBe(0);
+		expect(cellAt(result.grid, 0, 1)).toBe(1);
+		expect(cellAt(result.grid, 1, 0)).toBe(1);
+		expect(cellAt(result.grid, 2, 2)).toBe((4 + 4) % 7);
 	});
 
 	it("produces an asymmetric grid when q1 ≠ q2", () => {
 		const result = designPoly({ prime, designFrequency: freq, q1: 1, q2: 2 });
 
 		expect(result.grid).toEqual(expectedGrid(1, 2, 7));
-		// grid[0][1] uses q2 on j²; grid[1][0] uses q1 on i².
-		expect(result.grid[0][1]).toBe((2 * 1) % 7);
-		expect(result.grid[1][0]).toBe((1 * 1) % 7);
-		expect(result.grid[0][1]).not.toBe(result.grid[1][0]);
+		// cellAt(0, 1) uses q2 on j²; cellAt(1, 0) uses q1 on i².
+		expect(cellAt(result.grid, 0, 1)).toBe((2 * 1) % 7);
+		expect(cellAt(result.grid, 1, 0)).toBe((1 * 1) % 7);
+		expect(cellAt(result.grid, 0, 1)).not.toBe(cellAt(result.grid, 1, 0));
 	});
 
 	it("uses the QRD unit depth as the poly unit depth", () => {
@@ -65,9 +73,9 @@ describe("designPoly", () => {
 		const result = designPoly({ prime, designFrequency: freq, q1: 1, q2: 1 });
 
 		expect(result.depths).toHaveLength(7);
-		expect(result.depths[0][0]).toBeCloseTo(0, 3);
-		expect(result.depths[1][1]).toBeCloseTo(2 / 14, 3);
-		expect(result.depths[2][2]).toBeCloseTo(((4 + 4) % 7) / 14, 3);
+		expect(cellAt(result.depths, 0, 0)).toBeCloseTo(0, 3);
+		expect(cellAt(result.depths, 1, 1)).toBeCloseTo(2 / 14, 3);
+		expect(cellAt(result.depths, 2, 2)).toBeCloseTo(((4 + 4) % 7) / 14, 3);
 	});
 
 	it("reports the max residue and max depth", () => {

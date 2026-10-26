@@ -7,6 +7,7 @@ import { sequenceToDepths } from "@geometry/depths";
 import { asFlowResistivity } from "@math/helpers";
 import { generateQRDSequence } from "@math/sequences";
 import { toFrequency } from "@geometry/scaling";
+import { at } from "@utils/at";
 import type { FrequencyResponse } from "@units/core";
 import type { Frequency, Length, Prime } from "@units/units";
 import { Hz } from "@units/units";
@@ -133,8 +134,9 @@ function generateFrequencyAxis(
  * @param input The prime, design frequency, absorptive fraction, and material.
  * @returns The hybrid panel's geometry and combined diffusion/absorption metrics.
  * @throws RangeError if `absorptiveRatio` is outside `[0, 1)`, the flow
- * resistivity is non-positive, or an explicit frequency axis contains a
- * non-positive value.
+ * resistivity is non-positive, an explicit frequency axis contains a
+ * non-positive value, or (an impossible state) the prime order yields no wells
+ * or a well curve is misaligned with the analysis axis.
  */
 export function designABFUSOR(input: DesignABFUSORInput): DesignABFUSORResult {
 	const { prime, designFrequency, absorptiveRatio } = input;
@@ -160,26 +162,36 @@ export function designABFUSOR(input: DesignABFUSORInput): DesignABFUSORResult {
 	const depths = sequenceToDepths(sequence, unitDepth);
 
 	const n = depths.length;
+	// A `Prime` is at least 2, so a QRD sequence yields at least one well. That
+	// invariant is relied on by the `/ n` averaging below and by the `at(depths,
+	// 0)` reduce seeds, so it is stated here rather than only in a comment.
+	if (n === 0) {
+		throw new RangeError(
+			`Invariant violation: prime order ${prime} yielded no wells`,
+		);
+	}
 	const absorptiveCount = Math.floor(absorptiveRatio * n);
 
 	// Index wells sorted by ascending depth; the shallowest `absorptiveCount`
-	// become absorptive.
-	const order = Array.from({ length: n }, (_, i) => i).sort(
-		(a, b) => depths[a] - depths[b],
+	// become absorptive. Ties are broken by well index so the selection is a
+	// total order rather than a consequence of sort stability.
+	const indexedDepths = depths.map((d, i) => ({ depth: Number(d), i }));
+	indexedDepths.sort((a, b) =>
+		a.depth !== b.depth ? a.depth - b.depth : a.i - b.i,
 	);
-	const absorptiveSet = new Set<number>(order.slice(0, absorptiveCount));
+	const absorptiveSet = new Set<number>(
+		indexedDepths.slice(0, absorptiveCount).map((entry) => entry.i),
+	);
 
 	const axis = input.frequencyAxis ?? generateFrequencyAxis(designFrequency);
 
 	const wells: ABFUSORWell[] = [];
-	const absorptionSum: number[] = new Array<number>(axis.length).fill(0);
 
-	for (let i = 0; i < n; i = i + 1) {
+	depths.forEach((depth, i) => {
 		const state: ABFUSORWellState = absorptiveSet.has(i)
 			? "ABSORPTIVE"
 			: "DIFFUSIVE";
-		const depth = depths[i];
-		const residue = sequence[i];
+		const residue = at(sequence, i);
 
 		let absorption: FrequencyResponse;
 		if (state === "ABSORPTIVE") {
@@ -192,9 +204,6 @@ export function designABFUSOR(input: DesignABFUSORInput): DesignABFUSORResult {
 				frequencies: axis,
 				values: calculatePorousAbsorption(axis, { material: wellMaterial }),
 			};
-			for (let k = 0; k < axis.length; k = k + 1) {
-				absorptionSum[k] = absorptionSum[k] + absorption.values[k];
-			}
 		} else {
 			absorption = {
 				frequencies: axis,
@@ -203,9 +212,27 @@ export function designABFUSOR(input: DesignABFUSORInput): DesignABFUSORResult {
 		}
 
 		wells.push({ index: i, residue, depth, state, absorption });
-	}
+	});
 
-	const overallValues = absorptionSum.map((s) => s / n);
+	// Per-frequency average absorption across every well: fold each well's curve
+	// over the running column sums (one pass over the wells instead of summing
+	// every well per frequency sample), then divide by the well count. `map`
+	// yields `number` for the accumulator, so only the curve read needs
+	// narrowing.
+	const columnSums = wells.reduce(
+		(sums, well) => {
+			if (well.absorption.values.length !== axis.length) {
+				// Impossible state: every well curve is built over `axis`.
+				throw new RangeError(
+					`Well ${well.index} has ${well.absorption.values.length} absorption samples but the analysis axis has ${axis.length}`,
+				);
+			}
+
+			return sums.map((sum, k) => sum + at(well.absorption.values, k));
+		},
+		axis.map(() => 0),
+	);
+	const overallValues = columnSums.map((sum) => sum / n);
 	const maxAbsorption = overallValues.reduce((m, v) => (v > m ? v : m), 0);
 
 	return {
@@ -220,9 +247,9 @@ export function designABFUSOR(input: DesignABFUSORInput): DesignABFUSORResult {
 		// absorptiveSet.size is the single source of truth for the fractions.
 		absorptiveFraction: absorptiveSet.size / n,
 		diffusiveFraction: (n - absorptiveSet.size) / n,
-		// prime ≥ 2 ⇒ at least one well ⇒ depths is non-empty, so depths[0] is a
-		// valid seed for the reduce.
-		maxDepth: depths.reduce((m, d) => (d > m ? d : m), depths[0]),
-		minDepth: depths.reduce((m, d) => (d < m ? d : m), depths[0]),
+		// prime ≥ 2 ⇒ at least one well ⇒ depths is non-empty, so at(depths, 0) is
+		// a valid seed for the reduce (guarded above by the `n === 0` check).
+		maxDepth: depths.reduce((m, d) => (d > m ? d : m), at(depths, 0)),
+		minDepth: depths.reduce((m, d) => (d < m ? d : m), at(depths, 0)),
 	};
 }
