@@ -8,7 +8,7 @@ import {
 	type HelmholtzAcousticParams,
 	resolveAcousticResistance,
 } from "@acoustics/helmholtz-physics";
-import { toFrequency } from "@geometry/scaling";
+import { generateFrequencyAxis } from "@acoustics/response";
 import type { FrequencyResponse } from "@units/core";
 import type {
 	AcousticResistance,
@@ -17,7 +17,6 @@ import type {
 	Length,
 	Volume,
 } from "@units/units";
-import { Hz } from "@units/units";
 
 /**
  * Input for designing a Helmholtz resonator from its geometry.
@@ -53,29 +52,6 @@ export interface DesignHelmholtzResult {
 	acousticResistance: AcousticResistance;
 	absorptionCurve: FrequencyResponse;
 	bandwidth: Frequency;
-}
-
-/**
- * Builds a logarithmically spaced frequency axis from `center / 3` to
- * `center * 3` with `points` samples, used when no explicit axis is supplied.
- */
-function generateFrequencyAxis(
-	center: Frequency,
-	points: number = 400,
-): Frequency[] {
-	if (points < 2) {
-		throw new RangeError(`points must be at least 2 (got ${points})`);
-	}
-	const c = Number(center);
-	const lo = c / 3;
-	const hi = c * 3;
-	const axis: Frequency[] = [];
-	for (let i = 0; i < points; i = i + 1) {
-		const t = i / (points - 1);
-		const f = lo * (hi / lo) ** t;
-		axis.push(toFrequency(f, Hz));
-	}
-	return axis;
 }
 
 /**
