@@ -1,10 +1,10 @@
+import type { DesignQRDInput } from "@design/qrd";
+import type { ValidationResult } from "@validators/common";
 import {
 	combine,
 	validatePositiveFrequency,
 	validatePrime,
 } from "@validators/common";
-import type { DesignQRDInput } from "@design/qrd";
-import type { ValidationResult } from "@validators/common";
 
 /**
  * Unbranded, all-optional view of {@link DesignQRDInput}: the front door for

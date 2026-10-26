@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { m } from "@units/units";
-import { sequenceToDepths, matrixToLengths } from "@geometry/depths";
+import { matrixToLengths, sequenceToDepths } from "@geometry/depths";
 import { toLength } from "@geometry/scaling";
+import { m } from "@units/units";
 import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 describe("sequenceToDepths", () => {
 	it("should map sequence values linearly to depths", () => {

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Cancel in-flight runs for the same workflow + ref (e.g. a new commit on a PR).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # npm >= 11.10.0 is required for the min-release-age setting in .npmrc
+      - name: Install npm 11
+        run: npm install -g npm@11
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint & format (check)
+        run: npx @biomejs/biome check .
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npx vitest run

@@ -1,12 +1,12 @@
-import { describe, expect, it } from "vitest";
 import { SPEED_OF_SOUND } from "@acoustics/constants";
 import { AIR_DENSITY } from "@acoustics/helmholtz-physics";
+import { designHelmholtz } from "@design/helmholtz";
 import { toAcousticResistance, toLength, toVolume } from "@geometry/scaling";
 import { asAcousticResistance, asFrequency } from "@math/helpers";
-import { at } from "@utils/at";
 import type { Length, Volume } from "@units/units";
 import { m, m3, raylsPerM4 } from "@units/units";
-import { designHelmholtz } from "@design/helmholtz";
+import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 const neckRadius: Length = toLength(0.02, m);
 const neckLength: Length = toLength(0.01, m);

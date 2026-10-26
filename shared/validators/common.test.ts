@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import { asPrime } from "@math/helpers";
 import { isPrimitiveRoot } from "@math/number-theory";
 import {
@@ -8,20 +7,21 @@ import {
 	combine,
 	describeValue,
 	fail,
-	ok,
 	MAX_PRIME,
-	validatePositiveNumber,
-	validatePositiveFrequency,
-	validatePositiveLength,
-	validatePositiveVolume,
+	ok,
+	type ValidationResult,
 	validateNonNegativeNumber,
+	validateOneOf,
+	validatePositiveFrequency,
 	validatePositiveFrequencyArray,
+	validatePositiveLength,
+	validatePositiveNumber,
+	validatePositiveVolume,
 	validatePrime,
 	validatePrimitiveRoot,
 	validateRatioInRange,
-	validateOneOf,
-	type ValidationResult,
 } from "@validators/common";
+import { describe, expect, it } from "vitest";
 
 describe("combine", () => {
 	it("reports valid when nothing failed", () => {

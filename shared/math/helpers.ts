@@ -1,8 +1,8 @@
 import { isPrime } from "@math/number-theory";
 import type {
 	AcousticResistance,
-	Frequency,
 	FlowResistivity,
+	Frequency,
 	Integer,
 	Modulus,
 	NonNegativeInteger,

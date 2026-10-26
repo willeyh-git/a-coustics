@@ -1,16 +1,15 @@
+import { designUnitDepth } from "@acoustics/design";
 import {
 	calculatePorousAbsorption,
 	type PorousMaterial,
 } from "@acoustics/materials";
-import { designUnitDepth } from "@acoustics/design";
+import { generateFrequencyAxis } from "@acoustics/response";
 import { sequenceToDepths } from "@geometry/depths";
 import { asFlowResistivity } from "@math/helpers";
 import { generateQRDSequence } from "@math/sequences";
-import { toFrequency } from "@geometry/scaling";
-import { at } from "@utils/at";
 import type { FrequencyResponse } from "@units/core";
 import type { Frequency, Length, Prime } from "@units/units";
-import { Hz } from "@units/units";
+import { at } from "@utils/at";
 
 /**
  * State of an individual ABFUSOR well:
@@ -97,29 +96,6 @@ export interface DesignABFUSORResult {
 	maxDepth: Length;
 	/** Shallowest well depth. */
 	minDepth: Length;
-}
-
-/**
- * Builds a logarithmically spaced frequency axis from `center / 3` to
- * `center * 3`, used when no explicit axis is supplied.
- */
-function generateFrequencyAxis(
-	center: Frequency,
-	points: number = 400,
-): Frequency[] {
-	if (points < 2) {
-		throw new RangeError(`points must be at least 2 (got ${points})`);
-	}
-	const c = Number(center);
-	const lo = c / 3;
-	const hi = c * 3;
-	const axis: Frequency[] = [];
-	for (let i = 0; i < points; i = i + 1) {
-		const t = i / (points - 1);
-		const f = lo * (hi / lo) ** t;
-		axis.push(toFrequency(f, Hz));
-	}
-	return axis;
 }
 
 /**

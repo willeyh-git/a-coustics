@@ -1,13 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { toFrequency } from "@geometry/scaling";
-import { asPrime, asFlowResistivity } from "@math/helpers";
-import { Hz } from "@units/units";
 import {
 	type ABFUSORWellState,
 	type DesignABFUSORResult,
 	designABFUSOR,
 	type PorousAbsorberSpec,
 } from "@design/abfusor";
+import { toFrequency } from "@geometry/scaling";
+import { asFlowResistivity, asPrime } from "@math/helpers";
+import { Hz } from "@units/units";
+import { describe, expect, it } from "vitest";
 
 const material = (flowResistivity: number): PorousAbsorberSpec => ({
 	flowResistivity: asFlowResistivity(flowResistivity),

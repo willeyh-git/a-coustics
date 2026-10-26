@@ -1,5 +1,5 @@
 import { asPrime } from "@math/helpers";
-import type { Prime, PositiveInteger } from "@units/units";
+import type { PositiveInteger, Prime } from "@units/units";
 
 /**
  * Returns the prime factorization of a given integer.

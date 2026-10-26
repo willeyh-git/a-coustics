@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { asModulus, asPositiveInteger, asPrime } from "@math/helpers";
 import { modInverse } from "@math/number-theory/mod-inverse";
+import { describe, expect, it } from "vitest";
 
 describe("modInverse", () => {
 	describe("valid inverses", () => {

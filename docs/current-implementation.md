@@ -126,8 +126,9 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 ## Not Started
 
-- Shared validators (`shared/validators/`)
-- Shared frequency analysis (`shared/acoustics/response.ts`)
+- Shared validators (`shared/validators/`) — now implemented (see below).
+- Shared frequency analysis (`shared/acoustics/response.ts`) — now implemented
+  (see below).
 - UI components (only a skeleton `app/app.vue` exists)
 
 ## Phase 9 — ABFUSOR (Absorbing Binary Diffuser)
@@ -164,11 +165,34 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 The pre-plan calls for these modules which do not yet exist:
 
-- `shared/validators/` — Validation functions for all panel types
-- `shared/acoustics/response.ts` — Shared frequency analysis (`generateOctaveBands()`, `generateThirdOctaveBands()`)
+- `shared/validators/` — Validation functions for all panel types (now implemented).
+- `shared/acoustics/response.ts` — Shared frequency analysis (`generateFrequencyAxis()`,
+  `generateOctaveBands()`, `generateThirdOctaveBands()`, plus the ISO 266 band
+  center tables). Now implemented.
 - `shared/acoustics/materials.ts` (Shared Material Models for Helmholtz/ABFUSOR) is now implemented (Phase 9).
 
 `shared/math/grids.ts` (2D grid generation for Skyline/Poly) is now implemented.
+
+## Shared Frequency Analysis (`shared/acoustics/response.ts`)
+
+Implemented (TDD, `shared/acoustics/response.test.ts`). Replaces the private,
+duplicated `generateFrequencyAxis` copies that previously lived in
+`shared/design/helmholtz.ts` and `shared/design/abfusor.ts`, both of which now
+import the shared version.
+
+- `generateFrequencyAxis(center, points = 400)` — logarithmic axis from
+  `center/3` to `center*3` (the default sweep used by the design modules).
+- `OCTAVE_BAND_CENTERS_HZ` / `THIRD_OCTAVE_BAND_CENTERS_HZ` — ISO 266 preferred
+  band-center tables.
+- `octaveBandCenters(range)` / `thirdOctaveBandCenters(range)` — band centers
+  whose interval overlaps a `FrequencyRange`, branded.
+- `generateOctaveBands(response)` / `generateThirdOctaveBands(response)` —
+  aggregate a finely-sampled `FrequencyResponse` into per-band arithmetic means.
+  Each sample is assigned to the band whose ISO edge interval contains it, so
+  boundaries are the exact ISO band edges (not a linear midpoint); bands with no
+  samples are omitted. Third-octave bands tile the spectrum exactly; octave
+  bands use two interleaved ISO alignments that overlap, so a sample in an
+  overlap goes to the nearest center among the covering bands.
 
 ## UI
 

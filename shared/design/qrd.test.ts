@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { designQRD } from "@design/qrd";
 import { toFrequency } from "@geometry/scaling";
 import { asPrime } from "@math/helpers";
 import { Hz } from "@units/units";
-import { designQRD } from "@design/qrd";
+import { describe, expect, it } from "vitest";
 
 describe("designQRD", () => {
 	it("should generate a complete QRD design", () => {

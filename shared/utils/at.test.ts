@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 describe("at", () => {
 	it("returns the element at a valid index", () => {

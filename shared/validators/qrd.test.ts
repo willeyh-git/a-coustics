@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { validateQRDDesign } from "@validators/qrd";
+import { describe, expect, it } from "vitest";
 
 describe("validateQRDDesign", () => {
 	it("accepts a valid prime order and design frequency", () => {

@@ -1,20 +1,3 @@
-import { describe, expect, it } from "vitest";
-import {
-	toAcousticResistance,
-	toArea,
-	toLength,
-	toVolume,
-} from "@geometry/scaling";
-import { asAcousticResistance, asFrequency } from "@math/helpers";
-import { at } from "@utils/at";
-import type {
-	AcousticResistance,
-	Area,
-	Frequency,
-	Length,
-	Volume,
-} from "@units/units";
-import { m, m2, m3, raylsPerM4 } from "@units/units";
 import { SPEED_OF_SOUND } from "@acoustics/constants";
 import {
 	AIR_DENSITY,
@@ -26,6 +9,23 @@ import {
 	END_CORRECTION_FACTOR,
 	type HelmholtzAcousticParams,
 } from "@acoustics/helmholtz-physics";
+import {
+	toAcousticResistance,
+	toArea,
+	toLength,
+	toVolume,
+} from "@geometry/scaling";
+import { asAcousticResistance, asFrequency } from "@math/helpers";
+import type {
+	AcousticResistance,
+	Area,
+	Frequency,
+	Length,
+	Volume,
+} from "@units/units";
+import { m, m2, m3, raylsPerM4 } from "@units/units";
+import { at } from "@utils/at";
+import { describe, expect, it } from "vitest";
 
 // Canonical resonator used across the tests.
 const neckRadius: Length = toLength(0.02, m); // 2 cm

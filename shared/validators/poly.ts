@@ -1,4 +1,7 @@
+import type { DesignPolyInput } from "@design/poly";
 import { getQuadraticResidues, mod } from "@math/number-theory";
+import type { Modulus, Prime } from "@units/units";
+import type { ValidationResult } from "@validators/common";
 import {
 	asFiniteNumber,
 	asModulusValue,
@@ -10,9 +13,6 @@ import {
 	validatePositiveFrequency,
 	validatePrime,
 } from "@validators/common";
-import type { DesignPolyInput } from "@design/poly";
-import type { Modulus, Prime } from "@units/units";
-import type { ValidationResult } from "@validators/common";
 
 /**
  * Unbranded, all-optional view of {@link DesignPolyInput}: the front door for

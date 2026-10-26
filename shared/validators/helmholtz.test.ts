@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { validateHelmholtzDesign } from "@validators/helmholtz";
+import { describe, expect, it } from "vitest";
 
 describe("validateHelmholtzDesign", () => {
 	it("accepts a valid resonator geometry", () => {

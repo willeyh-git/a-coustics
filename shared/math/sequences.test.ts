@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
 import { asPrime } from "@math/helpers";
 import { findPrimitiveRoot, modPow } from "@math/number-theory";
-import { generateQRDSequence, generatePRDSequence } from "@math/sequences";
+import { generatePRDSequence, generateQRDSequence } from "@math/sequences";
+import { describe, expect, it } from "vitest";
 
 describe("generateQRDSequence", () => {
 	describe("Core correctness", () => {
