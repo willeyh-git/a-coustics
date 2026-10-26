@@ -53,43 +53,6 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 **Test coverage:** `design/qrd.test.ts`
 
-## Completed Work
-
-### Phase 1 — Shared Math Foundations
-
-**Files:**
-- `shared/math/number-theory.ts` — `isPrime()`, `gcd()`, `isCoprime()`, `mod()`, `modPow()`, `getQuadraticResidues()`, `findPrimitiveRoot()`, `isPrimitiveRoot()`
-- `shared/math/sequences.ts` — `generateQRDSequence()`, `generatePRDSequence()`
-- `shared/math/helpers.ts` — Type assertion and construction helpers
-- `shared/math/number-theory/` — Extended GCD, modular inverse (submodule)
-
-**Test coverage:** 12 test files covering all number theory and sequence functions.
-
-### Phase 2 — Shared Geometry
-
-**Files:**
-- `shared/geometry/depths.ts` — `sequenceToDepths()`
-- `shared/geometry/scaling.ts` — Unit conversion utilities
-
-**Test coverage:** `geometry/depths.test.ts`
-
-### Phase 3 — Shared Acoustic Utilities
-
-**Files:**
-- `shared/acoustics/constants.ts` — `SPEED_OF_SOUND`
-- `shared/acoustics/frequency.ts` — `calculateWavelength()`, `frequencyFromWavelength()`, `quarterWavelength()`, `halfWavelength()`
-- `shared/acoustics/design.ts` — `designUnitDepth()`
-
-**Test coverage:** `acoustics/design.test.ts`
-
-### Phase 4 — QRD (Reference Implementation)
-
-**Files:**
-- `shared/design/qrd.ts` — `designQRD()` with `DesignQRDInput` / `DesignQRDResult` types
-- `shared/acoustics/qrd-physics.ts` — `calculateUnitDepth()` for QRD
-
-**Test coverage:** `design/qrd.test.ts`
-
 ### Phase 5 — PRD
 
 **Files:**
@@ -126,9 +89,6 @@ This document tracks the current state of the acoustic diffuser implementation.
 
 ## Not Started
 
-- Shared validators (`shared/validators/`) — now implemented (see below).
-- Shared frequency analysis (`shared/acoustics/response.ts`) — now implemented
-  (see below).
 - UI components (only a skeleton `app/app.vue` exists)
 
 ## Phase 9 — ABFUSOR (Absorbing Binary Diffuser)
@@ -161,17 +121,6 @@ This document tracks the current state of the acoustic diffuser implementation.
 **Test coverage:** 30 tests across the two files; the closed-form bandwidth is verified against half-power crossings located by bisection on the absorption curve.
 
 
-## Missing Infrastructure
-
-The pre-plan calls for these modules which do not yet exist:
-
-- `shared/validators/` — Validation functions for all panel types (now implemented).
-- `shared/acoustics/response.ts` — Shared frequency analysis (`generateFrequencyAxis()`,
-  `generateOctaveBands()`, `generateThirdOctaveBands()`, plus the ISO 266 band
-  center tables). Now implemented.
-- `shared/acoustics/materials.ts` (Shared Material Models for Helmholtz/ABFUSOR) is now implemented (Phase 9).
-
-`shared/math/grids.ts` (2D grid generation for Skyline/Poly) is now implemented.
 
 ## Shared Frequency Analysis (`shared/acoustics/response.ts`)
 
