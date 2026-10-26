@@ -19,13 +19,14 @@ export const THIRD_OCTAVE_BAND_CENTERS_HZ: readonly number[] = [
 /**
  * ISO 266 preferred octave band center frequencies (Hz).
  *
- * The octave series is every third member of the third-octave series, i.e. the
- * nominal centers `f_c = 1000·10^(m/3)`.
+ * Octave centers are spaced one octave apart (ratio 2). ISO 266 defines two
+ * interleaved alignments (offset by a third of an octave); this table is their
+ * union, the standard 1/1-octave set (1000 * 2^m rounded to nominal values,
+ * for both alignments).
  */
 export const OCTAVE_BAND_CENTERS_HZ: readonly number[] = [
-	25, 31.5, 50, 63, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
-	1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000,
-	20000,
+	25, 31.5, 50, 63, 100, 125, 200, 250, 400, 500, 800, 1000, 1600, 2000, 3150,
+	4000, 6300, 8000, 12500, 16000,
 ];
 
 /**
@@ -133,15 +134,20 @@ function nearestBandCenter(value: number, centers: readonly number[]): number {
 /**
  * Aggregate a finely-sampled response into octave bands.
  *
- * Each sample is assigned to its nearest octave band center; the band value is
- * the arithmetic mean of the samples it contains. Bands with no samples are
- * omitted. Returns a {@link FrequencyResponse} whose `frequencies` are the
- * populated band centers and whose `values` are the per-band means.
+ * Each sample is assigned to the band whose ISO edge interval contains it; the
+ * band value is the arithmetic mean of the samples it contains. Bands with no
+ * samples are omitted. Returns a {@link FrequencyResponse} whose `frequencies`
+ * are the populated band centers and whose `values` are the per-band means.
+ *
+ * ISO 266 octave analysis uses two interleaved alignments, so some band
+ * intervals overlap; a sample in an overlap is assigned to the nearest center
+ * among the covering bands. Third-octave bands tile the spectrum exactly, so
+ * each sample lands in exactly one band.
  */
 export function generateOctaveBands(
 	response: FrequencyResponse,
 ): FrequencyResponse {
-	return aggregateBands(response, OCTAVE_BAND_CENTERS_HZ);
+	return aggregateBands(response, OCTAVE_BAND_CENTERS_HZ, octaveEdges);
 }
 
 /**
@@ -151,24 +157,46 @@ export function generateOctaveBands(
 export function generateThirdOctaveBands(
 	response: FrequencyResponse,
 ): FrequencyResponse {
-	return aggregateBands(response, THIRD_OCTAVE_BAND_CENTERS_HZ);
+	return aggregateBands(
+		response,
+		THIRD_OCTAVE_BAND_CENTERS_HZ,
+		thirdOctaveEdges,
+	);
 }
 
 function aggregateBands(
 	response: FrequencyResponse,
 	centers: readonly number[],
+	edges: (center: number) => [number, number],
 ): FrequencyResponse {
 	const sums = new Map<number, { sum: number; count: number }>();
 	for (let i = 0; i < response.frequencies.length; i = i + 1) {
 		// Both arrays are produced together with equal length; the read is
-		// guaranteed in bounds, so use `at` (which throws on the impossible case)
-		// rather than leaving the value unbranded under noUncheckedIndexedAccess.
-		const frequency = at(response.frequencies, i);
+		// guaranteed in bounds, so use `at` (which throws on the impossible case).
+		const hz = Number(at(response.frequencies, i));
+		// Assign to the band whose ISO edge interval contains this frequency, so
+		// the boundaries are the exact ISO edges. Among covering bands (possible
+		// only where octave alignments overlap) pick the nearest center. A
+		// frequency in no band falls back to the globally nearest center.
+		let bestCenter: number | undefined;
+		let bestDistance = Infinity;
+		for (const center of centers) {
+			const [lo, hi] = edges(center);
+			if (hz >= lo && hz <= hi) {
+				const distance = Math.abs(hz - center);
+				if (distance < bestDistance) {
+					bestCenter = center;
+					bestDistance = distance;
+				}
+			}
+		}
+		if (bestCenter === undefined) {
+			bestCenter = nearestBandCenter(hz, centers);
+		}
 		const value = at(response.values, i);
-		const center = nearestBandCenter(Number(frequency), centers);
-		const bucket = sums.get(center);
+		const bucket = sums.get(bestCenter);
 		if (bucket === undefined) {
-			sums.set(center, { sum: value, count: 1 });
+			sums.set(bestCenter, { sum: value, count: 1 });
 		} else {
 			bucket.sum = bucket.sum + value;
 			bucket.count = bucket.count + 1;
