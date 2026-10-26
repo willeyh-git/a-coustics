@@ -3,10 +3,10 @@ import {
 	CHARACTERISTIC_IMPEDANCE_OF_AIR,
 	AIR_DENSITY,
 } from "@acoustics/helmholtz-physics";
+import type { FrequencyResponse } from "@units/core";
 import type {
 	FlowResistivity,
 	Frequency,
-	FrequencyResponse,
 	Length,
 	SurfaceResistance,
 } from "@units/units";

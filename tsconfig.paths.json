@@ -6,7 +6,8 @@
 			"@geometry/*": ["./shared/geometry/*"],
 			"@math/*": ["./shared/math/*"],
 			"@validators/*": ["./shared/validators/*"],
-			"@units/*": ["./shared/types/*"]
+			"@units/*": ["./shared/types/*"],
+			"@utils/*": ["./shared/utils/*"]
 		},
 		"include": [
 			"shared/**/*",

@@ -1,3 +1,5 @@
+import type { PositiveIntegerLike } from "@units/units";
+
 /**
  * Result of the Extended Euclidean Algorithm.
  * Contains the greatest common divisor (gcd) and the Bézout coefficients (x, y)
@@ -14,36 +16,39 @@ export interface ExtendedGcdResult {
  * Returns the greatest common divisor (gcd) of two numbers a and b,
  * along with the coefficients x and y such that ax + by = gcd(a, b).
  *
- * @param a A non-negative integer.
- * @param b A non-negative integer.
+ * @param a A positive integer (any positive brand).
+ * @param b A positive integer (any positive brand).
  * @returns An object containing the gcd and the Bézout coefficients.
  * @throws RangeError if a or b is negative.
  */
-import type { PositiveInteger } from "@units/units";
-
 export function extendedGcd(
-	a: PositiveInteger,
-	b: PositiveInteger,
+	a: PositiveIntegerLike,
+	b: PositiveIntegerLike,
 ): ExtendedGcdResult {
 	if (a < 0 || b < 0) {
 		throw new RangeError("Arguments must be non-negative");
 	}
 
-	if (b === 0) {
-		return {
-			gcd: a,
-			x: 1,
-			y: 0,
-		};
+	// Arithmetic strips the brand, and the loop drives the remainder down to 0,
+	// so every state variable here is an unbranded `number` (the returned `gcd`
+	// is unbranded too, see `ExtendedGcdResult`).
+	let oldR: number = a;
+	let r: number = b;
+	let oldX: number = 1;
+	let x: number = 0;
+	let oldY: number = 0;
+	let y: number = 1;
+
+	while (r !== 0) {
+		const quotient = Math.floor(oldR / r);
+		[oldR, r] = [r, oldR - quotient * r];
+		[oldX, x] = [x, oldX - quotient * x];
+		[oldY, y] = [y, oldY - quotient * y];
 	}
 
-	const result = extendedGcd(b, a % b);
-	const x = result.y;
-	const y = result.x - Math.floor(a / b) * result.y;
-
 	return {
-		gcd: result.gcd,
-		x: x,
-		y: y,
+		gcd: oldR,
+		x: oldX,
+		y: oldY,
 	};
 }

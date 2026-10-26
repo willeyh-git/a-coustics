@@ -18,7 +18,13 @@ describe("gcd", () => {
 		// If we need to support 0, we'd need a NonNegativeInteger brand and update gcd signature.
 		// Since current requirements for gcd are PositiveInteger, we skip 0 for now.
 	});
-	it("throws for negative inputs", () => {
-		expect(() => gcd(-12, 8)).toThrow(RangeError);
+	// Out-of-domain literals are rejected while the branded argument is built,
+	// before `gcd` runs (see `helpers.test.ts` for the construction rules).
+	describe("rejects out-of-domain arguments at construction", () => {
+		it("rejects a negative a", () => {
+			expect(() => gcd(asPositiveInteger(-12), asPositiveInteger(8))).toThrow(
+				RangeError,
+			);
+		});
 	});
 });

@@ -59,6 +59,20 @@ export type Integer = Brand<number, "integer">;
 export type NonNegativeInteger = Brand<number, "nonNegativeInteger">;
 
 /**
+ * Union of the brands that already denote a positive integer: `PositiveInteger`
+ * (any positive integer, e.g. a composite modulus), `Modulus` (validated prime
+ * modulus) and `Prime` (a prime number used as a modulus).
+ *
+ * Generic modular arithmetic (`mod`, `modPow`, `modInverse`, `gcd`,
+ * `extendedGcd`) is defined for any of the three, so its parameters accept this
+ * union instead of a single brand: brands are invariant, so a `Prime`-branded
+ * value would not be assignable to a bare `PositiveInteger` parameter and the
+ * caller would need an unsafe cast. Parameters that need more than positivity
+ * (e.g. `getQuadraticResidues` requires primality) keep the narrow brand.
+ */
+export type PositiveIntegerLike = PositiveInteger | Modulus | Prime;
+
+/**
  * Base units constants.
  */
 export const m = 1 as Length;

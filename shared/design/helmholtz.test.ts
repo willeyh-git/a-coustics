@@ -3,6 +3,7 @@ import { SPEED_OF_SOUND } from "@acoustics/constants";
 import { AIR_DENSITY } from "@acoustics/helmholtz-physics";
 import { toAcousticResistance, toLength, toVolume } from "@geometry/scaling";
 import { asAcousticResistance, asFrequency } from "@math/helpers";
+import { at } from "@utils/at";
 import type { Length, Volume } from "@units/units";
 import { m, m3, raylsPerM4 } from "@units/units";
 import { designHelmholtz } from "@design/helmholtz";
@@ -68,9 +69,9 @@ describe("designHelmholtz", () => {
 			}
 		}
 
-		expect(values[peakIndex]).toBeCloseTo(1, 6);
+		expect(at(values, peakIndex)).toBeCloseTo(1, 6);
 		// The peak is the maximum of the curve.
-		expect(values[peakIndex]).toBeGreaterThanOrEqual(Math.max(...values), 1e-9);
+		expect(at(values, peakIndex)).toBeGreaterThanOrEqual(Math.max(...values));
 	});
 
 	it("reports a positive, finite bandwidth", () => {

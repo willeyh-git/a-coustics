@@ -1,14 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { buildGrid, maxInGrid } from "@math/grids";
+import { at } from "@utils/at";
 
 describe("buildGrid", () => {
 	const sequence = [0, 1, 4, 2, 2, 4, 1];
 	const p = 7;
 
-	const skyline = buildGrid(
-		sequence,
-		(i, j) => (sequence[i] + sequence[j]) % p,
-	);
+	const skyline = buildGrid(sequence, (a, b) => (a + b) % p);
+
+	// A matrix cell needs both indices narrowed: `matrix[i][j]` is rejected
+	// because `matrix[i]` is `number[] | undefined`. `cellAt` narrows both, so a
+	// wrong index fails loudly instead of comparing two `undefined`s as equal.
+	function cellAt(matrix: number[][], i: number, j: number): number {
+		return at(at(matrix, i), j);
+	}
 
 	it("produces a square n × n grid", () => {
 		expect(skyline).toHaveLength(7);
@@ -20,17 +25,21 @@ describe("buildGrid", () => {
 	it("is symmetric across the diagonal", () => {
 		for (let i = 0; i < 7; i++) {
 			for (let j = 0; j < 7; j++) {
-				expect(skyline[i][j]).toBe(skyline[j][i]);
+				expect(cellAt(skyline, i, j)).toBe(cellAt(skyline, j, i));
 			}
 		}
 	});
 
 	it("computes (S(i) + S(j)) mod p", () => {
-		expect(skyline[0][0]).toBe(0);
-		expect(skyline[0][1]).toBe(1);
-		expect(skyline[1][0]).toBe(1);
-		expect(skyline[2][2]).toBe((4 + 4) % p);
-		expect(skyline[3][5]).toBe((2 + 4) % p);
+		expect(skyline).toEqual([
+			[0, 1, 4, 2, 2, 4, 1],
+			[1, 2, 5, 3, 3, 5, 2],
+			[4, 5, 1, 6, 6, 1, 5],
+			[2, 3, 6, 4, 4, 6, 3],
+			[2, 3, 6, 4, 4, 6, 3],
+			[4, 5, 1, 6, 6, 1, 5],
+			[1, 2, 5, 3, 3, 5, 2],
+		]);
 	});
 
 	it("keeps every value within [0, p)", () => {
@@ -53,10 +62,7 @@ describe("maxInGrid", () => {
 		).toBe(6);
 
 		const qrdSequence = [0, 1, 4, 2, 2, 4, 1];
-		const grid = buildGrid(
-			qrdSequence,
-			(i, j) => (qrdSequence[i] + qrdSequence[j]) % 7,
-		);
+		const grid = buildGrid(qrdSequence, (a, b) => (a + b) % 7);
 		expect(maxInGrid(grid)).toBe(6);
 	});
 

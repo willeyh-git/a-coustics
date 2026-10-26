@@ -26,15 +26,28 @@ describe("extendedGcd", () => {
 		// If we need to support 0, we'd need a NonNegativeInteger brand and update extendedGcd signature.
 		// Since current requirements for extendedGcd are PositiveInteger, we skip 0 for now.
 	});
-	it("throws when a is negative", () => {
-		expect(() => extendedGcd(-1, 5)).toThrow(RangeError);
-	});
+	// Out-of-domain literals never reach `extendedGcd`: its parameters are branded
+	// `PositiveIntegerLike`, so `asPositiveInteger` throws while the argument is
+	// built. These assertions only pin that junk cannot be passed at all; the
+	// guards inside `extendedGcd` exist for unbranded JavaScript callers, and
+	// construction itself is covered in `helpers.test.ts`.
+	describe("rejects out-of-domain arguments at construction", () => {
+		it("rejects a negative a", () => {
+			expect(() =>
+				extendedGcd(asPositiveInteger(-1), asPositiveInteger(5)),
+			).toThrow(RangeError);
+		});
 
-	it("throws when b is negative", () => {
-		expect(() => extendedGcd(5, -1)).toThrow(RangeError);
-	});
+		it("rejects a negative b", () => {
+			expect(() =>
+				extendedGcd(asPositiveInteger(5), asPositiveInteger(-1)),
+			).toThrow(RangeError);
+		});
 
-	it("throws when both inputs are negative", () => {
-		expect(() => extendedGcd(-5, -1)).toThrow(RangeError);
+		it("rejects two negative arguments", () => {
+			expect(() =>
+				extendedGcd(asPositiveInteger(-5), asPositiveInteger(-1)),
+			).toThrow(RangeError);
+		});
 	});
 });

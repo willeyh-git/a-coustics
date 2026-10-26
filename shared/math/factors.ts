@@ -1,3 +1,4 @@
+import { asPrime } from "@math/helpers";
 import type { Prime, PositiveInteger } from "@units/units";
 
 /**
@@ -12,7 +13,7 @@ export function getPrimeFactors(n: PositiveInteger): Prime[] {
 
 	const factors: Prime[] = [];
 	let d = 2;
-	let temp = n;
+	let temp: number = n;
 
 	// Handle cases for numbers less than 2
 	if (temp < 2) {
@@ -22,14 +23,14 @@ export function getPrimeFactors(n: PositiveInteger): Prime[] {
 	// Trial division
 	while (d * d <= temp) {
 		while (temp % d === 0) {
-			factors.push(d);
+			factors.push(asPrime(d));
 			temp /= d;
 		}
 		d++;
 	}
 
 	if (temp > 1) {
-		factors.push(temp);
+		factors.push(asPrime(temp));
 	}
 
 	return factors;

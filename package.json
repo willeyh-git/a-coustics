@@ -9,6 +9,7 @@
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
 		"test": "vitest",
+		"typecheck": "npx tsc -p .nuxt/tsconfig.app.json --noEmit && npx tsc -p .nuxt/tsconfig.shared.json --noEmit",
 		"lint": "npx @biomejs/biome lint --write",
 		"format": "npx @biomejs/biome format --write"
 	},
