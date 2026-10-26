@@ -63,6 +63,14 @@ describe("design unit depth", () => {
 		expect(result).toBeCloseTo(1 / (2 * 7), 3);
 	});
 
+	it("matches the QRD reference formula lambda_0 / (2p) at a second frequency", () => {
+		const p = asPrime(7);
+		// c = 343 m/s, so f = 686 Hz gives lambda_0 = 0.5 m.
+		const result = designUnitDepth(asFrequency(686), p);
+
+		expect(result).toBeCloseTo(0.5 / (2 * 7), 6);
+	});
+
 	it("should produce smaller depths at higher frequency", () => {
 		const p = asPrime(7);
 
