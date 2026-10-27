@@ -13,8 +13,10 @@
 		"postinstall": "nuxt prepare",
 		"test": "vitest",
 		"typecheck": "npx tsc -p .nuxt/tsconfig.app.json --noEmit && npx tsc -p .nuxt/tsconfig.shared.json --noEmit",
-		"lint": "npx @biomejs/biome lint --write",
-		"format": "npx @biomejs/biome format --write"
+		"lint": "npx @biomejs/biome lint .",
+		"format": "npx @biomejs/biome format --write .",
+		"check": "npx @biomejs/biome check .",
+		"hooks": "git config core.hooksPath .githooks && echo Git hooks installed from .githooks"
 	},
 	"dependencies": {
 		"nuxt": "^4.4.8",
