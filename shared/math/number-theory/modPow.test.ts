@@ -17,6 +17,18 @@ describe("modPow", () => {
 		});
 	});
 
+	describe("base validation", () => {
+		it("throws for fractional bases", () => {
+			expect(() => modPow(2.5, 2, asModulus(7))).toThrow(RangeError);
+		});
+
+		it("throws for NaN and infinite bases", () => {
+			expect(() => modPow(NaN, 2, asModulus(7))).toThrow(RangeError);
+			expect(() => modPow(Infinity, 2, asModulus(7))).toThrow(RangeError);
+			expect(() => modPow(-Infinity, 2, asModulus(7))).toThrow(RangeError);
+		});
+	});
+
 	describe("exponent validation", () => {
 		it("throws for negative exponents", () => {
 			expect(() => modPow(2, -1, asModulus(7))).toThrow(RangeError);
@@ -30,9 +42,7 @@ describe("modPow", () => {
 		it("throws for NaN and infinite exponents", () => {
 			expect(() => modPow(2, NaN, asModulus(7))).toThrow(RangeError);
 			expect(() => modPow(2, Infinity, asModulus(7))).toThrow(RangeError);
-			expect(() => modPow(2, -Infinity, asModulus(7))).toThrow(
-				RangeError,
-			);
+			expect(() => modPow(2, -Infinity, asModulus(7))).toThrow(RangeError);
 		});
 
 		it("throws for exponents above MAX_SAFE_INTEGER", () => {

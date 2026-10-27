@@ -25,27 +25,23 @@ describe("getPrimeFactors", () => {
 		expect(getPrimeFactors(asPositiveInteger(77))).toEqual([7, 11]);
 	});
 
-	describe("non-finite and non-integer boundaries", () => {
-		it("throws for Infinity", () => {
-			expect(() => getPrimeFactors(Infinity as unknown as PositiveInteger)).toThrow(
-				RangeError,
-			);
+	describe("positive-integer construction boundaries", () => {
+		// The PositiveInteger brand is enforced by asPositiveInteger, so invalid
+		// values are rejected while the argument is constructed and
+		// getPrimeFactors never sees them (branded-value contract).
+		it("rejects non-finite values", () => {
+			expect(() => asPositiveInteger(Infinity)).toThrow(RangeError);
+			expect(() => asPositiveInteger(-Infinity)).toThrow(RangeError);
+			expect(() => asPositiveInteger(NaN)).toThrow(RangeError);
 		});
 
-		it("throws for -Infinity", () => {
-			expect(() =>
-				getPrimeFactors(-Infinity as unknown as PositiveInteger),
-			).toThrow(RangeError);
+		it("rejects fractional values", () => {
+			expect(() => asPositiveInteger(2.5)).toThrow(RangeError);
 		});
 
-		it("throws for NaN", () => {
-			expect(() => getPrimeFactors(NaN as unknown as PositiveInteger)).toThrow(
-				RangeError,
-			);
-		});
-
-		it("throws for fractional values", () => {
-			expect(() => getPrimeFactors(2.5 as unknown as PositiveInteger)).toThrow(
+		it("rejects integers above MAX_SAFE_INTEGER", () => {
+			// 2^53 + 2 is not exactly representable, so it is not a safe integer.
+			expect(() => asPositiveInteger(Number.MAX_SAFE_INTEGER + 2)).toThrow(
 				RangeError,
 			);
 		});

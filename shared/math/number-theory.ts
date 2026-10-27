@@ -66,16 +66,29 @@ export function mod(n: number, m: PositiveIntegerLike): number {
 
 /**
  * Modular exponentiation.
- * @param base The base.
- * @param exp The exponent.
+ *
+ * `base` and `exp` are unbranded values, so their contracts are enforced here.
+ * `modulus` is a branded {@link PositiveIntegerLike}, validated at
+ * construction (`asModulus`/`assertModulus`), so it is not re-checked
+ * (branded-value contract).
+ *
+ * @param base The base (an integer; negative bases are reduced first).
+ * @param exp The exponent (a non-negative safe integer).
  * @param modulus A positive integer modulus.
  * @returns (base^exp) % modulus.
+ * @throws RangeError if base is not an integer or exp is not a
+ * non-negative safe integer.
  */
 export function modPow(
 	base: number,
 	exp: number,
 	modulus: PositiveIntegerLike,
 ): number {
+	// Large but exactly representable integer bases are accepted: `mod` reduces
+	// the base into [0, modulus) before any multiplication can lose precision.
+	if (!Number.isInteger(base)) {
+		throw new RangeError("base must be an integer");
+	}
 	if (!Number.isSafeInteger(exp) || exp < 0) {
 		throw new RangeError("exp must be a non-negative integer");
 	}
@@ -93,16 +106,16 @@ export function modPow(
 
 /**
  * Returns the set of quadratic residues modulo p.
- * Quadratic residues are numbers y such such as there exists some x where x^2 ≡ y (mod p).
+ * Quadratic residues are numbers y such that there exists some x where
+ * x^2 ≡ y (mod p).
+ *
+ * `p` is a branded {@link Prime} validated by `asPrime` at construction, so
+ * primality is not re-checked here (branded-value contract).
  *
  * @param p A prime number.
  * @returns An array of unique quadratic residues modulo p.
- * @throws Error if p is not prime.
  */
 export function getQuadraticResidues(p: Prime): number[] {
-	if (!isPrime(p)) {
-		throw new RangeError("p must be prime");
-	}
 	const residues = new Set<number>();
 	for (let i = 0; i < p; i++) {
 		residues.add(mod(i * i, p));
@@ -149,15 +162,15 @@ function hasFullMultiplicativeOrder(
  * g is a primitive root modulo p iff its multiplicative order modulo p is p - 1,
  * i.e. g^((p-1)/q) ≢ 1 (mod p) for every prime factor q of p - 1.
  *
+ * `p` is a branded {@link Prime}, so primality is enforced at construction and
+ * not re-checked; `g` is an unbranded value and is rejected (rather than
+ * thrown for) when it is not an integer, keeping this a total predicate.
+ *
  * @param p A prime number.
  * @param g The candidate base.
  * @returns True if g is a primitive root modulo p, false otherwise.
- * @throws RangeError if p is not a prime number.
  */
 export function isPrimitiveRoot(p: Prime, g: number): boolean {
-	if (!isPrime(p)) {
-		throw new RangeError("p must be prime");
-	}
 	if (!Number.isInteger(g)) {
 		return false;
 	}
@@ -170,15 +183,15 @@ export function isPrimitiveRoot(p: Prime, g: number): boolean {
  * A primitive root modulo p is a number g such that every number coprime to p
  * is congruent to a power of g modulo p.
  *
+ * `p` is a branded {@link Prime}, so primality is enforced at construction and
+ * not re-checked (branded-value contract). Every prime has a primitive root,
+ * so the loop below always returns; the throw at the end guards an
+ * impossible state.
+ *
  * @param p A prime number.
  * @returns The smallest primitive root modulo p.
- * @throws Error if p is not a prime number.
  */
 export function findPrimitiveRoot(p: Prime): number {
-	if (!isPrime(p)) {
-		throw new RangeError("p must be prime");
-	}
-
 	const factorsOfPhi = uniquePrimeFactorsBelow(p);
 	for (let g = 1; g < p; g++) {
 		if (hasFullMultiplicativeOrder(mod(g, p), p, factorsOfPhi)) {
