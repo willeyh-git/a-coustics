@@ -24,4 +24,34 @@ describe("getPrimeFactors", () => {
 	it("returns factors for semiprimes", () => {
 		expect(getPrimeFactors(asPositiveInteger(77))).toEqual([7, 11]);
 	});
+
+	describe("positive-integer construction boundaries", () => {
+		// The PositiveInteger brand is enforced by asPositiveInteger, so invalid
+		// values are rejected while the argument is constructed and
+		// getPrimeFactors never sees them (branded-value contract).
+		it("rejects non-finite values", () => {
+			expect(() => asPositiveInteger(Infinity)).toThrow(RangeError);
+			expect(() => asPositiveInteger(-Infinity)).toThrow(RangeError);
+			expect(() => asPositiveInteger(NaN)).toThrow(RangeError);
+		});
+
+		it("rejects fractional values", () => {
+			expect(() => asPositiveInteger(2.5)).toThrow(RangeError);
+		});
+
+		it("rejects integers above MAX_SAFE_INTEGER", () => {
+			// 2^53 + 2 is not exactly representable, so it is not a safe integer.
+			expect(() => asPositiveInteger(Number.MAX_SAFE_INTEGER + 2)).toThrow(
+				RangeError,
+			);
+		});
+
+		it("returns itself for a large safe prime", () => {
+			// Largest prime below Number.MAX_SAFE_INTEGER (MAX_SAFE_INTEGER itself is composite).
+			const LARGE_PRIME = 9007199254740881;
+			expect(getPrimeFactors(asPositiveInteger(LARGE_PRIME))).toEqual([
+				LARGE_PRIME,
+			]);
+		});
+	});
 });

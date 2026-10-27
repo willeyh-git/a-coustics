@@ -12,37 +12,39 @@ import type {
 } from "@units/units";
 
 /**
- * Asserts that the given value is an integer.
+ * Asserts that the given value is a safe integer (an integer exactly
+ * representable in IEEE-754 double precision, i.e. within ±
+ * `Number.MAX_SAFE_INTEGER`, the range where integer arithmetic is exact).
  * @param n The value to check.
- * @throws RangeError if n is not an integer.
+ * @throws RangeError if n is not a safe integer.
  */
 export function assertInteger(n: number): asserts n is Integer {
-	if (!Number.isInteger(n)) {
-		throw new RangeError(`Value ${n} must be an integer.`);
+	if (!Number.isSafeInteger(n)) {
+		throw new RangeError(`Value ${n} must be a safe integer.`);
 	}
 }
 
 /**
- * Asserts that the given value is a non-negative integer.
+ * Asserts that the given value is a non-negative safe integer.
  * @param n The value to check.
- * @throws RangeError if n is not a non-negative integer.
+ * @throws RangeError if n is not a non-negative safe integer.
  */
 export function assertNonNegativeInteger(
 	n: number,
 ): asserts n is NonNegativeInteger {
-	if (!Number.isInteger(n) || n < 0) {
-		throw new RangeError(`Value ${n} must be a non-negative integer.`);
+	if (!Number.isSafeInteger(n) || n < 0) {
+		throw new RangeError(`Value ${n} must be a non-negative safe integer.`);
 	}
 }
 
 /**
- * Asserts that the given value is a positive integer.
+ * Asserts that the given value is a positive safe integer.
  * @param n The value to check.
- * @throws RangeError if n is not a positive integer.
+ * @throws RangeError if n is not a positive safe integer.
  */
 export function assertPositiveInteger(n: number): asserts n is PositiveInteger {
-	if (!Number.isInteger(n) || n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive integer.`);
+	if (!Number.isSafeInteger(n) || n <= 0) {
+		throw new RangeError(`Value ${n} must be a positive safe integer.`);
 	}
 }
 
@@ -52,7 +54,9 @@ export function assertPositiveInteger(n: number): asserts n is PositiveInteger {
  * @throws RangeError if n is not a prime number.
  */
 export function assertPrime(n: number): asserts n is Prime {
-	if (!Number.isInteger(n) || !isPrime(n)) {
+	// `isPrime` already rejects non-integers, non-safe integers, and values
+	// below 2, so a single call is the full contract check.
+	if (!isPrime(n)) {
 		throw new RangeError(`Value ${n} must be a prime number.`);
 	}
 }
@@ -85,7 +89,7 @@ export function asModulus(n: number): Modulus {
  * Constructs a PositiveInteger from a number.
  * @param n The number to convert.
  * @returns The branded PositiveInteger.
- * @throws RangeError if n is not a positive integer.
+ * @throws RangeError if n is not a positive safe integer.
  */
 export function asPositiveInteger(n: number): PositiveInteger {
 	assertPositiveInteger(n);
@@ -107,7 +111,7 @@ export function asPrime(n: number): Prime {
  * Constructs an Integer from a number.
  * @param n The number to convert.
  * @returns The branded Integer.
- * @throws RangeError if n is not an integer.
+ * @throws RangeError if n is not a safe integer.
  */
 export function asInteger(n: number): Integer {
 	assertInteger(n);
@@ -118,7 +122,7 @@ export function asInteger(n: number): Integer {
  * Constructs a NonNegativeInteger from a number.
  * @param n The number to convert.
  * @returns The branded NonNegativeInteger.
- * @throws RangeError if n is not a non-negative integer.
+ * @throws RangeError if n is not a non-negative safe integer.
  */
 export function asNonNegativeInteger(n: number): NonNegativeInteger {
 	assertNonNegativeInteger(n);
@@ -132,8 +136,8 @@ export function asNonNegativeInteger(n: number): NonNegativeInteger {
  * @throws RangeError if n is not a positive number.
  */
 export function asFrequency(n: number): Frequency {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(`Value ${n} must be a finite, positive frequency.`);
 	}
 	return n as Frequency;
 }
@@ -145,8 +149,10 @@ export function asFrequency(n: number): Frequency {
  * @throws RangeError if n is not a positive number.
  */
 export function asAcousticResistance(n: number): AcousticResistance {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(
+			`Value ${n} must be a finite, positive acoustic resistance.`,
+		);
 	}
 	return n as AcousticResistance;
 }
@@ -158,8 +164,10 @@ export function asAcousticResistance(n: number): AcousticResistance {
  * @throws RangeError if n is not a positive number.
  */
 export function asFlowResistivity(n: number): FlowResistivity {
-	if (n <= 0) {
-		throw new RangeError(`Value ${n} must be a positive number.`);
+	if (!Number.isFinite(n) || n <= 0) {
+		throw new RangeError(
+			`Value ${n} must be a finite, positive flow resistivity.`,
+		);
 	}
 	return n as FlowResistivity;
 }
@@ -171,8 +179,8 @@ export function asFlowResistivity(n: number): FlowResistivity {
  * @throws RangeError if n is not a non-negative number.
  */
 export function asSurfaceResistance(n: number): SurfaceResistance {
-	if (n < 0) {
-		throw new RangeError(`Value ${n} must be non-negative.`);
+	if (!Number.isFinite(n) || n < 0) {
+		throw new RangeError(`Value ${n} must be a finite, non-negative number.`);
 	}
 	return n as SurfaceResistance;
 }

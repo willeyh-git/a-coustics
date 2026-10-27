@@ -8,7 +8,6 @@ import {
 } from "@acoustics/frequency";
 import { calculateUnitDepth } from "@acoustics/qrd-physics";
 import { asFrequency, asPrime } from "@math/helpers";
-import type { Prime } from "@units/units";
 import { m } from "@units/units";
 import { describe, expect, it } from "vitest";
 
@@ -64,6 +63,14 @@ describe("design unit depth", () => {
 		expect(result).toBeCloseTo(1 / (2 * 7), 3);
 	});
 
+	it("matches the QRD reference formula lambda_0 / (2p) at a second frequency", () => {
+		const p = asPrime(7);
+		// c = 343 m/s, so f = 686 Hz gives lambda_0 = 0.5 m.
+		const result = designUnitDepth(asFrequency(686), p);
+
+		expect(result).toBeCloseTo(0.5 / (2 * 7), 6);
+	});
+
 	it("should produce smaller depths at higher frequency", () => {
 		const p = asPrime(7);
 
@@ -80,12 +87,20 @@ describe("acoustic sanity constraints", () => {
 		expect(() => designUnitDepth(asFrequency(-100), asPrime(7))).toThrow();
 	});
 
-	it("should reject non-prime p", () => {
-		// Branded types are compile-time; pass a runtime value that fails validation.
-		const fakePrime = 8 as unknown as Prime;
-		expect(() => designUnitDepth(asFrequency(343), fakePrime)).toThrow(
-			"p must be a prime number",
+	it("should reject non-finite frequency at the construction boundary", () => {
+		// Invalid input is rejected by asFrequency before designUnitDepth runs.
+		expect(() => designUnitDepth(asFrequency(NaN), asPrime(7))).toThrow(
+			RangeError,
 		);
+		expect(() => designUnitDepth(asFrequency(Infinity), asPrime(7))).toThrow(
+			RangeError,
+		);
+	});
+
+	it("should reject a non-prime p at construction", () => {
+		// Prime validation lives in asPrime (see shared/math/helpers.ts); a
+		// non-prime value is rejected before designUnitDepth is ever reached.
+		expect(() => asPrime(8)).toThrow();
 	});
 });
 

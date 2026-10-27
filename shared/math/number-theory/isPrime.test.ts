@@ -32,4 +32,26 @@ describe("isPrime", () => {
 		expect(isPrime(-7)).toBe(false);
 		expect(isPrime(-2)).toBe(false);
 	});
+
+	describe("non-finite and non-integer boundaries", () => {
+		it("should return false for NaN", () => {
+			expect(isPrime(NaN)).toBe(false);
+		});
+
+		it("should return false for Infinity and -Infinity", () => {
+			expect(isPrime(Infinity)).toBe(false);
+			expect(isPrime(-Infinity)).toBe(false);
+		});
+
+		it("should return false for fractional values", () => {
+			expect(isPrime(4.5)).toBe(false);
+			expect(isPrime(2.1)).toBe(false);
+		});
+
+		it("should return false for integers above MAX_SAFE_INTEGER", () => {
+			// 2 * MAX_SAFE_INTEGER is exactly representable but above MAX_SAFE_INTEGER,
+			// so it must not be treated as prime (and must not hang).
+			expect(isPrime(Number.MAX_SAFE_INTEGER * 2)).toBe(false);
+		});
+	});
 });
