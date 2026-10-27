@@ -90,9 +90,7 @@ This describes the curvature; slats or QRD patterns can add further scattering.
 
 ## 8. ABFUSOR — Absorbing Binary Diffuser
 
-Hybrid absorber/diffuser built on QRD well depths. Shallow wells (ascending by
-depth, fraction `absorptiveRatio`) are filled with absorptive material and become
-`ABSORPTIVE`; deep wells remain `DIFFUSIVE` (plain QRD depth).
+Hybrid absorber/diffuser built on QRD well depths. Shallow wells (ascending by depth, fraction `absorptiveRatio`) are filled with absorptive material and become `ABSORPTIVE`; deep wells remain `DIFFUSIVE` (plain QRD depth).
 
 Diffusive wells: identical diffusion profile to the underlying QRD design.
 
@@ -109,16 +107,33 @@ Zs = Rs + Zc · coth(j·k·L)   (Rs ≈ 0 rigid backing; backed-layer surface im
 α = 1 − |Zs − Z₀| / |Zs + Z₀| (normal-incidence power absorption)
 ```
 
-The overall absorption profile is the per-well average (diffusive wells
-contribute 0). A well's absorptive-layer thickness equals that well's QRD depth.
+The overall absorption profile is the per-well average (diffusive wells contribute 0). A well's absorptive-layer thickness equals that well's QRD depth.
+
+## 9. Helmholtz Resonator
+
+Lumped-parameter mass–spring resonator.
+
+### Resonant Frequency
+```text
+f = (c / 2π) * sqrt(A / (V * L_eff))
+```
+Where:
+- A = neck area (pi * r^2)
+- V = cavity volume
+- L_eff = L + 1.7r (end-corrected neck length)
+
+### Absorption
+Using the Z₀-referenced specific impedance z = r + jx:
+```text
+r = A * Ra / Z₀
+x(ω) = ω * L_eff / c - A * c / (ω * V)
+α = 4r / ((r + 1)^2 + x^2)
+```
+- Ra is the acoustic resistance (rayls/m^4).
+- α peaks at the resonant frequency where x = 0.
 
 ## Useful frequency estimate
 
-For a well diffuser, a rough quarter-wavelength depth estimate is
-```
-d ≈ c / (4 f)
-```
+For a well diffuser, the maximum depth d_max approaches lambda/2 = c/(2f) for large prime orders p.
 For example, at 500 Hz:
-d ≈ 343 / (4 * 500) ≈ 0.172 m
-
-That is approximately 17.2 cm. This is a rough acoustic scale, not a universal design formula for every diffuser.
+d_max ≈ 343 / (2 * 500) ≈ 0.343 m.

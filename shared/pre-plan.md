@@ -265,9 +265,9 @@ Used by:
 Responsibilities:
 
 ```ts
-speedOfSound()
+SPEED_OF_SOUND (constant, not a function — see acoustics/constants.ts)
 
-wavelength()
+calculateWavelength()
 
 frequencyFromWavelength()
 
@@ -279,7 +279,7 @@ halfWavelength()
 Example:
 
 ```ts
-wavelength(1000 * Hz);
+calculateWavelength(1000 * Hz);
 ```
 
 ---
@@ -298,9 +298,9 @@ Responsibilities:
 ```ts
 calculateUnitDepth()
 
-calculateMaxDepth()
+calculateMaxDepth() // not implemented (deferred; see GEOMETRY-VALIDATORS-PLAN.md)
 
-calculateDiffusionBandwidth()
+calculateDiffusionBandwidth() // not implemented
 ```
 
 Example:
@@ -398,11 +398,10 @@ Used by:
 Responsibilities:
 
 ```ts
-calculateFlowResistance()
-
+calculateFlowResistance() // not implemented
 calculatePorousAbsorption()
 
-lookupMaterial()
+lookupMaterial() // not implemented
 ```
 
 ---
@@ -636,16 +635,44 @@ Outputs:
 ```text
 shared/
 ├── types/
-│   ├── units.ts
-│   ├── core.ts
-│   ├── panels.ts
-│   └── results.ts
+│   ├── units.ts          (branded physical types + unit constants)
+│   └── core.ts           (FrequencyRange, FrequencyResponse, MaterialProperties)
 │
 ├── math/
-│   ├── constants.ts
-│   ├── number-theory.ts
-│   ├── sequences.ts
-│   ├── grids.ts
+│   ├── number-theory.ts  (isPrime, gcd, isCoprime, mod, modPow,
+│   │                     getQuadraticResidues, isPrimitiveRoot, findPrimitiveRoot)
+│   ├── sequences.ts      (generateQRDSequence, generatePRDSequence)
+│   ├── grids.ts          (buildGrid, maxInGrid)
+│   ├── extended-gcd.ts   (extendedGcd, ExtendedGcdResult)
+│   ├── factors.ts        (getPrimeFactors)
+│   ├── helpers.ts        (assert*/as* branded-type guards)
+│   └── number-theory/    (submodule: mod-inverse.ts + tests)
+│
+├── acoustics/
+│   ├── constants.ts      (SPEED_OF_SOUND)
+│   ├── design.ts         (designUnitDepth)
+│   ├── frequency.ts      (calculateWavelength, frequencyFromWavelength,
+│   │                     quarterWavelength, halfWavelength)
+│   ├── response.ts       (frequency axis + octave/third-octave analysis)
+│   ├── materials.ts      (Delany–Bazley porous absorber; calculatePorousAbsorption, …)
+│   ├── qrd-physics.ts    (calculateUnitDepth for QRD)
+│   └── helmholtz-physics.ts (neck/effective-length/resonant-frequency/absorption/bandwidth)
+│
+├── design/
+│   ├── qrd.ts            (designQRD)
+│   ├── prd.ts            (designPRD)
+│   ├── skyline.ts        (designSkyline)
+│   ├── poly.ts           (designPoly)
+│   ├── helmholtz.ts      (designHelmholtz)
+│   └── abfusor.ts        (designABFUSOR)
+│
+├── geometry/
+│   ├── depths.ts         (sequenceToDepths, matrixToLengths)
+│   ├── panel.ts          (well/panel width, height, area, volume)
+│   └── scaling.ts        (toLength, toFrequency, toArea, toVolume, toDensity, …)
+│
+├── validators/
+│   ├── common.ts         (shared non-throwing predicates)
 │   ├── qrd.ts
 │   ├── prd.ts
 │   ├── skyline.ts
@@ -653,28 +680,8 @@ shared/
 │   ├── helmholtz.ts
 │   └── abfusor.ts
 │
-├── acoustics/
-│   ├── wavelength.ts
-│   ├── diffuser.ts
-│   ├── response.ts
-│   ├── materials.ts
-│   ├── diffusion.ts
-│   └── absorption.ts
-│
-├── geometry/
-│   ├── depths.ts
-│   ├── panel.ts
-│   ├── dimensions.ts
-│   └── spacing.ts
-│
-└── validators/
-    ├── common.ts
-    ├── qrd.ts
-    ├── prd.ts
-    ├── skyline.ts
-    ├── poly.ts
-    ├── helmholtz.ts
-    └── abfusor.ts
+└── utils/
+    └── at.ts             (in-bounds array read under noUncheckedIndexedAccess)
 ```
 
 ---
@@ -817,15 +824,15 @@ with a matching `*.test.ts` each. See
 Implement:
 
 ```ts
-speedOfSound()
+SPEED_OF_SOUND (constant)
 
-wavelength()
+calculateWavelength()
 
 frequencyFromWavelength()
 
 calculateUnitDepth()
 
-calculateMaxDepth()
+calculateMaxDepth() // not implemented (deferred)
 ```
 
 Tests verified against published acoustic references.
