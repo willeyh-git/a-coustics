@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Pre-commit hook: run Biome (formatter + linter + import sorting) on the staged
+# files, write automatic fixes, and re-stage them so the committed content is
+# always clean. Unfixable lint errors block the commit.
+#
+# Install: npm run hooks   (sets core.hooksPath to .githooks)
+#
+# Files that are only partially staged (staged content differs from the working
+# tree) are skipped: rewriting the file on disk would silently fold unstaged
+# edits into the commit. Fix and stage those files fully before committing.
+
+set -euo pipefail
+
+mapfile -d '' staged < <(git diff -z --name-only --diff-filter=ACM --cached .)
+mapfile -d '' partially_staged < <(git diff -z --name-only --diff-filter=ACM .)
+
+if ((${#staged[@]} == 0)); then
+    exit 0
+fi
+
+is_partially_staged() {
+    local candidate=$1 other
+    for other in "${partially_staged[@]}"; do
+        [[ $other == "$candidate" ]] && return 0
+    done
+    return 1
+}
+
+candidates=()
+skipped=()
+for file in "${staged[@]}"; do
+    if is_partially_staged "$file"; then
+        skipped+=("$file")
+    else
+        candidates+=("$file")
+    fi
+done
+
+if ((${#skipped[@]} > 0)); then
+    printf 'Skipped partially staged files (stage them fully, or commit them as-is): %s\n' "${skipped[@]}"
+fi
+
+if ((${#candidates[@]} == 0)); then
+    exit 0
+fi
+
+if ! printf '%s\0' "${candidates[@]}" |
+    xargs -0 npx @biomejs/biome check --write; then
+    echo "Biome found issues that cannot be fixed automatically. Commit aborted."
+    exit 1
+fi
+
+# Re-stage the files Biome rewrote on disk (paths are relative to the repo root).
+for file in "${candidates[@]}"; do
+    git add -- "$file"
+done
+
+echo "Biome formatted/linted $(printf '%s ' "${candidates[@]}") staged files."
