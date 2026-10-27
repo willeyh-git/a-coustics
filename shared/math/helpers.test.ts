@@ -1,12 +1,12 @@
 import {
-	assertInteger,
-	assertNonNegativeInteger,
-	assertPositiveInteger,
-	assertPrime,
 	asAcousticResistance,
 	asFlowResistivity,
 	asFrequency,
 	asSurfaceResistance,
+	assertInteger,
+	assertNonNegativeInteger,
+	assertPositiveInteger,
+	assertPrime,
 } from "@math/helpers";
 import { describe, expect, it } from "vitest";
 
