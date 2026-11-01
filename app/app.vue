@@ -47,32 +47,34 @@ const heading = (path: string): string => {
 </script>
 
 <template>
-	<main class="panel-form-app">
-		<h1 class="app-heading">{{ heading($route.path) }}</h1>
+  <UApp>
+    <main class="panel-form-app">
+      <h1 class="app-heading">{{ heading($route.path) }}</h1>
 
-		<nav class="panel-form-nav">
-			<ul>
-				<li v-for="item in navItems">
-					<a
-						:href="item.href"
-						:data-panelType="item.panelType"
-						:aria-current="item.panelType === currentFormPanelType($route.path) ? 'true' : undefined"
-					>
-						{{ item.title }}
-					</a>
-				</li>
-			</ul>
-		</nav>
+      <nav class="panel-form-nav">
+        <ul>
+          <li v-for="item in navItems">
+            <a
+              :href="item.href"
+              :data-panelType="item.panelType"
+              :aria-current="item.panelType === currentFormPanelType($route.path) ? 'true' : undefined"
+            >
+              {{ item.title }}
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-		<NuxtPage />
+      <NuxtPage />
 
-		<p class="app-note">
-			Each form collects the values a panel needs, rejects the values that cannot build one, and
-			shows the panel the current values produce. Every value stays editable: change one and the
-			panel below is rebuilt from the new values.
-		</p>
-		<p class="app-index-note" v-if="currentFormPanelType($route.path) === null">
-			Pick a panel above to open its form.
-		</p>
-	</main>
+      <p class="app-note">
+        Each form collects the values a panel needs, rejects the values that cannot build one, and
+        shows the panel the current values produce. Every value stays editable: change one and the
+        panel below is rebuilt from the new values.
+      </p>
+      <p class="app-index-note" v-if="currentFormPanelType($route.path) === null">
+        Pick a panel above to open its form.
+      </p>
+    </main>
+  </UApp>
 </template>
