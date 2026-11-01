@@ -19,7 +19,9 @@
 		"hooks": "git config core.hooksPath .githooks && echo Git hooks installed from .githooks"
 	},
 	"dependencies": {
+		"@nuxt/ui": "^4.12.0",
 		"nuxt": "^4.6.2",
+		"tailwindcss": "^4.3.3",
 		"vue": "^3.5.35",
 		"vue-router": "^5.1.0",
 		"zod": "^4.6.7"
@@ -38,6 +40,7 @@
 		"vitest": "^4.1.9"
 	},
 	"allowScripts": {
+		"vue-demi@0.14.10": true,
 		"esbuild@0.28.2": true
 	}
 }

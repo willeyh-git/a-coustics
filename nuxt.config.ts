@@ -6,7 +6,7 @@ import { compilerOptions } from "./tsconfig.paths.json";
 const sharedAlias: Record<string, string> = {};
 for (const [pattern, [target]] of Object.entries(compilerOptions.paths)) {
 	const alias = pattern.replace(/\/\*$/, "");
-	const directory = target.replace(/\/\*$/, "");
+	const directory = target?.replace(/\/\*$/, "");
 	if (!directory) continue;
 	sharedAlias[alias] = fileURLToPath(new URL(directory, import.meta.url));
 }
@@ -14,6 +14,7 @@ for (const [pattern, [target]] of Object.entries(compilerOptions.paths)) {
 export default defineNuxtConfig({
 	compatibilityDate: "2025-07-15",
 	devtools: { enabled: true },
-	modules: ["@nuxt/test-utils/module"],
+	modules: ["@nuxt/test-utils/module", "@nuxt/ui"],
+	css: ["~/assets/css/main.css"],
 	alias: sharedAlias,
 });
