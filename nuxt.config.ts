@@ -14,7 +14,7 @@ for (const [pattern, [target]] of Object.entries(compilerOptions.paths)) {
 export default defineNuxtConfig({
 	compatibilityDate: "2025-07-15",
 	devtools: { enabled: true },
-	modules: ["@nuxt/test-utils/module", "@nuxt/ui"],
+	modules: ["@nuxt/test-utils/module", "@nuxt/ui", "@pinia/nuxt"],
 	css: ["~/assets/css/main.css"],
 	alias: sharedAlias,
 });
