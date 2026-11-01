@@ -48,16 +48,17 @@ const heading = (path: string): string => {
 
 <template>
   <UApp>
-    <main class="panel-form-app">
-      <h1 class="app-heading">{{ heading($route.path) }}</h1>
+    <main class="panel-form-app flex-1 min-w-0 p-6 overflow-y-auto">
+      <h1 class="app-heading text-2xl leading-tight mb-4">{{ heading($route.path) }}</h1>
 
-      <nav class="panel-form-nav">
-        <ul>
+      <nav class="panel-form-nav mb-4">
+        <ul class="list-none grid-cols-3 gap-4">
           <li v-for="item in navItems">
             <a
               :href="item.href"
               :data-panelType="item.panelType"
               :aria-current="item.panelType === currentFormPanelType($route.path) ? 'true' : undefined"
+              class="text-sm block pe-4 rounded-md text-primary"
             >
               {{ item.title }}
             </a>
@@ -67,14 +68,23 @@ const heading = (path: string): string => {
 
       <NuxtPage />
 
-      <p class="app-note">
-        Each form collects the values a panel needs, rejects the values that cannot build one, and
-        shows the panel the current values produce. Every value stays editable: change one and the
-        panel below is rebuilt from the new values.
-      </p>
-      <p class="app-index-note" v-if="currentFormPanelType($route.path) === null">
-        Pick a panel above to open its form.
-      </p>
+      <UAlert
+        class="app-note"
+        color="info"
+        variant="subtle"
+        title="How the forms work"
+        description="Each form collects the values a panel needs, rejects the values that cannot build one, and shows the panel the current values produce. Every value stays editable: change one and the panel below is rebuilt from the new values."
+      />
+      <UAlert
+        v-if="currentFormPanelType($route.path) === null"
+        class="app-index-note"
+        color="primary"
+        variant="subtle"
+        orientation="horizontal"
+        icon="i-lucide-arrow-right"
+        title="Pick a panel"
+        description="Pick a panel above to open its form."
+      />
     </main>
   </UApp>
 </template>

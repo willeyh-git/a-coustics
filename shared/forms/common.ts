@@ -440,6 +440,22 @@ export function formFieldRequirement(spec: PanelFormSpec, key: string): string {
 }
 
 /**
+ * The one problem that names a control, so the control can show its own error
+ * inline instead of making the user match a list against the fields. Errors are
+ * keyed by the dotted control key (see `resolveFormKey` and the validators), so
+ * the match is exact; `undefined` means nothing is wrong with that control.
+ * @param errors - Every problem with the current control text.
+ * @param key - The dotted control key the control owns.
+ */
+export function findControlError(
+	errors: readonly ValidationError[],
+	key: string,
+): string | undefined {
+	const found = errors.find((error) => error.field === key);
+	return found?.message;
+}
+
+/**
  * Turns zod's problems into the same user-facing errors the hand-written
  * validators in `shared/validators/` produce, keyed by the control the user
  * has to fix, so one screen can show every problem at once and point at the

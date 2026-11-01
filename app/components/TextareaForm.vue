@@ -4,7 +4,8 @@ import type {
 	PanelFormFieldSpec,
 	PanelFormSpec,
 } from "@forms/common";
-import { findSpecField, formatFormValue } from "@forms/common";
+import { findControlError, findSpecField } from "@forms/common";
+import type { ValidationError } from "@validators/common";
 
 const props = defineProps<{
 	/** The form this control belongs to: the control takes its label, unit and help from the spec. */
@@ -13,8 +14,8 @@ const props = defineProps<{
 	controls: PanelFormControls;
 	/** Which entry of the shared control text this control owns. */
 	fieldKey: string;
-	/** Prefix that makes this control's id unique on the page. */
-	idPrefix: string;
+	/** Every problem with the current control values; this control shows the one that names its key. */
+	errors: ValidationError[];
 }>();
 
 /** The field this control edits, looked up in the form's spec. */
@@ -37,15 +38,25 @@ const descriptor = computed<PanelFormFieldSpec>(() => {
 	};
 });
 
-// biome-ignore lint/correctness/noUnusedVariables: the template below gives the textarea its id and its label its target
-const controlId = computed<string>(() => `${props.idPrefix}-${props.fieldKey}`);
+/** How to type a list into this control. */
+// biome-ignore lint/correctness/noUnusedVariables: the template below passes it to UFormField
+const listNote = computed<string>(
+	() =>
+		"Separate the values with spaces, commas or new lines; blank means this panel has no frequency axis.",
+);
+
+/**
+ * The problem that names this control, or nothing when this control is clean.
+ * Errors are keyed by the dotted control key, so a control only ever shows its
+ * own problem and the user never has to match a list against the fields.
+ */
+// biome-ignore lint/correctness/noUnusedVariables: the template below passes it to UFormField
+const fieldError = computed<string | undefined>(() =>
+	findControlError(props.errors, props.fieldKey),
+);
 
 /** The raw list text typed into this control; it opens at the form's state. */
 const controlText = ref<string>(props.controls[props.fieldKey] ?? "");
-
-/** The control's text as the value display shows it. */
-// biome-ignore lint/correctness/noUnusedVariables: the template below shows the control's current text
-const valueText = computed<string>(() => formatFormValue(controlText.value));
 
 watch(controlText, (text) => {
 	props.controls[props.fieldKey] = text;
@@ -54,13 +65,27 @@ watch(controlText, (text) => {
 
 <template>
 	<div class="panel-form-field" :data-fieldKey="fieldKey">
-		<label :for="controlId">{{ descriptor.label }}</label>
-		<textarea v-model="controlText" :id="controlId" :rows="'3'"></textarea>
-		<span class="panel-form-value">{{ valueText }}</span>
-		<p class="panel-form-unit" v-if="descriptor.unit">{{ descriptor.unit }}</p>
-		<p class="panel-form-hint">
-			Separate the values with spaces, commas or new lines; blank means this panel has no frequency axis.
-		</p>
-		<p class="panel-form-description" v-if="descriptor.description">{{ descriptor.description }}</p>
+		<UFormField
+			:name="fieldKey"
+			:label="descriptor.label"
+			:hint="descriptor.unit"
+			:description="descriptor.description"
+			:help="listNote"
+			:error="fieldError"
+			:required="!descriptor.optional"
+			class="panel-form-control"
+		>
+			<!-- The list stays plain text so an unparseable entry is named as wrong by
+				the form rather than dropped or invented by the control. `UFormField`
+				renders the label and wires it to the control below. -->
+			<UTextarea
+				v-model="controlText"
+				:rows="3"
+				autoresize
+				:required="!descriptor.optional"
+				:placeholder="descriptor.optional ? 'Optional' : 'Required'"
+				class="panel-form-textarea"
+			/>
+		</UFormField>
 	</div>
 </template>

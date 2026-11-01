@@ -4,7 +4,8 @@ import type {
 	PanelFormFieldSpec,
 	PanelFormSpec,
 } from "@forms/common";
-import { findSpecField } from "@forms/common";
+import { findControlError, findSpecField } from "@forms/common";
+import type { ValidationError } from "@validators/common";
 
 const props = defineProps<{
 	/** The form this control belongs to: the control takes its label, options and help from the spec. */
@@ -13,8 +14,8 @@ const props = defineProps<{
 	controls: PanelFormControls;
 	/** Which entry of the shared control text this control owns. */
 	fieldKey: string;
-	/** Prefix that makes this control's id unique on the page. */
-	idPrefix: string;
+	/** Every problem with the current control values; this control shows the one that names its key. */
+	errors: ValidationError[];
 }>();
 
 /** The field this control edits, looked up in the form's spec. */
@@ -38,7 +39,6 @@ const descriptor = computed<PanelFormFieldSpec>(() => {
 });
 
 /** The options the form offers; a select with none is a spec bug. */
-// biome-ignore lint/correctness/noUnusedVariables: the template below offers them as select options
 const options = computed<readonly string[]>(() => {
 	const offered = descriptor.value.options;
 
@@ -53,9 +53,21 @@ const options = computed<readonly string[]>(() => {
 	return offered;
 });
 
-/** The id of this control. */
-// biome-ignore lint/correctness/noUnusedVariables: the template below gives the select its id and its label its target
-const controlId = computed<string>(() => `${props.idPrefix}-${props.fieldKey}`);
+/** What a select may be set to, shown next to its label. */
+// biome-ignore lint/correctness/noUnusedVariables: the template below passes it to UFormField
+const optionsHint = computed<string>(
+	() => `Choose one of: ${options.value.join(", ")}`,
+);
+
+/**
+ * The problem that names this control, or nothing when this control is clean.
+ * Errors are keyed by the dotted control key, so a control only ever shows its
+ * own problem and the user never has to match a list against the fields.
+ */
+// biome-ignore lint/correctness/noUnusedVariables: the template below passes it to UFormField
+const fieldError = computed<string | undefined>(() =>
+	findControlError(props.errors, props.fieldKey),
+);
 
 /** The option chosen; the control opens at whatever the form's state holds. */
 const chosen = ref<string>(props.controls[props.fieldKey] ?? "");
@@ -67,14 +79,25 @@ watch(chosen, (option) => {
 
 <template>
 	<div class="panel-form-field" :data-fieldKey="fieldKey">
-		<label :for="controlId">{{ descriptor.label }}</label>
-		<select v-model="chosen" :id="controlId">
-			<option v-for="option in options" :selected="option === chosen" :value="option">
-				{{ option }}
-			</option>
-		</select>
-		<span class="panel-form-value">{{ chosen }}</span>
-		<p class="panel-form-options">Choose one of: {{ options.join(", ") }}</p>
-		<p class="panel-form-description" v-if="descriptor.description">{{ descriptor.description }}</p>
+		<UFormField
+			:name="fieldKey"
+			:label="descriptor.label"
+			:hint="optionsHint"
+			:description="descriptor.description"
+			:error="fieldError"
+			:required="!descriptor.optional"
+			class="panel-form-control"
+		>
+			<!-- The option stays a string the form can name as wrong, so an option the
+				form does not offer is reported rather than silently dropped. `UFormField`
+				renders the label and wires it to the control below. -->
+			<USelect
+				v-model="chosen"
+				:items="[...options]"
+				:required="!descriptor.optional"
+				:placeholder="descriptor.optional ? 'Optional' : 'Required'"
+				class="panel-form-select"
+			/>
+		</UFormField>
 	</div>
 </template>
