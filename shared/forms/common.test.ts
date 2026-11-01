@@ -3,6 +3,7 @@ import {
 	buildRawFormFields,
 	defaultControls,
 	draftFieldsToControls,
+	findControlError,
 	formatFormValue,
 	formatMetres,
 	formatPercent,
@@ -12,6 +13,7 @@ import {
 } from "@forms/common";
 import { toLength } from "@geometry/scaling";
 import { m } from "@units/units";
+import type { ValidationError } from "@validators/common";
 import { describe, expect, it } from "vitest";
 
 const sampleSpec: PanelFormSpec = {
@@ -202,6 +204,28 @@ describe("toFormValidationErrors", () => {
 					"Prime order must be a prime whole-number panel order between 3 and 100; nothing was supplied.",
 			},
 		]);
+	});
+});
+
+describe("findControlError", () => {
+	it("returns the message of the error that names the control", () => {
+		const errors: ValidationError[] = [
+			{ field: "prime", message: "Prime order is too small." },
+			{
+				field: "material.flowResistivity",
+				message: "Flow resistivity must be positive.",
+			},
+		];
+
+		expect(findControlError(errors, "designFrequency")).toBeUndefined();
+		expect(findControlError(errors, "prime")).toBe("Prime order is too small.");
+		expect(findControlError(errors, "material.flowResistivity")).toBe(
+			"Flow resistivity must be positive.",
+		);
+	});
+
+	it("says a control is clean while the form still has problems", () => {
+		expect(findControlError([], "prime")).toBeUndefined();
 	});
 });
 

@@ -37,43 +37,74 @@ const formRows = computed<readonly PanelFormRow[]>(() =>
 
 <template>
 	<section class="panel-form" :data-panelType="spec.panelType">
-		<h2 class="panel-form-heading">{{ spec.title }}</h2>
-
-		<div class="panel-form-status" :aria-live="'polite'" :aria-atomic="'true'">
-			<ul v-if="errors.length > 0" class="panel-form-errors">
-				<li v-for="error in errors" class="panel-form-error">{{ error.field }}: {{ error.message }}</li>
-			</ul>
-			<p v-else class="panel-form-ok">
-				These values build a {{ spec.title }}. Change any control below and the panel is rebuilt.
-			</p>
-		</div>
-
-		<table class="panel-form-summary">
-			<caption>{{ summary.title }}</caption>
-			<tbody>
-				<tr v-for="row in summary.rows">
-					<th scope="row">{{ row.label }}</th>
-					<td>{{ row.value }}</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<dl class="panel-form-values">
-			<template v-for="row in formRows" :key="row.field.key">
-				<dt>
-					{{ row.field.label }}
-					<span v-if="row.field.unit" class="panel-form-unit">({{ row.field.unit }})</span>
-					<span v-if="row.field.optional" class="panel-form-optional">(optional)</span>
-					<span v-else class="panel-form-required">(required)</span>
-				</dt>
-				<dd>
-					{{ row.value }}
-					<span v-if="row.field.description" class="panel-form-help">{{ row.field.description }}</span>
-				</dd>
+		<UCard class="panel-form-card" variant="outline">
+			<template #header>
+				<h2 class="panel-form-heading text-xl leading-tight">{{ spec.title }}</h2>
 			</template>
-		</dl>
-		<span class="panel-form-visually-hidden">
-			Fields of the {{ spec.panelType }} form as they are now; the input controls follow below.
-		</span>
+
+			<div class="panel-form-status" :aria-live="'polite'" :aria-atomic="'true'">
+				<template v-if="errors.length > 0">
+					<UAlert
+						v-for="error in errors"
+						:key="error.field"
+						orientation="horizontal"
+						color="error"
+						variant="soft"
+						:title="error.field"
+						:description="error.message"
+						class="panel-form-error"
+					/>
+				</template>
+				<UAlert
+					v-else
+					orientation="horizontal"
+					color="success"
+					variant="soft"
+					:title="`These values build a ${spec.title}.`"
+					:description="'Change any control below and the panel is rebuilt.'"
+					class="panel-form-ok"
+				/>
+			</div>
+
+			<UTable
+				v-if="summary.rows.length > 0"
+				class="panel-form-summary"
+				:caption="summary.title"
+				:data="[...summary.rows]"
+				:columns="[
+					{ accessorKey: 'label', header: 'Property' },
+					{ accessorKey: 'value', header: 'Value' },
+				]"
+			/>
+
+			<dl class="panel-form-values divide-y divide-default">
+				<template v-for="row in formRows" :key="row.field.key">
+					<dt class="panel-form-value-label pe-4 flex content-center justify-between gap-1">
+						{{ row.field.label }}
+						<UBadge
+							v-if="row.field.unit"
+							class="panel-form-unit"
+							:label="row.field.unit"
+							color="neutral"
+							variant="subtle"
+							size="xs"
+						/>
+						<UBadge
+							class="panel-form-requirement"
+							:label="row.field.optional ? 'optional' : 'required'"
+							:color="row.field.optional ? 'neutral' : 'warning'"
+							variant="subtle"
+							size="xs"
+						/>
+					</dt>
+					<dd class="panel-form-value ps-4">
+						{{ row.value }}
+					</dd>
+				</template>
+			</dl>
+			<span class="panel-form-visually-hidden sr-only">
+				Fields of the {{ spec.panelType }} form as they are now; the input controls follow below.
+			</span>
+		</UCard>
 	</section>
 </template>

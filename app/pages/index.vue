@@ -1,6 +1,11 @@
 <template>
-  <div class="p-8 text-center">
-    <h1 class="text-2xl font-bold mb-4">Welcome to Acoustic Diffuser Calculator</h1>
-    <p class="mb-4">Select a panel type from the navigation above to get started.</p>
-  </div>
+	<UCard class="panel-form-index-card mx-auto max-w-3xl rounded-lg" variant="outline">
+		<template #header>
+			<h2 class="panel-form-index-heading text-xl leading-tight">Welcome to Acoustic Diffuser Calculator</h2>
+		</template>
+
+		<p class="panel-form-index-body">
+			Select a panel type from the navigation above to get started.
+		</p>
+	</UCard>
 </template>

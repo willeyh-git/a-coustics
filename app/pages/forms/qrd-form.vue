@@ -56,6 +56,8 @@ const summary = computed<PanelFormSummary>(() => {
 <template>
 	<AppForm :spec="spec" :controls="controls" :errors="errors" :summary="summary" />
 
-	<FieldForm :spec="spec" :controls="controls" fieldKey="prime" idPrefix="qrd" />
-	<FieldForm :spec="spec" :controls="controls" fieldKey="designFrequency" idPrefix="qrd" />
+	<UFieldGroup orientation="vertical">
+		<FieldForm :spec="spec" :controls="controls" :errors="errors" fieldKey="prime" />
+		<FieldForm :spec="spec" :controls="controls" :errors="errors" fieldKey="designFrequency" />
+	</UFieldGroup>
 </template>
