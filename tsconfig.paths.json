@@ -5,6 +5,7 @@
 			"@design/*": ["./shared/design/*"],
 			"@geometry/*": ["./shared/geometry/*"],
 			"@math/*": ["./shared/math/*"],
+			"@forms/*": ["./shared/forms/*"],
 			"@validators/*": ["./shared/validators/*"],
 			"@units/*": ["./shared/types/*"],
 			"@utils/*": ["./shared/utils/*"]
